@@ -1,0 +1,51 @@
+{{!--
+<link rel="stylesheet" type="text/css" href="/css/jq22-demo.css"> --}}
+
+
+<script src="/js/jquery/jquery-3.3.1.min.js"></script>
+
+<script src="/js/html/d3.v4.min.js"></script>
+<script src="/js/echarts/echarts.js"></script>
+
+<script src="/js/bootstrap/Popper.js"></script>
+<script src="/js/jquery/jquery-ui.min.js"></script>
+<script src="/js/bootstrap/bootstrap.min.js"></script>
+
+
+{{!-- <nav id="nav" class="navbar navbar-dark sticky-top  flex-md-nowrap p-0" style="border-bottom:3px solid rgb(216, 216, 216);">
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#" style="border-bottom:0.1px solid rgb(216, 216, 216);background-color:white;box-shadow:none;color:rgb(124, 124, 124);font-size:1.5em;">胜利油田</a>
+</nav> --}}
+<div id='left'></div>
+<div id='mid'>
+    <div id='scatter'>
+        <button id="point" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Point</button>
+        <button id="brush" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Brush</button>
+        <div class="dropdown" id='dropdown'>
+            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false" style='font-size:0.8em;padding:.0rem .5rem;color:gray;background-color:white;border-color:gray;'>
+                Sample set
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" id='j-a-t'>journal & abstract & time</a>
+                <a class="dropdown-item" id='j-t'>journal & time</a>
+                <a class="dropdown-item" id='j-a'>journal & abstract</a>
+                <a class="dropdown-item" id='a-t'>abstract & time</a>
+            </div>
+        </div>
+        <svg id='svg_scatter'></svg>
+
+
+    </div>
+</div>
+<div id='right'>
+    <div id='param'>
+    </div>
+</div>
+
+
+
+</div>
+<script src="/js/my/variable.js"></script>
+<script src="/js/my/sactter.js"></script>
+<script src="/js/my/parameters.js"></script>
+<script src="/js/my/option.js"></script>
