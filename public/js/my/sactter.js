@@ -58,9 +58,9 @@ let scatter = (function () {
                 .call(brush)
         })
         //设置选点按钮操作
-        $("#point").click(function () {
-            variable.svg_scatter.selectAll("a").remove();
-        })
+        // $("#point").click(function () {
+        //     variable.svg_scatter.selectAll("a").remove();
+        // })
 
     }
 
