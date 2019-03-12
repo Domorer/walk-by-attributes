@@ -9,36 +9,131 @@
 
 <script src="/js/bootstrap/Popper.js"></script>
 <script src="/js/jquery/jquery-ui.min.js"></script>
+<script src="/js/jquery/jquery-3.3.1.min.js"></script>
 <script src="/js/bootstrap/bootstrap.min.js"></script>
+<script src="/js/hull.js"></script>
 
 
 {{!-- <nav id="nav" class="navbar navbar-dark sticky-top  flex-md-nowrap p-0" style="border-bottom:3px solid rgb(216, 216, 216);">
     <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#" style="border-bottom:0.1px solid rgb(216, 216, 216);background-color:white;box-shadow:none;color:rgb(124, 124, 124);font-size:1.5em;">胜利油田</a>
 </nav> --}}
-<div id='left'></div>
-<div id='mid'>
-    <div id='scatter'>
+<div class='left'>
+    <div class='dataset'>
+        <div id="headLine">
+            <a>Dataset</a>
+        </div>
+        <div class='radioDiv'>
+            <div class="custom-control custom-radio " style='top:15%;left:15%;'>
+                <input type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input">
+                <label class="custom-control-label" for="customRadioInline1">Dataset 1</label>
+            </div>
+            <div class="custom-control custom-radio " style='top:30%;left:15%;'>
+                <input type="radio" id="customRadioInline2" name="customRadioInline1" class="custom-control-input">
+                <label class="custom-control-label" for="customRadioInline2">Dataset 2</label>
+            </div>
+            <div class="custom-control custom-radio " style='top:80%;margin-left:15%;'>
+                <input type="radio" id="customRadioInline3" name="customRadioInline1" class="custom-control-input">
+                <label class="custom-control-label" for="customRadioInline3">Dataset 3</label>
+            </div>
+        </div>
+
+    </div>
+    <div class='paramList'>
+        <div id="headLine">
+            <a>Parameters</a>
+        </div>
+        <div class="custom-control custom-checkbox" style='margin-top:10%;margin-left:15%;'>
+            <input type="checkbox" class="custom-control-input" id="cited">
+            <label class="custom-control-label" for="cited" id="citedLabel">Number of citations</label>
+        </div>
+        <div class="custom-control custom-checkbox" style='margin-top:10%;margin-left:15%;'>
+            <input type="checkbox" class="custom-control-input" id="abt">
+            <label class="custom-control-label" for="abt" id="abtLabel">Abstract</label>
+        </div>
+        <div class="custom-control custom-checkbox" style='margin-top:10%;margin-left:15%;'>
+            <input type="checkbox" class="custom-control-input" id="conf" checked='true'>
+            <label class="custom-control-label" for="conf" id="confLabel">Conference</label>
+        </div>
+        <div class="custom-control custom-checkbox" style='margin-top:10%;margin-left:15%;'>
+            <input type="checkbox" class="custom-control-input" id="year">
+            <label class="custom-control-label" for="year" id="yearLabel">Time</label>
+        </div>
+        <div class="custom-control custom-checkbox" style='margin-top:10%;margin-left:15%;'>
+            <input type="checkbox" class="custom-control-input" id="aff">
+            <label class="custom-control-label" for="aff" id="affLabel">First Author Affiliation</label>
+        </div>
+        <div class="custom-control custom-checkbox custom-control-inline" style='margin-top:10%;margin-left:15%;'>
+            <input type="checkbox" class="custom-control-input" id="P">
+            <label class="custom-control-label" for="P">Probability</label>
+        </div>
+        <div class="custom-control custom-checkbox custom-control-inline">
+            <input type="checkbox" class="custom-control-input" id="R">
+            <label class="custom-control-label" for="R">Root</label>
+        </div>
+        <div class='btn_out'>
+            <button id="confirm" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Confirm</button>
+        </div>
+
+    </div>
+    <div class='inforList'>
+        <div id="headLine">
+            <a>Information</a>
+        </div>
+        <p> eps ： 0.2</p>
+        <p> min_samples : 15 </p>
+    </div>
+</div>
+<div class='mid'>
+    <div class='forceDiv'>
+        <svg id='svg_force'></svg>
+    </div>
+    <div class='sankeyDiv'></div>
+</div>
+<div class='right'>
+    <div class='scatter'>
         {{!-- <button id="point" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Point</button> --}}
-        <button id="brush" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Brush</button>
+        <button id="brush" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Brush</button>
+        <button id="cluster" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Cluster</button>
+
         <div class="dropdown" id='dropdown'>
             <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false" style='font-size:0.8em;padding:.0rem .5rem;color:gray;background-color:white;border-color:gray;'>
-                Walk combination
+                walk combination
             </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" id='j-a-t'>journal & abstract & time</a>
-                <a class="dropdown-item" id='j-t'>journal & time</a>
-                <a class="dropdown-item" id='j-a'>journal & abstract</a>
-                <a class="dropdown-item" id='a-t'>abstract & time</a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id='options'>
             </div>
         </div>
         <svg id='svg_scatter'></svg>
-
-
     </div>
-</div>
-<div id='right'>
-    <div id='param'>
+    <div id='paramDiv'>
+        <nav>
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <a class="nav-item nav-link active" id="cited_chart-tab" data-toggle="tab" href="#cited_chart" role="tab"
+                    aria-controls="nav-home" aria-selected="true">Citations</a>
+                <a class="nav-item nav-link" id="abt_chart-tab" data-toggle="tab" href="#abt_chart" role="tab"
+                    aria-controls="nav-profile" aria-selected="false">Abstract</a>
+                <a class="nav-item nav-link" id="conf_chart-tab" data-toggle="tab" href="#conf_chart" role="tab"
+                    aria-controls="nav-contact" aria-selected="false">Conference</a>
+                <a class="nav-item nav-link" id="time_chart-tab" data-toggle="tab" href="#time_chart" role="tab"
+                    aria-controls="nav-contact" aria-selected="false">Time</a>
+                <a class="nav-item nav-link" id="aff_chart-tab" data-toggle="tab" href="#aff_chart" role="tab"
+                    aria-controls="nav-contact" aria-selected="false">Afflication</a>
+            </div>
+        </nav>
+
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade show active" id="cited_chart">
+            </div>
+            <div class="tab-pane fade" id="abt_chart">
+            </div>
+            <div class="tab-pane fade" id="conf_chart">
+            </div>
+            <div class="tab-pane fade" id="time_chart">
+            </div>
+            <div class="tab-pane fade" id="aff_chart">
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -48,4 +143,5 @@
 <script src="/js/my/variable.js"></script>
 <script src="/js/my/sactter.js"></script>
 <script src="/js/my/parameters.js"></script>
+<script src="/js/my/force.js"></script>
 <script src="/js/my/option.js"></script>
