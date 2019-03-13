@@ -5,6 +5,7 @@ let variable = (function () {
     let all_comb;
     let svg_scatter = d3.select('#svg_scatter');
     let svg_brush = d3.select('#svg_brush');
+    let svg_sankey = d3.select('#svg_sankey');
     let svg_force = d3.select('#svg_force');
     let attr_arr = ['conf', 'aff', 'abt', 'year', 'cited'];
     let chose = ['P', 'R'];
@@ -12,6 +13,7 @@ let variable = (function () {
     let pr = 'O';
     let info_dict = {};
     let ChoseCluster = false;
+    let cluster_dict = {};
     return {
         all_comb,
         comb_data,
@@ -25,5 +27,7 @@ let variable = (function () {
         pr,
         info_dict,
         ChoseCluster,
+        cluster_dict,
+        svg_sankey
     }
 })()

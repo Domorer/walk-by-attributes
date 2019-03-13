@@ -7,6 +7,30 @@ let option = (function () {
     let tmp_fun = parameters.drawCount;
     let tmp_param = ["cited", '次', 'cited_chart'];
 
+    //读取数据和初始化各窗口
+    d3.json('data/cluster_all_comb.json', function (all_data) {
+        console.log('all_data: ', all_data);
+        variable.all_comb = all_data;
+        scatter.drawScatter(all_data['conf']['O']);
+
+        d3.csv('data/link.csv', function (error, link_data) {
+            if (error)
+                console.log(error);
+            d3.json('data/info.json', function (error, info_dict) {
+                if (error)
+                    console.log(error);
+                for (let i = 0; i < all_data['conf']['O'].length; i++) {
+                    variable.cluster_dict[all_data['conf']['O'][i].id] = parseInt(all_data['conf']['O'][i].cluster);
+                }
+                variable.info_dict = info_dict;
+                variable.link_data = link_data;
+                // ForceChart.drawForce(link_data, info_dict, variable.cluster_dict);
+            })
+
+
+        })
+    })
+
     //设置参数选择
     $('#confirm').on('click', function () {
         console.log(1)

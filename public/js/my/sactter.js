@@ -1,11 +1,7 @@
 let scatter = (function () {
 
 
-    d3.json('data/cluster_all_comb.json', function (all_data) {
-        console.log('all_data: ', all_data);
-        variable.all_comb = all_data;
-        drawScatter(all_data['conf']['O']);
-    })
+
 
     function drawScatter(comb_data) {
         variable.svg_scatter.selectAll('*').remove();
@@ -47,8 +43,8 @@ let scatter = (function () {
                 return d.id;
             })
         //绘制簇边界  
-        let cluster_point_dict = {};
-        let cluster_id_dict = {};
+        let cluster_point_dict = {};//保存每个簇的边界点坐标
+        let cluster_id_dict = {};//保存每个簇内点的id
         for (let i = 0; i < comb_data.length; i++) {
             if (comb_data[i].cluster != -1) {
                 let tmp_cluster = 'cluster_' + comb_data[i]['cluster'];
@@ -117,13 +113,18 @@ let scatter = (function () {
         $('#cluster').on('click', function () {
             variable.svg_scatter.selectAll("a").remove();
             variable.svg_scatter.selectAll('path')
+                .attr('opacity', 0.2)
                 .on('mouseover', function () {
                     // variable.svg_scatter.selectAll('path').attr('opacity', 0.1)
                     d3.select(this).attr('opacity', 0.5);
+                    // variable.svg_force.selectAll('circle').attr('opacity', 0.1);
+                    // variable.svg_force.selectAll('line').attr('opacity', 0.1);
+                    // variable.svg_force.selectAll('.' + this.id).attr('opacity', 0.5);
+                    // variable.svg_force.selectAll('.' + this.id + '_' + this.id).attr('opacity', 0.5);
                 }).on('mouseout', function () {
-                    d3.select(this).attr('opacity', 0.1);
+                    d3.select(this).attr('opacity', 0.2);
                 }).on('click', function () {
-                    let tmp_cluster_data = [];
+                    let tmp_cluster_data = [];//当前簇内点的数据集
                     for (let i in cluster_id_dict[this.id]) {
                         tmp_cluster_data.push(variable.info_dict[cluster_id_dict[this.id][i]])
                     }

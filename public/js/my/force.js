@@ -1,21 +1,8 @@
 let ForceChart = (function () {
     let forceWidth = $('#svg_force')[0].scrollWidth;
     let forceHeight = $('#svg_force')[0].scrollHeight;
-    d3.csv('data/link.csv', function (error, link_data) {
-        if (error)
-            console.log(error);
-        d3.json('data/info.json', function (error, info_dict) {
-            if (error)
-                console.log(error);
-            variable.info_dict = info_dict;
-            console.log('info_dict: ', info_dict);
-            variable.link_data = link_data;
-            // drawForce(link_data, info_dict);
-        })
 
-
-    })
-    function drawForce(link_data, info_data) {
+    function drawForce(link_data, info_data, cluster_dict) {
         function transformData(info_data) {
             let tmp_data = [];
             for (let key in info_data) {
@@ -55,7 +42,8 @@ let ForceChart = (function () {
         let simulation = d3.forceSimulation(node_data)
             .force("charge", d3.forceManyBody().strength(-5).distanceMax(100))
             .force("link", d3.forceLink(link_data).id(d => d.id))
-            .force("center", d3.forceCenter(forceWidth / 2, forceHeight / 2));
+            .force("center", d3.forceCenter(forceWidth / 2, forceHeight / 2))
+            .velocityDecay(0.5);
 
         let color = d3.scaleOrdinal(d3.schemeCategory20);
         //绘制节点
@@ -63,17 +51,18 @@ let ForceChart = (function () {
             .append('circle')
             .attr('r', 2)
             .attr('stroke', function (d) {
-                d.cluster = parseInt(d.cluster);
+                d.cluster = cluster_dict[d.id];
+
                 if (d.cluster != -1)
                     return color(d.cluster)
                 else
                     return 'black';
             }).attr('fill', function (d) {
-                if (d.cluster != -1)
-                    return color(d.cluster)
+                if (cluster_dict[d.id] != -1)
+                    return color(cluster_dict[d.id])
                 else
                     return 'black';
-            }).attr('id', function (d) {
+            }).attr('class', function (d) {
                 return d.id;
             }).call(drag(simulation));
 
@@ -81,13 +70,17 @@ let ForceChart = (function () {
         let link = variable.svg_force.append('g').selectAll('line').data(link_data).enter()
             .append('line')
             .attr('stroke', function (d) {
-                let s_cluster = d.source.cluster;
-                let t_cluster = d.target.cluster;
+                let s_cluster = cluster_dict[d.source.id];
+                let t_cluster = cluster_dict[d.target.id];
                 if (s_cluster === t_cluster)
                     return color(parseInt(s_cluster));
                 else
                     return 'gray';
             }).attr('stroke-width', 1)
+            .attr('opacity', 0.1)
+            .attr('class', function (d) {
+                return d.id + '_' + d.id;
+            })
 
         //设置力的作用函数
         simulation.on("tick", () => {
