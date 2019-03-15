@@ -3,7 +3,7 @@ let option = (function () {
     let cs_dict = { 'O-P': 'P', 'O-R': 'R', 'O': 'O', 'O-P-R': 'PR' }
     let comb_len = 0;
     let optIndex = 0;//记录操作的index
-    let comb_record = [];//记录操作的具体参数
+    let comb_record = [];//记录操作的具体参数元素格式为[当前属性选择，当前游走方式选择]
     let tmp_fun = parameters.drawCount;
     let tmp_param = ["cited", '次', 'cited_chart'];
 
@@ -12,7 +12,6 @@ let option = (function () {
         console.log('all_data: ', all_data);
         variable.all_comb = all_data;
         scatter.drawScatter(all_data['conf']['O']);
-
         d3.csv('data/link.csv', function (error, link_data) {
             if (error)
                 console.log(error);
@@ -24,17 +23,19 @@ let option = (function () {
                 }
                 variable.info_dict = info_dict;
                 variable.link_data = link_data;
+                variable.cluster_record.push(variable.cluster_dict);
                 // ForceChart.drawForce(link_data, info_dict, variable.cluster_dict);
             })
-
 
         })
     })
 
     //设置参数选择
     $('#confirm').on('click', function () {
-        console.log(1)
-        //获取当前各参数的选择情况
+        //操作次数加一
+        variable.confirm_time += 1;
+
+        //***********获取当前各参数的选择情况***********
         comb_len = 0;
         variable.attr = 'conf';
         variable.attr_arr.forEach(Element => {
@@ -58,21 +59,64 @@ let option = (function () {
             tmp_comb += '-R';
         variable.pr = cs_dict[tmp_comb];
         console.log('variable.pr: ', variable.pr);
+        /*****************************************************/
 
         //将操作数据记录并添加到dropdown
         comb_record.push([variable.attr, variable.pr]);
         let tmp_text = variable.attr + '-' + variable.pr;
         let tmp_option = $('<a></a>').text(tmp_text).attr("id", optIndex).attr('class', 'dropdown-item').on('click', function () {
             let tmpCombData = variable.all_comb[comb_record[this.id][0]][comb_record[this.id][1]];
+            scatter.drawScatter(tmpCombData);
         });
         $("#options").append(tmp_option);
         optIndex += 1;
 
         //根据参数选择获取对应数据
         console.log('variable.all_comb: ', variable.all_comb);
-
         let tmpCombData = variable.all_comb[variable.attr][variable.pr];
+        for (let i = 0; i < tmpCombData.length; i++) {
+            variable.cluster_dict[tmpCombData[i].id] = tmpCombData[i].cluster;
+        }
+        variable.cluster_record.push(variable.cluster_dict);
+        console.log('variable.cluster_record: ', variable.cluster_record);
         scatter.drawScatter(tmpCombData);
+
+        //判断是否可以绘制sankey
+        if (variable.confirm_time == 2) {
+            let sankey_links = [], sankey_nodes = [];
+            let nodes_dict = {};
+
+            let link_value_dict = {}; //便于计算每条link的value
+            for (let id in variable.cluster_record[0]) {
+                let source_cluster = variable.cluster_record[0][id];//该点的起始簇
+                let target_cluster = variable.cluster_record[1][id];//该点的目标簇
+
+                if (source_cluster != -1 && target_cluster != -1) {
+                    if (!nodes_dict['0-' + source_cluster]) {
+                        nodes_dict['0-' + source_cluster] = ''
+                    }
+                    if (!nodes_dict['1-' + target_cluster]) {
+                        nodes_dict['1-' + target_cluster] = ''
+                    }
+                    let tmp_key = source_cluster + '_' + target_cluster;
+                    if (link_value_dict[tmp_key])
+                        link_value_dict[tmp_key] += 1;
+                    else
+                        link_value_dict[tmp_key] = 1;
+                }
+            }
+            //将每种link组合转换成arr形式
+            console.log('nodes_dict: ', nodes_dict);
+            for (let key in link_value_dict) {
+                let source = '0' + '-' + key.split('_')[0];
+                let target = '1' + '-' + key.split('_')[1];
+                let tmp_link = { 'source': source, 'target': target, 'value': link_value_dict[key] };
+                sankey_links.push(tmp_link);
+            }
+            for (let key in nodes_dict)
+                sankey_nodes.push({ 'id': key });
+            // sankeyChart.drawSankey(sankey_nodes, sankey_links);
+        }
     })
 
     return {

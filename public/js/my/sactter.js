@@ -1,8 +1,5 @@
 let scatter = (function () {
 
-
-
-
     function drawScatter(comb_data) {
         variable.svg_scatter.selectAll('*').remove();
         let svg_width = $("#svg_scatter")[0].scrollWidth;
@@ -44,16 +41,16 @@ let scatter = (function () {
             })
         //绘制簇边界  
         let cluster_point_dict = {};//保存每个簇的边界点坐标
-        let cluster_id_dict = {};//保存每个簇内点的id
+        let cluster_ids_dict = {};//保存每个簇内点的id
         for (let i = 0; i < comb_data.length; i++) {
             if (comb_data[i].cluster != -1) {
                 let tmp_cluster = 'cluster_' + comb_data[i]['cluster'];
                 if (cluster_point_dict[tmp_cluster]) {
-                    cluster_id_dict[tmp_cluster].push(comb_data[i]['id']);
+                    cluster_ids_dict[tmp_cluster].push(comb_data[i]['id']);
                     cluster_point_dict[tmp_cluster].push([comb_data[i].x, comb_data[i].y])
                 }
                 else {
-                    cluster_id_dict[tmp_cluster] = [comb_data[i]['id']];
+                    cluster_ids_dict[tmp_cluster] = [comb_data[i]['id']];
                     cluster_point_dict[tmp_cluster] = [[comb_data[i].x, comb_data[i].y]]
                 }
             }
@@ -115,22 +112,16 @@ let scatter = (function () {
             variable.svg_scatter.selectAll('path')
                 .attr('opacity', 0.2)
                 .on('mouseover', function () {
-                    // variable.svg_scatter.selectAll('path').attr('opacity', 0.1)
                     d3.select(this).attr('opacity', 0.5);
-                    // variable.svg_force.selectAll('circle').attr('opacity', 0.1);
-                    // variable.svg_force.selectAll('line').attr('opacity', 0.1);
-                    // variable.svg_force.selectAll('.' + this.id).attr('opacity', 0.5);
-                    // variable.svg_force.selectAll('.' + this.id + '_' + this.id).attr('opacity', 0.5);
                 }).on('mouseout', function () {
                     d3.select(this).attr('opacity', 0.2);
                 }).on('click', function () {
                     let tmp_cluster_data = [];//当前簇内点的数据集
-                    for (let i in cluster_id_dict[this.id]) {
-                        tmp_cluster_data.push(variable.info_dict[cluster_id_dict[this.id][i]])
+                    for (let i in cluster_ids_dict[this.id]) {
+                        tmp_cluster_data.push(variable.info_dict[cluster_ids_dict[this.id][i]])
                     }
                     parameters.drawchart(tmp_cluster_data);
                 })
-
         })
         //设置选点按钮操作
         // $("#point").click(function () {

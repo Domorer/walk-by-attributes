@@ -17,7 +17,7 @@ for key in data.keys():
             tmp_loc_arr.append([float(t['x']), float(t['y'])])
             tmp_id_arr.append(t['id'])
         X = StandardScaler().fit_transform(tmp_loc_arr)
-        db = DBSCAN(eps=0.1, min_samples=5).fit(X)
+        db = DBSCAN(eps=0.1, min_samples=4).fit(X)
         labels = db.labels_
         new_arr = []
         for i in range(len(labels)):

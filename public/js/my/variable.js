@@ -14,6 +14,8 @@ let variable = (function () {
     let info_dict = {};
     let ChoseCluster = false;
     let cluster_dict = {};
+    let confirm_time = 1;
+    let cluster_record = [];
     return {
         all_comb,
         comb_data,
@@ -28,6 +30,8 @@ let variable = (function () {
         info_dict,
         ChoseCluster,
         cluster_dict,
-        svg_sankey
+        svg_sankey,
+        confirm_time,
+        cluster_record
     }
 })()
