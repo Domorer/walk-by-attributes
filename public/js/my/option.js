@@ -12,19 +12,23 @@ let option = (function () {
         console.log('all_data: ', all_data);
         variable.all_comb = all_data;
         scatter.drawScatter(all_data['conf']['O']);
-        d3.csv('data/link.csv', function (error, link_data) {
+        d3.json('data/links.json', function (error, link_data) {
             if (error)
                 console.log(error);
             d3.json('data/info.json', function (error, info_dict) {
-                if (error)
-                    console.log(error);
-                for (let i = 0; i < all_data['conf']['O'].length; i++) {
-                    variable.cluster_dict[all_data['conf']['O'][i].id] = parseInt(all_data['conf']['O'][i].cluster);
-                }
-                variable.info_dict = info_dict;
-                variable.link_data = link_data;
-                variable.cluster_record.push(variable.cluster_dict);
-                // ForceChart.drawForce(link_data, info_dict, variable.cluster_dict);
+                d3.json('data/nodes.json', function (error, node_data) {
+                    if (error)
+                        console.log(error);
+                    for (let i = 0; i < all_data['conf']['O'].length; i++) {
+                        variable.cluster_dict[all_data['conf']['O'][i].id] = parseInt(all_data['conf']['O'][i].cluster);
+                    }
+                    variable.info_dict = info_dict;
+                    variable.link_data = link_data;
+                    variable.cluster_record.push(variable.cluster_dict);
+                    // ForceChart.drawForce(link_data, info_dict, variable.cluster_dict);
+                    ForceChart.drawStaticForce(node_data, link_data, variable.cluster_dict);
+                });
+
             })
 
         })

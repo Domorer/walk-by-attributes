@@ -2,16 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="653ba90d-450e-4b56-b91f-d81e9affae55" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/cluster.py" beforeDir="false" afterPath="$PROJECT_DIR$/cluster.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cluster_all_comb.json" beforeDir="false" afterPath="$PROJECT_DIR$/cluster_all_comb.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../js/html/d3-scale-chromatic.v1.min.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../js/html/d3.v3.min.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../js/html/d3.v4.min.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../js/html/handlebars.min.js" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/link数据/AAA.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/link.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../js/my/force.js" beforeDir="false" afterPath="$PROJECT_DIR$/../js/my/force.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../js/my/option.js" beforeDir="false" afterPath="$PROJECT_DIR$/../js/my/option.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../js/my/sactter.js" beforeDir="false" afterPath="$PROJECT_DIR$/../js/my/sactter.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../js/my/sankeyChart.js" beforeDir="false" afterPath="$PROJECT_DIR$/../js/my/sankeyChart.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../js/my/variable.js" beforeDir="false" afterPath="$PROJECT_DIR$/../js/my/variable.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../views/index.handlebars" beforeDir="false" afterPath="$PROJECT_DIR$/../../views/index.handlebars" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -22,16 +17,33 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/cluster.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="390">
-              <caret line="22" column="36" lean-forward="true" selection-start-line="22" selection-end-line="23" />
+            <state relative-caret-position="391">
+              <caret line="22" column="36" selection-start-line="22" selection-end-line="23" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
             </state>
           </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/link数据/AAA.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="266">
+              <caret line="14" column="21" selection-start-line="14" selection-start-column="21" selection-end-line="14" selection-end-column="21" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/link数据/nodes.json">
+          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
@@ -61,14 +73,15 @@
         <option value="$PROJECT_DIR$/添加数据/add——comb.py" />
         <option value="$PROJECT_DIR$/添加数据/add_comb.py" />
         <option value="$PROJECT_DIR$/cluster.py" />
+        <option value="$PROJECT_DIR$/link数据/AAA.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-1930" />
     <option name="y" value="-10" />
-    <option name="width" value="1939" />
-    <option name="height" value="1049" />
+    <option name="width" value="1940" />
+    <option name="height" value="1050" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -84,11 +97,6 @@
               <item name="data" type="b2602c69:ProjectViewProjectNode" />
               <item name="data" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="data" type="b2602c69:ProjectViewProjectNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="添加数据" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -98,6 +106,11 @@
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="H:\Node项目\walk-by-attributes\public\data\link数据" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -111,7 +124,28 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.cluster">
+  <component name="RunManager" selected="Python.AAA">
+    <configuration name="AAA" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="data" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/link数据" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/link数据/AAA.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="add_comb" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="data" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -156,6 +190,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.AAA" />
         <item itemvalue="Python.cluster" />
         <item itemvalue="Python.add_comb" />
       </list>
@@ -183,7 +218,7 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.3286119" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3286119" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -201,20 +236,36 @@
     <entry file="file://$PROJECT_DIR$/cluster.json" />
     <entry file="file://$PROJECT_DIR$/merge.json" />
     <entry file="file://$PROJECT_DIR$/添加数据/add——comb.py" />
+    <entry file="file://$PROJECT_DIR$/添加数据/add_comb.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="57">
+          <caret line="3" column="19" selection-start-line="3" selection-start-column="19" selection-end-line="3" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/cluster.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="22" column="36" lean-forward="true" selection-start-line="22" selection-end-line="23" />
+        <state relative-caret-position="391">
+          <caret line="22" column="36" selection-start-line="22" selection-end-line="23" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/添加数据/add_comb.py">
+    <entry file="file://$PROJECT_DIR$/link数据/nodes.json">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/link数据/lins.json">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/link数据/AAA.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="57">
-          <caret line="3" column="19" selection-start-line="3" selection-start-column="19" selection-end-line="3" selection-end-column="19" />
+        <state relative-caret-position="266">
+          <caret line="14" column="21" selection-start-line="14" selection-start-column="21" selection-end-line="14" selection-end-column="21" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
