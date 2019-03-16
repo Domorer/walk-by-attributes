@@ -1,25 +1,27 @@
 let variable = (function () {
 
-    let comb_data;
-    let link_data;
-    let all_comb;
+    let comb_data;//当前游走类型的数据
+    let link_data;//引用连线数据
+    let node_data;//力引导点的数据
+    let all_comb;//所有游走类型的数据集合
     let svg_scatter = d3.select('#svg_scatter');
     let svg_brush = d3.select('#svg_brush');
     let svg_sankey = d3.select('#svg_sankey');
     let svg_force = d3.select('#svg_force');
     let attr_arr = ['conf', 'aff', 'abt', 'year', 'cited'];
     let chose = ['P', 'R'];
-    let attr = 'conf';
-    let pr = 'O';
-    let info_dict = {};
-    let ChoseCluster = false;
-    let cluster_dict = {};
-    let confirm_time = 1;
-    let cluster_record = [];
+    let attr = 'conf';//当前选中的属性组合
+    let pr = 'O';//当前需那种的游走方式
+    let info_dict = {};//节点的信息字典
+    let ChoseCluster = false;//判断当前选择点的方式
+    let cluster_dict = {};//点的簇字典
+    let confirm_time = 1;//记录操作了几次，用于判断是否需要绘制桑基图
+    let cluster_record = [];//保存每次操作的cu字典
     return {
         all_comb,
         comb_data,
         link_data,
+        node_data,
         svg_scatter,
         svg_force,
         svg_brush,

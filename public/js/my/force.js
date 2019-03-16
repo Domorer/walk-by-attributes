@@ -49,11 +49,14 @@ let ForceChart = (function () {
     }
 
     function Clustering(nodes, links, cluster_dict) {
+        variable.svg_force.selectAll('*').remove();
         //直接只画类的点，不画类内的点
         let clusterValue_dict = {}, cluster_links = [], cluster_nodes = [];
         let r_extent = [], lineW_extent = [];
+        let color = d3.scaleOrdinal(d3.schemeCategory20);
+
         //统计每个簇内的点数量
-        for (let i = 0; i < ndoes.length; i++) {
+        for (let i = 0; i < nodes.length; i++) {
             if (cluster_dict[nodes[i].id] != -1) {
                 if (!clusterValue_dict[cluster_dict[nodes[i].id]]) {
                     clusterValue_dict[cluster_dict[nodes[i].id]] = 1;
@@ -80,12 +83,13 @@ let ForceChart = (function () {
                 if (s_cluster != t_cluster) {
                     let tmp_key = s_cluster + '_' + t_cluster;
                     if (linksValue_dict[tmp_key])
-                        linksValue_dict[tmp_key] = 1;
-                    else
                         linksValue_dict[tmp_key] += 1;
+                    else
+                        linksValue_dict[tmp_key] = 1;
                 }
             }
         }
+
         for (let key in linksValue_dict) {
             let tmp_dict = {};
             tmp_dict['source'] = key.split('_')[0];
@@ -95,7 +99,59 @@ let ForceChart = (function () {
         }
         //设置线宽的比例尺
         lineW_extent = d3.extent(cluster_links, function (d) { return d.value; })
+        console.log('cluster_links: ', cluster_links);
         let LWScale = d3.scaleLinear().domain(lineW_extent).range([5, 10]);
+        console.log('lineW_extent: ', lineW_extent);
+
+        //设置力的作用
+        let drag = simulation => {
+
+            function dragstarted(d) {
+                if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+            }
+
+            function dragged(d) {
+                d.fx = d3.event.x;
+                d.fy = d3.event.y;
+            }
+
+            function dragended(d) {
+                if (!d3.event.active) simulation.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+            }
+
+            return d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended);
+        }
+
+        let simulation = d3.forceSimulation(cluster_nodes)
+            .force("charge", d3.forceManyBody().strength(-500).distanceMin(100))
+            .force("link", d3.forceLink(cluster_links).id(d => d.id))
+            .force("center", d3.forceCenter(forceWidth / 2, forceHeight / 2))
+
+
+
+        //画线
+        let link = variable.svg_force.append('g').selectAll('line').data(cluster_links).enter()
+            .append('line')
+            .attr('stroke', function (d) {
+                if (d.source.id === d.target.id)
+                    return color(d.target.id);
+                else
+                    return '#999';
+            }).attr('stroke-width', function (d) {
+                // return LWScale(d.value);
+                return 2;
+            })
+            .attr('opacity', 0.2)
+            .attr('class', function (d) {
+                return d.source + '_' + d.target;
+            })
         //画点
         let node = variable.svg_force.append('g').selectAll('circle').data(cluster_nodes).enter()
             .append('circle')
@@ -108,30 +164,26 @@ let ForceChart = (function () {
                 else
                     return 'black';
             }).attr('fill', function (d) {
-                if (cluster_dict[d.id] != -1)
-                    return color(cluster_dict[d.id])
+                if (d.id != -1)
+                    return color(d.id)
                 else
                     return 'black';
             }).attr('class', function (d) {
                 return 'cluster_' + d.id;
-            });
-        //画线
-        let link = variable.svg_force.append('g').selectAll('line').data(links).enter()
-            .append('line')
-            .attr('stroke', function (d) {
-                if (d.source === d.target)
-                    return color(d.target);
-                else
-                    return 'gray';
-            }).attr('stroke-width', function (d) {
-                return LWScale(d.value);
-            })
-            .attr('opacity', 0.1)
-            .attr('class', function (d) {
-                return d.source + '_' + d.target;
-            })
-        
-        
+            }).call(drag(simulation))
+
+
+        simulation.on("tick", () => {
+            link
+                .attr("x1", d => d.source.x)
+                .attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x)
+                .attr("y2", d => d.target.y);
+
+            node
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y);
+        });
     }
     return {
         drawStaticForce,
