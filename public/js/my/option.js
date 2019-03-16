@@ -79,7 +79,7 @@ let option = (function () {
         console.log('variable.all_comb: ', variable.all_comb);
         let tmpCombData = variable.all_comb[variable.attr][variable.pr];
         for (let i = 0; i < tmpCombData.length; i++) {
-            variable.cluster_dict[tmpCombData[i].id] = tmpCombData[i].cluster;
+            variable.cluster_dict[tmpCombData[i].id] = parseInt(tmpCombData[i].cluster);
         }
         variable.cluster_record.push(variable.cluster_dict);
         console.log('variable.cluster_record: ', variable.cluster_record);
