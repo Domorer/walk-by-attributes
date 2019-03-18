@@ -108,6 +108,11 @@ let ForceChart = (function () {
         console.log('lineW_extent: ', lineW_extent);
 
         //设置力的作用
+        let simulation = d3.forceSimulation(cluster_nodes)
+            .force("charge", d3.forceManyBody().strength(-500).distanceMin(100))
+            .force("link", d3.forceLink(cluster_links).id(d => d.id))
+            .force("center", d3.forceCenter(forceWidth / 2, forceHeight / 2))
+
         let drag = simulation => {
 
             function dragstarted(d) {
@@ -132,11 +137,6 @@ let ForceChart = (function () {
                 .on("drag", dragged)
                 .on("end", dragended);
         }
-
-        let simulation = d3.forceSimulation(cluster_nodes)
-            .force("charge", d3.forceManyBody().strength(-500).distanceMin(100))
-            .force("link", d3.forceLink(cluster_links).id(d => d.id))
-            .force("center", d3.forceCenter(forceWidth / 2, forceHeight / 2))
 
 
 
@@ -178,7 +178,38 @@ let ForceChart = (function () {
                 return 'cluster_' + d.id;
             }).call(drag(simulation))
 
+        //画园内的pattern
+        let pattern_nodes = [];
+        for (let i = 0; i < cluster_nodes.length; i++) {
+            pattern_nodes.push({ cluster: cluster_nodes[i].cluster, pos: 'left', value: cluster_nodes[i].value, index: i });
+            pattern_nodes.push({ 'cluster': cluster_nodes[i].cluster, 'pos': 'right', value: cluster_nodes[i].value, index: i });
+        }
+        let node_pattern = variable.svg_force.append('g').selectAll('circle').data(pattern_nodes).enter()
+            .append('circle')
+            .attr('r', function (d) {
+                return rScale(d.value) / 6;
+            })
+            .attr('stroke', 'white')
+            .attr('fill', 'white')
+            .attr('class', function (d) {
+                return 'pattern_' + d.cluster + '_' + d.pos;
+            });
 
+        let line = d3.line()
+            .x(function (d) { return d[0] })
+            .y(function (d) { return d[1] })
+            .curve(d3.curveBasis)
+        let pattern_links = [];
+        for (let i = 0; i < cluster_nodes.length; i++) {
+            pattern_links.push({ loc: [[0, 0], [0, 0], [0, 0]], value: cluster_nodes[i].value, index: i })
+        }
+        let link_pattern = variable.svg_force.append('g').selectAll('path').data(pattern_links).enter()
+            .append('path')
+            // .attr('d', function (d) { return line(d.loc) })
+            .attr('stroke', 'white')
+            .attr('stroke-width', d => rScale(d.value) / 12)
+            .attr('fill', 'none')
+        //设置tick函数
         simulation.on("tick", () => {
             link
                 .attr("x1", d => d.source.x)
@@ -189,6 +220,23 @@ let ForceChart = (function () {
             node
                 .attr("cx", d => d.x)
                 .attr("cy", d => d.y);
+
+            node_pattern
+                .attr("cx", function (d) {
+                    if (d.pos == 'left')
+                        return cluster_nodes[d.index].x - rScale(d.value) / 3;
+                    else
+                        return cluster_nodes[d.index].x + rScale(d.value) / 3;
+                })
+                .attr("cy", d => cluster_nodes[d.index].y);
+
+            link_pattern.attr('d', function (d) {
+                let tmp_source = [cluster_nodes[d.index].x - rScale(d.value) / 3, cluster_nodes[d.index].y + rScale(d.value) / 2];
+                let tmp_target = [cluster_nodes[d.index].x + rScale(d.value) / 3, cluster_nodes[d.index].y + rScale(d.value) / 2];
+                let tmp_middle = [cluster_nodes[d.index].x, cluster_nodes[d.index].y + rScale(d.value) * 4 / 5];
+                let tmp_loc = [tmp_source, tmp_middle, tmp_target];
+                return line(tmp_loc);
+            })
         });
     }
     return {
