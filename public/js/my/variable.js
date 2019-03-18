@@ -15,8 +15,11 @@ let variable = (function () {
     let info_dict = {};//节点的信息字典
     let ChoseCluster = false;//判断当前选择点的方式
     let cluster_dict = {};//点的簇字典
-    let confirm_time = 1;//记录操作了几次，用于判断是否需要绘制桑基图
+    let confirm_time = 0;//记录操作了几次，用于判断是否需要绘制桑基图
     let cluster_record = [];//保存每次操作的cu字典
+    let sankeyNode_data = [];//保存桑基图的节点数据
+    let nodes_dict;//用来判断节点的数据是否已经存在里面
+    let sankeyLink_data = [];//保存桑基图的连线数据
     return {
         all_comb,
         comb_data,
@@ -34,6 +37,9 @@ let variable = (function () {
         cluster_dict,
         svg_sankey,
         confirm_time,
-        cluster_record
+        cluster_record,
+        sankeyNode_data,
+        sankeyLink_data,
+        nodes_dict
     }
 })()

@@ -42,6 +42,8 @@ let parameters = (function () {
         layout.start();
 
         function draw(words) {
+            let color = d3.scaleOrdinal(d3.schemeCategory20);
+
             d3.select("#" + dom).append("svg")
                 .attr("width", layout.size()[0])
                 .attr("height", layout.size()[1])
@@ -53,6 +55,9 @@ let parameters = (function () {
                 .style("font-size", function (d) { return d.size + "px"; })
                 .style("font-family", "Impact")
                 .attr("text-anchor", "middle")
+                .attr('fill',function(d,i){
+                    return color(i);
+                })
                 .attr("transform", function (d) {
                     return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
                 })

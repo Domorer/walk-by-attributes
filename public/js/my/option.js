@@ -33,6 +33,20 @@ let option = (function () {
                     variable.cluster_record.push(tmp_dict);
                     //绘制静态力引导图
                     ForceChart.drawStaticForce(node_data, link_data, variable.cluster_dict);
+
+                    //保存当前簇数据
+                    let max_cluster = -1000;
+                    let tmp_index = variable.confirm_time;
+                    for (let id in variable.cluster_record[tmp_index]) {
+                        let tmp_cluster = variable.cluster_record[tmp_index][id];//该点的目标簇
+                        if (tmp_cluster > max_cluster)
+                            max_cluster = tmp_cluster;
+                    }
+                    for (let i = 0; i <= max_cluster; i++) {
+                        let tmp_id = tmp_index + '_' + i;
+                        variable.sankeyNode_data.push({ 'id': tmp_id });
+                    }
+                    $('#max_cluster').text(max_cluster);
                 });
             })
         })
@@ -96,48 +110,49 @@ let option = (function () {
         }
         //将当前操作的簇字典添加到cluster_record
         variable.cluster_dict = tmp_dict;;
-        console.log('tmp_dict: ', tmp_dict);
         variable.cluster_record.push(tmp_dict);
         scatter.drawScatter(tmpCombData);
 
         //判断是否可以绘制sankey
-        if (variable.confirm_time == 2) {
-            let sankey_links = [], sankey_nodes = [];
-            let nodes_dict = {};
 
-            let link_value_dict = {}; //便于计算每条link的value
-            console.log('cluster_record: ', variable.cluster_record);
-            for (let id in variable.cluster_record[0]) {
-                let source_cluster = variable.cluster_record[0][id];//该点的起始簇
-                let target_cluster = variable.cluster_record[1][id];//该点的目标簇
-                //判断簇的始末位置都不是噪音簇
-                if (source_cluster != -1 && target_cluster != -1) {
-                    if (!nodes_dict['0-' + source_cluster]) {
-                        nodes_dict['0-' + source_cluster] = ''
-                    }
-                    if (!nodes_dict['1-' + target_cluster]) {
-                        nodes_dict['1-' + target_cluster] = ''
-                    }
-                    let tmp_key = source_cluster + '_' + target_cluster;
-                    if (link_value_dict[tmp_key])
-                        link_value_dict[tmp_key] += 1;
-                    else
-                        link_value_dict[tmp_key] = 1;
-                }
+        let tmp_index = variable.confirm_time;//当前操作下标
+
+        let link_value_dict = {}; //便于计算每条link的value
+        let max_cluster = -10000;//获取当前操作的最大簇
+        console.log('cluster_record: ', variable.cluster_record);
+        for (let id in variable.cluster_record[tmp_index - 1]) {
+            let source_cluster = variable.cluster_record[tmp_index - 1][id];//该点的起始簇
+            let target_cluster = variable.cluster_record[tmp_index][id];//该点的目标簇
+            if (target_cluster > max_cluster)
+                max_cluster = target_cluster;
+            //判断簇的始末位置都不是噪音簇
+            if (source_cluster != -1 && target_cluster != -1 && source_cluster != undefined && target_cluster != undefined) {
+                let tmp_key = source_cluster + '_' + target_cluster;
+                if (link_value_dict[tmp_key])
+                    link_value_dict[tmp_key] += 1;
+                else
+                    link_value_dict[tmp_key] = 1;
             }
-            //将每种link组合转换成arr形式
-            console.log('nodes_dict: ', nodes_dict);
-            for (let key in link_value_dict) {
-                let source = '0' + '-' + key.split('_')[0];
-                let target = '1' + '-' + key.split('_')[1];
-                let tmp_link = { 'source': source, 'target': target, 'value': link_value_dict[key] };
-                sankey_links.push(tmp_link);
-            }
-            for (let key in nodes_dict)
-                sankey_nodes.push({ 'id': key });
-            //调用桑基图绘制函数
-            sankeyChart.drawSankey(sankey_nodes, sankey_links);
         }
+        //将每种link组合转换成arr形式
+        for (let key in link_value_dict) {
+            let source = (tmp_index - 1) + '_' + key.split('_')[0];
+            let target = tmp_index + '_' + key.split('_')[1];
+            let tmp_link = { 'source': source, 'target': target, 'value': link_value_dict[key], 'id': source + '_' + target };
+            //将当前操作的连线数据加入
+            variable.sankeyLink_data.push(tmp_link)
+
+        }
+        for (let i = 0; i <= max_cluster; i++) {
+            let tmp_id = tmp_index + '_' + i;
+            variable.sankeyNode_data.push({ 'id': tmp_id });
+
+        }
+        //调用桑基图绘制函数
+        if (tmp_index > 0)
+            sankeyChart.drawSankey(variable.sankeyNode_data, variable.sankeyLink_data);
+        //将最大簇修改
+        $('#max_cluster').text(max_cluster);
     })
 
     return {
