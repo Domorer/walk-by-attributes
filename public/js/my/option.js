@@ -8,7 +8,7 @@ let option = (function () {
     let tmp_param = ["cited", '次', 'cited_chart'];
 
     //读取数据和初始化各窗口
-    d3.json('data/cluster_all_comb.json', function (all_data) {
+    d3.json('data/with_clusterLink.json', function (all_data) {
         console.log('all_data: ', all_data);
         //赋值总数据集合
         variable.all_comb = all_data;
@@ -78,23 +78,14 @@ let option = (function () {
             }
         })
         console.log('variable.attr: ', variable.attr);
-        //记录游走方式
-        let tmp_comb = 'O';
-        let p_checked = $('#P')[0].checked;
-        let r_checked = $('#R')[0].checked;
-        if (p_checked)
-            tmp_comb += '-P';
-        if (r_checked)
-            tmp_comb += '-R';
-        variable.pr = cs_dict[tmp_comb];
-        console.log('variable.pr: ', variable.pr);
+
         /*****************************************************/
 
         //将操作数据记录并添加到dropdown，格式为选择的属性 + 游走的方式
-        comb_record.push([variable.attr, variable.pr]);
-        let tmp_text = variable.attr + '-' + variable.pr;
+        comb_record.push(variable.attr);
+        let tmp_text = variable.attr;
         let tmp_option = $('<a></a>').text(tmp_text).attr("id", optIndex).attr('class', 'dropdown-item').on('click', function () {
-            let tmpCombData = variable.all_comb[comb_record[this.id][0]][comb_record[this.id][1]];
+            let tmpCombData = variable.all_comb[comb_record[this.id]['info'];
             scatter.drawScatter(tmpCombData);
         });
         $("#options").append(tmp_option);
@@ -102,7 +93,7 @@ let option = (function () {
 
         //根据参数选择获取对应数据
         console.log('variable.all_comb: ', variable.all_comb);
-        let tmpCombData = variable.all_comb[variable.attr][variable.pr];
+        let tmpCombData = variable.all_comb[variable.attr]['info'];
         //生成簇字典
         let tmp_dict = {};
         for (let i = 0; i < tmpCombData.length; i++) {

@@ -9,7 +9,6 @@ let variable = (function () {
     let svg_sankey = d3.select('#svg_sankey');
     let svg_force = d3.select('#svg_force');
     let attr_arr = ['conf', 'aff', 'abt', 'year', 'cited'];
-    let chose = ['P', 'R'];
     let attr = 'conf';//当前选中的属性组合
     let pr = 'O';//当前需那种的游走方式
     let info_dict = {};//节点的信息字典
@@ -29,7 +28,6 @@ let variable = (function () {
         svg_force,
         svg_brush,
         attr_arr,
-        chose,
         attr,
         pr,
         info_dict,

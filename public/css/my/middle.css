@@ -31,6 +31,14 @@
     height: 100%;
 }
 
+#svgCluster_force{
+    position: absolute;
+    bottom:35%;
+    right:0;
+    width:30%;
+    height:20%;
+}
+
 #cluster_layout{
     position: absolute;
     top: 1%;

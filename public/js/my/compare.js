@@ -6,8 +6,6 @@ let AttrValue = (function () {
             console.log('data_id: ', data_id);
             d3.csv('data/year_p.csv', function (data_pos) {
                 console.log('data_pos: ', data_pos);
-                let svg_force = d3.select('#svg_force');
-
                 let year_list = [];
                 let year_dict = {};
                 for (let i = 0; i < data_infor.length; i++) {
