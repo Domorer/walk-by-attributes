@@ -5,7 +5,6 @@ let ForceChart = (function () {
     function drawStaticForce(nodes, links, cluster_dict) {
         console.log('links: ', links);
         let color = d3.scaleOrdinal(d3.schemeCategory20);
-
         //绘制节点
         let node = variable.svg_force.append('g').selectAll('circle').data(nodes).enter()
             .append('circle')
@@ -19,8 +18,8 @@ let ForceChart = (function () {
                 else
                     return 'black';
             }).attr('fill', function (d) {
-                if (cluster_dict[d.id] != -1)
-                    return color(cluster_dict[d.id])
+                if (d.cluster != -1 && d.cluster != undefined)
+                    return color(d.cluster)
                 else
                     return 'black';
             }).attr('class', function (d) {
@@ -50,56 +49,38 @@ let ForceChart = (function () {
 
 
     //绘制聚类后的力引导图
-    function Clustering(nodes, links, cluster_dict) {
+    function Clustering(clusterids_dict, clusterLinks_dict, cluster_dict) {
+        console.log('clusterLinks_dict: ', clusterLinks_dict);
         variable.svg_force.selectAll('*').remove();
         //直接只画类的点，不画类内的点
-        let clusterValue_dict = {}, cluster_links = [], cluster_nodes = [];
+        let cluster_links = [], cluster_nodes = [];
         let r_extent = [], lineW_extent = [];
         let color = d3.scaleOrdinal(d3.schemeCategory20);
 
         //统计每个簇内的点数量
-        for (let i = 0; i < nodes.length; i++) {
-            if (cluster_dict[nodes[i].id] != -1) {
-                if (!clusterValue_dict[cluster_dict[nodes[i].id]]) {
-                    clusterValue_dict[cluster_dict[nodes[i].id]] = 1;
-                } else {
-                    clusterValue_dict[cluster_dict[nodes[i].id]] += 1;
-                }
-            }
-        }
-        for (let key in clusterValue_dict) {
+
+        for (let key in clusterids_dict) {
             let tmp_dict = {};
             tmp_dict['id'] = key;
-            tmp_dict['value'] = clusterValue_dict[key];
+            tmp_dict['value'] = parseInt(clusterids_dict[key].length);
+
             cluster_nodes.push(tmp_dict);
         }
         //设置半径的比例尺
         r_extent = d3.extent(cluster_nodes, function (d) { return d.value; })
         let rScale = d3.scaleLinear().domain(r_extent).range([5, 20]);
         //统计每条连线的权重
-        let linksValue_dict = {};
-        for (let i = 0; i < links.length; i++) {
-            let s_cluster = cluster_dict[links[i].source];
-            let t_cluster = cluster_dict[links[i].target];
-            //去除包含噪音点的连接，或者包含不存在当前语料库内的点的连接
-            if (s_cluster != -1 && t_cluster != -1 && s_cluster != undefined && t_cluster != undefined) {
-                if (s_cluster != t_cluster) {
-                    let tmp_key = d3.min([s_cluster, t_cluster]) + '_' + d3.max([s_cluster, t_cluster]);
-                    // let tmp_key = s_cluster + '_' + t_cluster;
-                    if (linksValue_dict[tmp_key])
-                        linksValue_dict[tmp_key] += 1;
-                    else
-                        linksValue_dict[tmp_key] = 1;
-                }
-            }
-        }
 
-        for (let key in linksValue_dict) {
-            let tmp_dict = {};
-            tmp_dict['source'] = key.split('_')[0];
-            tmp_dict['target'] = key.split('_')[1];
-            tmp_dict['value'] = linksValue_dict[key];
-            cluster_links.push(tmp_dict);
+
+        for (let key in clusterLinks_dict) {
+            if (key.split('-')[0] != key.split('-')[1]) {
+                let tmp_dict = {};
+                tmp_dict['source'] = key.split('-')[0];
+                tmp_dict['target'] = key.split('-')[1];
+                tmp_dict['ratio'] = clusterLinks_dict[key]['ratio']
+                tmp_dict['value'] = parseInt(clusterLinks_dict[key]['value']);
+                cluster_links.push(tmp_dict);
+            }
         }
         //设置线宽的比例尺
         lineW_extent = d3.extent(cluster_links, function (d) { return d.value; })

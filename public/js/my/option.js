@@ -25,7 +25,9 @@ let option = (function () {
                     let tmp_dict = {};
                     for (let i = 0; i < all_data['conf']['info'].length; i++) {
                         tmp_dict[all_data['conf']['info'][i].id] = parseInt(all_data['conf']['info'][i].cluster);
+                        
                     }
+                    console.log('tmp_dict: ', tmp_dict);
                     variable.node_data = node_data;
                     variable.info_dict = info_dict;
                     variable.link_data = link_data;
