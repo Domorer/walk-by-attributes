@@ -10,7 +10,6 @@ let variable = (function () {
     let svg_force = d3.select('#svg_force');
     let attr_arr = ['conf', 'aff', 'abt', 'year', 'cited'];
     let attr = 'conf';//当前选中的属性组合
-    let pr = 'O';//当前需那种的游走方式
     let info_dict = {};//节点的信息字典
     let ChoseCluster = false;//判断当前选择点的方式
     let cluster_dict = {};//点的簇字典
@@ -29,7 +28,6 @@ let variable = (function () {
         svg_brush,
         attr_arr,
         attr,
-        pr,
         info_dict,
         ChoseCluster,
         cluster_dict,

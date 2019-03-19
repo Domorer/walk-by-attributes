@@ -13,7 +13,7 @@ let option = (function () {
         //赋值总数据集合
         variable.all_comb = all_data;
         //绘制降维散点图
-        scatter.drawScatter(all_data['conf']['O']);
+        scatter.drawScatter(all_data['conf']['info']);
         d3.json('data/links.json', function (error, link_data) {
             if (error)
                 console.log(error);
@@ -23,8 +23,8 @@ let option = (function () {
                         console.log(error);
                     //生成簇字典并赋值给varibale
                     let tmp_dict = {};
-                    for (let i = 0; i < all_data['conf']['O'].length; i++) {
-                        tmp_dict[all_data['conf']['O'][i].id] = parseInt(all_data['conf']['O'][i].cluster);
+                    for (let i = 0; i < all_data['conf']['info'].length; i++) {
+                        tmp_dict[all_data['conf']['info'][i].id] = parseInt(all_data['conf']['info'][i].cluster);
                     }
                     variable.node_data = node_data;
                     variable.info_dict = info_dict;
@@ -54,7 +54,7 @@ let option = (function () {
 
     //力引导图的簇展示
     $('#cluster_layout').on('click', function () {
-        ForceChart.Clustering(variable.node_data, variable.link_data, variable.cluster_dict);
+        ForceChart.Clustering(variable.all_comb[variable.attr]['clu_ids'], variable.all_comb[variable.attr]['cluster_link'], variable.cluster_dict);
     })
 
     //设置参数选择
@@ -85,7 +85,7 @@ let option = (function () {
         comb_record.push(variable.attr);
         let tmp_text = variable.attr;
         let tmp_option = $('<a></a>').text(tmp_text).attr("id", optIndex).attr('class', 'dropdown-item').on('click', function () {
-            let tmpCombData = variable.all_comb[comb_record[this.id]['info'];
+            let tmpCombData = variable.all_comb[comb_record[this.id]]['info'];
             scatter.drawScatter(tmpCombData);
         });
         $("#options").append(tmp_option);
@@ -132,12 +132,10 @@ let option = (function () {
             let tmp_link = { 'source': source, 'target': target, 'value': link_value_dict[key], 'id': source + '_' + target };
             //将当前操作的连线数据加入
             variable.sankeyLink_data.push(tmp_link)
-
         }
         for (let i = 0; i <= max_cluster; i++) {
             let tmp_id = tmp_index + '_' + i;
             variable.sankeyNode_data.push({ 'id': tmp_id });
-
         }
         //调用桑基图绘制函数
         if (tmp_index > 0)

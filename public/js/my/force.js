@@ -14,7 +14,7 @@ let ForceChart = (function () {
             .attr('cy', function (d) { return d.y; })
             .attr('stroke', function (d) {
                 d.cluster = cluster_dict[d.id];
-                if (d.cluster != -1)
+                if (d.cluster != -1 && d.cluster != undefined)
                     return color(d.cluster)
                 else
                     return 'black';
