@@ -84,7 +84,8 @@ let ForceChart = (function () {
             //去除包含噪音点的连接，或者包含不存在当前语料库内的点的连接
             if (s_cluster != -1 && t_cluster != -1 && s_cluster != undefined && t_cluster != undefined) {
                 if (s_cluster != t_cluster) {
-                    let tmp_key = s_cluster + '_' + t_cluster;
+                    let tmp_key = d3.min([s_cluster, t_cluster]) + '_' + d3.max([s_cluster, t_cluster]);
+                    // let tmp_key = s_cluster + '_' + t_cluster;
                     if (linksValue_dict[tmp_key])
                         linksValue_dict[tmp_key] += 1;
                     else
@@ -209,6 +210,10 @@ let ForceChart = (function () {
             .attr('stroke', 'white')
             .attr('stroke-width', d => rScale(d.value) / 12)
             .attr('fill', 'none')
+
+        //画线内的pattern
+
+
         //设置tick函数
         simulation.on("tick", () => {
             link
@@ -228,7 +233,7 @@ let ForceChart = (function () {
                     else
                         return cluster_nodes[d.index].x + rScale(d.value) / 3;
                 })
-                .attr("cy", d => cluster_nodes[d.index].y);
+                .attr("cy", d => cluster_nodes[d.index].y - rScale(d.value) / 10);
 
             link_pattern.attr('d', function (d) {
                 let tmp_source = [cluster_nodes[d.index].x - rScale(d.value) / 3, cluster_nodes[d.index].y + rScale(d.value) / 2];
