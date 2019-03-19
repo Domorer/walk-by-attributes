@@ -2,12 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="653ba90d-450e-4b56-b91f-d81e9affae55" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/link数据/AAA.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/link.csv" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../js/my/force.js" beforeDir="false" afterPath="$PROJECT_DIR$/../js/my/force.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../js/my/option.js" beforeDir="false" afterPath="$PROJECT_DIR$/../js/my/option.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../views/index.handlebars" beforeDir="false" afterPath="$PROJECT_DIR$/../../views/index.handlebars" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../js/my/parameters.js" beforeDir="false" afterPath="$PROJECT_DIR$/../js/my/parameters.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../js/my/variable.js" beforeDir="false" afterPath="$PROJECT_DIR$/../js/my/variable.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,11 +14,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/cluster.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="391">
-              <caret line="22" column="36" selection-start-line="22" selection-end-line="23" />
+            <state relative-caret-position="486">
+              <caret line="27" column="27" lean-forward="true" selection-start-line="27" selection-start-column="27" selection-end-line="27" selection-end-column="27" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -29,11 +26,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/link数据/AAA.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="266">
-              <caret line="14" column="21" selection-start-line="14" selection-start-column="21" selection-end-line="14" selection-end-column="21" />
+            <state relative-caret-position="437">
+              <caret line="23" column="19" selection-start-line="23" selection-start-column="19" selection-end-line="23" selection-end-column="19" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -72,8 +69,8 @@
       <list>
         <option value="$PROJECT_DIR$/添加数据/add——comb.py" />
         <option value="$PROJECT_DIR$/添加数据/add_comb.py" />
-        <option value="$PROJECT_DIR$/cluster.py" />
         <option value="$PROJECT_DIR$/link数据/AAA.py" />
+        <option value="$PROJECT_DIR$/cluster.py" />
       </list>
     </option>
   </component>
@@ -213,7 +210,7 @@
     <frame x="-1927" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24966975" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24966975" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -236,6 +233,12 @@
     <entry file="file://$PROJECT_DIR$/cluster.json" />
     <entry file="file://$PROJECT_DIR$/merge.json" />
     <entry file="file://$PROJECT_DIR$/添加数据/add——comb.py" />
+    <entry file="file://$PROJECT_DIR$/link数据/lins.json">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/link数据/nodes.json">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/添加数据/add_comb.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="57">
@@ -243,28 +246,25 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cluster.py">
+    <entry file="file://$PROJECT_DIR$/link数据/AAA.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="22" column="36" selection-start-line="22" selection-end-line="23" />
+        <state relative-caret-position="437">
+          <caret line="23" column="19" selection-start-line="23" selection-start-column="19" selection-end-line="23" selection-end-column="19" />
           <folding>
-            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/link数据/nodes.json">
+    <entry file="file://$PROJECT_DIR$/cluster_all_comb.json">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/link数据/lins.json">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/link数据/AAA.py">
+    <entry file="file://$PROJECT_DIR$/cluster.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="266">
-          <caret line="14" column="21" selection-start-line="14" selection-start-column="21" selection-end-line="14" selection-end-column="21" />
+        <state relative-caret-position="486">
+          <caret line="27" column="27" lean-forward="true" selection-start-line="27" selection-start-column="27" selection-end-line="27" selection-end-column="27" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>

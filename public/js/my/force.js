@@ -47,7 +47,80 @@ let ForceChart = (function () {
 
     }
 
+    //绘制簇内点的原始力引导图
+    function drawClusterForce(id_links) {
+        let forceClusterWidth = $('#svgCluster_force')[0].scrollWidth;
+        let forceClusterHeight = $('#svgCluster_force')[0].scrollHeight;
+        variable.svg_cluster.selectAll('*').remove();
+        let nodes = [], links = [], nodes_dict = {};
+        for (let i = 0; i < id_links.length; i++) {
+            links.push({ 'source': id_links[i][0], 'target': id_links[i][1] });
+            if (nodes_dict[id_links[i][0]] == undefined)
+                nodes_dict[id_links[i][0]] = true;
+            if (nodes_dict[id_links[i][1]] == undefined)
+                nodes_dict[id_links[i][1]] = true;
+        }
+        for (let key in nodes_dict) {
+            nodes.push({ 'id': key });
+        }
+        let simulation_cluster = d3.forceSimulation(nodes)
+            .force("charge", d3.forceManyBody().distanceMax(50))
+            .force("link", d3.forceLink(links).id(d => d.id))
+            .force("center", d3.forceCenter(forceClusterWidth / 2, forceClusterHeight / 2))
+        let drag_cluster = simulation_cluster => {
 
+            function dragstarted(d) {
+                if (!d3.event.active) simulation_cluster.alphaTarget(0.3).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+            }
+
+            function dragged(d) {
+                d.fx = d3.event.x;
+                d.fy = d3.event.y;
+            }
+
+            function dragended(d) {
+                if (!d3.event.active) simulation_cluster.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+            }
+
+            return d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended);
+        }
+
+        //设置tick函数
+        simulation_cluster.on("tick", () => {
+            link_cluster
+                .attr("x1", d => d.source.x)
+                .attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x)
+                .attr("y2", d => d.target.y);
+
+            node_cluster
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y);
+
+        })
+        //画线
+        let link_cluster = variable.svg_cluster.append('g').selectAll('line').data(links).enter()
+            .append('line')
+            .attr('stroke', '#999')
+            .attr('opacity',0.5)
+            .attr('stroke-width', 2)
+        //画点
+        let node_cluster = variable.svg_cluster.append('g').selectAll('circle').data(nodes).enter()
+            .append('circle')
+            .attr('r', 3)
+            .attr('stroke', '#b4b4ff')
+            .attr('fill', '#b4b4ff')
+            .call(drag_cluster(simulation_cluster));
+
+
+    }
     //绘制聚类后的力引导图
     function Clustering(clusterids_dict, clusterLinks_dict, cluster_dict) {
         console.log('clusterLinks_dict: ', clusterLinks_dict);
@@ -158,6 +231,9 @@ let ForceChart = (function () {
                     return 'black';
             }).attr('class', function (d) {
                 return 'cluster_' + d.id;
+            })
+            .on('click', function (d) {
+                drawClusterForce(variable.all_comb[variable.attr]['clu_tpg'][d.id]);
             }).call(drag(simulation))
 
         //画园内的pattern

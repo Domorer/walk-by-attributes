@@ -8,6 +8,7 @@ let variable = (function () {
     let svg_brush = d3.select('#svg_brush');
     let svg_sankey = d3.select('#svg_sankey');
     let svg_force = d3.select('#svg_force');
+    let svg_cluster = d3.select('#svgCluster_force')
     let attr_arr = ['conf', 'aff', 'abt', 'year', 'cited'];
     let attr = 'conf';//当前选中的属性组合
     let info_dict = {};//节点的信息字典
@@ -26,6 +27,7 @@ let variable = (function () {
         svg_scatter,
         svg_force,
         svg_brush,
+        svg_cluster,
         attr_arr,
         attr,
         info_dict,

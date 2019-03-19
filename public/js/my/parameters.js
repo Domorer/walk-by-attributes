@@ -55,7 +55,7 @@ let parameters = (function () {
                 .style("font-size", function (d) { return d.size + "px"; })
                 .style("font-family", "Impact")
                 .attr("text-anchor", "middle")
-                .attr('fill',function(d,i){
+                .attr('fill', function (d, i) {
                     return color(i);
                 })
                 .attr("transform", function (d) {
