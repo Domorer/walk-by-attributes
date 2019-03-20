@@ -4,6 +4,7 @@ let variable = (function () {
     let link_data;//引用连线数据
     let node_data;//力引导点的数据
     let all_comb;//所有游走类型的数据集合
+    let all_data;//所有参数的集合
     let svg_scatter = d3.select('#svg_scatter');
     let svg_brush = d3.select('#svg_brush');
     let svg_sankey = d3.select('#svg_sankey');
@@ -38,6 +39,7 @@ let variable = (function () {
         cluster_record,
         sankeyNode_data,
         sankeyLink_data,
-        nodes_dict
+        nodes_dict,
+        all_data
     }
 })()

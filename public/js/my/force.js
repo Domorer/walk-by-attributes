@@ -3,7 +3,6 @@ let ForceChart = (function () {
     let forceHeight = $('#svg_force')[0].scrollHeight;
 
     function drawStaticForce(nodes, links, cluster_dict) {
-        console.log('links: ', links);
         let color = d3.scaleOrdinal(d3.schemeCategory20);
         //绘制节点
         let node = variable.svg_force.append('g').selectAll('circle').data(nodes).enter()
@@ -233,7 +232,7 @@ let ForceChart = (function () {
                 return 'cluster_' + d.id;
             })
             .on('click', function (d) {
-                drawClusterForce(variable.all_comb[variable.attr]['clu_tpg'][d.id]);
+                drawClusterForce(variable.comb_data['clu_tpg'][d.id]);
             }).call(drag(simulation))
 
         //画园内的pattern
