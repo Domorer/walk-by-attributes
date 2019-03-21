@@ -50,7 +50,8 @@ let ForceChart = (function () {
     function drawClusterForce(id_links) {
         let forceClusterWidth = $('#svgCluster_force')[0].scrollWidth;
         let forceClusterHeight = $('#svgCluster_force')[0].scrollHeight;
-        variable.svg_cluster.selectAll('*').remove();
+        let svg_cluster = d3.select('#svg_oriTopo');
+        svg_cluster.selectAll('*').remove();
         let nodes = [], links = [], nodes_dict = {};
         for (let i = 0; i < id_links.length; i++) {
             links.push({ 'source': id_links[i][0], 'target': id_links[i][1] });
@@ -105,13 +106,13 @@ let ForceChart = (function () {
 
         })
         //画线
-        let link_cluster = variable.svg_cluster.append('g').selectAll('line').data(links).enter()
+        let link_cluster = svg_cluster.append('g').selectAll('line').data(links).enter()
             .append('line')
             .attr('stroke', '#999')
             .attr('opacity',0.5)
             .attr('stroke-width', 2)
         //画点
-        let node_cluster = variable.svg_cluster.append('g').selectAll('circle').data(nodes).enter()
+        let node_cluster = svg_cluster.append('g').selectAll('circle').data(nodes).enter()
             .append('circle')
             .attr('r', 3)
             .attr('stroke', '#b4b4ff')

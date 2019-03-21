@@ -22,96 +22,103 @@
 <div class='left'>
     <div class='dataset'>
         <div id="headLine">
-            <a class='headline_a'>Dataset</a>
+            <a id='headline_a'>Dataset</a>
         </div>
-        <div class='radioDiv'>
-            <div class="custom-control custom-radio " style='left:15%;'>
-                <input type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input">
-                <label class="custom-control-label" for="customRadioInline1">Dataset 1</label>
+        <div id='radioDiv'>
+            <div class="custom-control custom-radio " style='margin-left:13%;margin-top:5%;color:gray'>
+                <input type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input"
+                    checked=True>
+                <label class="custom-control-label" for="customRadioInline1">Citation Network</label>
             </div>
-            <div class="custom-control custom-radio " style='left:15%;'>
+            <div class="custom-control custom-radio " style='margin-left:13%;margin-top:3%;color:gray'>
                 <input type="radio" id="customRadioInline2" name="customRadioInline1" class="custom-control-input">
-                <label class="custom-control-label" for="customRadioInline2">Dataset 2</label>
+                <label class="custom-control-label" for="customRadioInline2">Chicago Bicycle</label>
             </div>
-            <div class="custom-control custom-radio " style='margin-left:15%;'>
+            <div class="custom-control custom-radio " style='margin-left:13%;margin-top:3%;color:gray'>
                 <input type="radio" id="customRadioInline3" name="customRadioInline1" class="custom-control-input">
-                <label class="custom-control-label" for="customRadioInline3">Dataset 3</label>
+                <label class="custom-control-label" for="customRadioInline3">Shenzhen Taxi</label>
             </div>
         </div>
-
     </div>
     <div class='paramList'>
         <div id="headLine">
-            <a>Parameters</a>
+            <a id='headline_a'>Parameters</a>
         </div>
-        <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:15%;'>
-            <input type="checkbox" class="custom-control-input" id="cited">
-            <label class="custom-control-label" for="cited" id="citedLabel">Number of citations</label>
-        </div>
-        <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:15%;'>
-            <input type="checkbox" class="custom-control-input" id="abt">
-            <label class="custom-control-label" for="abt" id="abtLabel">Abstract</label>
-        </div>
-        <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:15%;'>
-            <input type="checkbox" class="custom-control-input" id="conf" checked='true'>
-            <label class="custom-control-label" for="conf" id="confLabel">Conference</label>
-        </div>
-        <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:15%;'>
-            <input type="checkbox" class="custom-control-input" id="year">
-            <label class="custom-control-label" for="year" id="yearLabel">Time</label>
-        </div>
-        <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:15%;'>
-            <input type="checkbox" class="custom-control-input" id="aff">
-            <label class="custom-control-label" for="aff" id="affLabel">First Author Affiliation</label>
-        </div>
+        <div id='paramInner'>
+            <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
+                <input type="checkbox" class="custom-control-input" id="cited">
+                <label class="custom-control-label" for="cited" id="citedLabel" style='color:gray'>Number of citations</label>
+            </div>
+            <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
+                <input type="checkbox" class="custom-control-input" id="abt">
+                <label class="custom-control-label" for="abt" id="abtLabel" style='color:gray'>Abstract</label>
+            </div>
+            <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
+                <input type="checkbox" class="custom-control-input" id="conf" checked='true'>
+                <label class="custom-control-label" for="conf" id="confLabel" style='color:gray'>Conference</label>
+            </div>
+            <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
+                <input type="checkbox" class="custom-control-input" id="year">
+                <label class="custom-control-label" for="year" id="yearLabel" style='color:gray'>Time</label>
+            </div>
+            <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
+                <input type="checkbox" class="custom-control-input" id="aff">
+                <label class="custom-control-label" for="aff" id="affLabel" style='color:gray'>First Author Affiliation</label>
+            </div>
 
-        <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:15%;'>
-            <input type="checkbox" class="custom-control-input" id="wt_3" checked='true'>
-            <label class="custom-control-label" for="wt_3" id="wt_3_label">Walk 3 times</label>
-        </div>
+            <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
+                <input type="checkbox" class="custom-control-input" id="wt_3" checked='true'>
+                <label class="custom-control-label" for="wt_3" id="wt_3_label" style='color:gray'>Walk 3 times</label>
+            </div>
 
-        <div class="custom-control custom-checkbox custom-control-inline" style='margin-top:7%;margin-left:15%;'>
-            <input type="checkbox" class="custom-control-input" id="sl_5" checked='true'>
-            <label class="custom-control-label" for="sl_5" id="sl_5_label">5 steps</label>
-        </div>
-        <div class="custom-control custom-checkbox custom-control-inline" style='margin-top:7%;margin-left:1%;'>
-            <input type="checkbox" class="custom-control-input" id="sl_10">
-            <label class="custom-control-label" for="sl_10" id="sl_10_label">10 steps</label>
-        </div>
+            <div class="custom-control custom-checkbox custom-control-inline" style='margin-top:7%;margin-left:13%;'>
+                <input type="checkbox" class="custom-control-input" id="sl_5" checked='true'>
+                <label class="custom-control-label" for="sl_5" id="sl_5_label" style='color:gray'>5 steps</label>
+            </div>
+            <div class="custom-control custom-checkbox custom-control-inline" style='margin-top:7%;'>
+                <input type="checkbox" class="custom-control-input" id="sl_10">
+                <label class="custom-control-label" for="sl_10" id="sl_10_label" style='color:gray'>10 steps</label>
+            </div>
 
-
-        <div class="custom-control custom-checkbox custom-control-inline" style='margin-top:7%;margin-left:15%;'>
-            <input type="checkbox" class="custom-control-input" id="ret_True">
-            <label class="custom-control-label" for="ret_True" id="ret_True_label">True</label>
-        </div>
-        <div class="custom-control custom-checkbox custom-control-inline" style='margin-top:7%;margin-left:15%;'>
-            <input type="checkbox" class="custom-control-input" id="ret_False" checked='true'>
-            <label class="custom-control-label" for="ret_False" id="ret_False_label">False</label>
-        </div>
-        <div class='btn_out'>
-            <button id="confirm" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Confirm</button>
+            <div class="custom-control custom-checkbox custom-control-inline" style='margin-top:7%;margin-left:13%;'>
+                <input type="checkbox" class="custom-control-input" id="ret_True">
+                <label class="custom-control-label" for="ret_True" id="ret_True_label">True</label>
+            </div>
+            <div class="custom-control custom-checkbox custom-control-inline" style='margin-top:7%;margin-left:13%;'>
+                <input type="checkbox" class="custom-control-input" id="ret_False" checked='true'>
+                <label class="custom-control-label" for="ret_False" id="ret_False_label">False</label>
+            </div>
+            <div class='btn_out'>
+                <button id="confirm" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Confirm</button>
+            </div>
         </div>
     </div>
-    <div class='inforList'>
+
+    <div class='OriTopo'>
         <div id="headLine">
-            <a>Information</a>
+            <a id='headline_a'>Original topology</a>
         </div>
-        <p> eps ： 0.2</p>
-        <p> min_samples : 15 </p>
-        <p> min_samples : <a id='max_cluster'>15</a> </p>
+        <div class='svg_oriTopoDiv'>
+            <svg id='svg_oriTopo'></svg>
+        </div>
+
     </div>
 </div>
+
 <div class='mid'>
     <button id="cluster_layout" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Cluster Layout</button>
+
     <div class='forceDiv'>
         <svg id='svg_force'></svg>
-        <svg id='svgCluster_force'></svg>
     </div>
+
     <div class='sankeyDiv'>
         <svg id='svg_sankey'></svg>
     </div>
 </div>
+
 <div class='right'>
+
     <div class='scatter'>
         {{!-- <button id="point" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Point</button> --}}
         <button id="brush" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Brush</button>
@@ -127,36 +134,10 @@
         </div>
         <svg id='svg_scatter'></svg>
     </div>
-    <div id='paramDiv'>
-        <nav>
-            <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                <a class="nav-item nav-link active" id="cited_chart-tab" data-toggle="tab" href="#cited_chart" role="tab"
-                    aria-controls="nav-home" aria-selected="true">Citations</a>
-                <a class="nav-item nav-link" id="abt_chart-tab" data-toggle="tab" href="#abt_chart" role="tab"
-                    aria-controls="nav-profile" aria-selected="false">Abstract</a>
-                <a class="nav-item nav-link" id="conf_chart-tab" data-toggle="tab" href="#conf_chart" role="tab"
-                    aria-controls="nav-contact" aria-selected="false">Conference</a>
-                <a class="nav-item nav-link" id="time_chart-tab" data-toggle="tab" href="#time_chart" role="tab"
-                    aria-controls="nav-contact" aria-selected="false">Time</a>
-                <a class="nav-item nav-link" id="aff_chart-tab" data-toggle="tab" href="#aff_chart" role="tab"
-                    aria-controls="nav-contact" aria-selected="false">Afflication</a>
-            </div>
-        </nav>
 
-        <div id="myTabContent" class="tab-content">
-            <div class="tab-pane fade show active" id="cited_chart">
-            </div>
-            <div class="tab-pane fade" id="abt_chart">
-            </div>
-            <div class="tab-pane fade" id="conf_chart">
-            </div>
-            <div class="tab-pane fade" id="time_chart">
-            </div>
-            <div class="tab-pane fade" id="aff_chart">
-            </div>
-        </div>
-
+    <div class='paramDiv'>
     </div>
+
 </div>
 
 
@@ -164,7 +145,6 @@
 </div>
 <script src="/js/my/variable.js"></script>
 <script src="/js/my/sactter.js"></script>
-<script src="/js/my/parameters.js"></script>
 <script src="/js/my/force.js"></script>
 <script src="/js/my/axis.js"></script>
 <script src="/js/my/sankeyChart.js"></script>

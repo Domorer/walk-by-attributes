@@ -4,7 +4,6 @@ let option = (function () {
     let comb_len = 0;
     let optIndex = 0;//记录操作的index
     let comb_record = [];//记录操作的具体参数元素格式为[当前属性选择，当前游走方式选择]
-    let tmp_fun = parameters.drawCount;
     let tmp_param = ["cited", '次', 'cited_chart'];
     let wt = 'wt_3', sl = 'sl_5', rl = 'rl_False';
     //读取数据和初始化各窗口
@@ -112,7 +111,6 @@ let option = (function () {
     })
 
     return {
-        tmp_fun,
         tmp_param
     }
 })()
