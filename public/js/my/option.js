@@ -5,16 +5,16 @@ let option = (function () {
     let optIndex = 0;//记录操作的index
     let comb_record = [];//记录操作的具体参数元素格式为[当前属性选择，当前游走方式选择]
     let tmp_param = ["cited", '次', 'cited_chart'];
-    let wt = 'wt_3', sl = 'sl_5', rl = 'rl_False';
+    let wt = 'wt_5', sl = 'sl_5', rl = 'rl_False';
     //读取数据和初始化各窗口
-    d3.json('data/dim3_param_k_clu_5.json', function (all_data) {
+    d3.json('data/merge_corpus/topo_param_loc_0_3_4.json', function (all_data) {
         console.log('all_data: ', all_data);
         //赋值总数据集合
         variable.all_data = all_data;
-        variable.all_comb = all_data['wt_3']['sl_5']['rl_False'];
+        variable.all_comb = all_data['wt_5']['sl_5']['rl_False'];
         //绘制降维散点图
-        scatter.drawScatter(variable.all_comb['conf']['info']);
-        variable.comb_data = variable.all_comb['conf']['info']
+        scatter.drawScatter(variable.all_comb['conf_year']['info']);
+        variable.comb_data = variable.all_comb['conf_year']['info']
         d3.json('data/links.json', function (error, link_data) {
             if (error)
                 console.log(error);
@@ -24,8 +24,8 @@ let option = (function () {
                         console.log(error);
                     //生成簇字典并赋值给varibale
                     let tmp_dict = {};
-                    for (let i = 0; i < variable.all_comb['conf']['info'].length; i++) {
-                        tmp_dict[variable.all_comb['conf']['info'][i].id] = parseInt(variable.all_comb['conf']['info'][i].cluster);
+                    for (let i = 0; i < variable.all_comb['conf_year']['info'].length; i++) {
+                        tmp_dict[variable.all_comb['conf_year']['info'][i].id] = parseInt(variable.all_comb['conf_year']['info'][i].cluster);
                     }
                     variable.node_data = node_data;
                     variable.info_dict = info_dict;

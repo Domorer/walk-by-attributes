@@ -144,7 +144,7 @@ let ForceChart = (function () {
         }
         //设置半径的比例尺
         r_extent = d3.extent(cluster_nodes, function (d) { return d.value; })
-        let rScale = d3.scaleLinear().domain(r_extent).range([5, 20]);
+        let rScale = d3.scaleLinear().domain(r_extent).range([5, 30]);
         //统计每条连线的权重
         for (let key in clusterLinks_dict) {
             if (key.split('-')[0] != key.split('-')[1]) {
@@ -239,18 +239,13 @@ let ForceChart = (function () {
 
         //画园内的pattern
 
-        let pattern_nodes = [];
+        let pattern_g = [];
+
         for (let i = 0; i < cluster_nodes.length; i++) {
-            let topo = i % 5;
-            pattern_nodes.push({ cluster: cluster_nodes[i].cluster, pos: 'left_top', value: cluster_nodes[i].value, index: i, tolo_type: topo });
-            pattern_nodes.push({ 'cluster': cluster_nodes[i].cluster, 'pos': 'left_bottom', value: cluster_nodes[i].value, index: i, tolo_type: topo });
-            pattern_nodes.push({ 'cluster': cluster_nodes[i].cluster, 'pos': 'right_top', value: cluster_nodes[i].value, index: i, tolo_type: topo });
-            pattern_nodes.push({ 'cluster': cluster_nodes[i].cluster, 'pos': 'right_bottom', value: cluster_nodes[i].value, index: i, tolo_type: topo });
-            pattern_nodes.push({ 'cluster': cluster_nodes[i].cluster, 'pos': 'top', value: cluster_nodes[i].value, index: i, tolo_type: topo });
-
-
+            let tmp_g = drawTopo(Math.floor(Math.random()*5), rScale(cluster_nodes[i].value))
+            pattern_g.push({ node: tmp_g[0], link: tmp_g[1], value: cluster_nodes[i].value });
         }
-
+        console.log('pattern_g: ', pattern_g);
         // let node_pattern = variable.svg_force.append('g').selectAll('circle').data(pattern_nodes).enter()
         //     .append('circle')
         //     .attr('r', function (d) {
@@ -294,7 +289,11 @@ let ForceChart = (function () {
             node
                 .attr("cx", d => d.x)
                 .attr("cy", d => d.y);
+            for (let i = 0; i < pattern_g.length; i++) {
+                pattern_g[i].node.attr('transform', "translate(" + cluster_nodes[i].x + ',' + cluster_nodes[i].y + ')');
+                pattern_g[i].link.attr('transform', "translate(" + cluster_nodes[i].x + ',' + cluster_nodes[i].y + ')');
 
+            }
             // node_pattern
             //     .attr("cx", function (d) {
             //         if (d.pos != 'top')
@@ -320,27 +319,96 @@ let ForceChart = (function () {
     }
 
     function drawTopo(topo_type, radius) {
-        if (topo_type = 0) {
-            let radian_dict = {
-                'left_top': 162 * (2 * Math.PI / 360),
-                'left_bottom': 234 * (2 * Math.PI / 360),
-                'right_top': 18 * (2 * Math.PI / 360),
-                'right_bottom': 308 * (2 * Math.PI / 360)
-            }
-            let topo_nodes = [];
-            for (let key in radian_dict) {
-                topo_nodes.push({ x: Math.cos(radian_dict[d.pos]) * radius / 2, y: Math.sin(radian_dict[d.pos]) * radius / 2 });
-            }
-            topo_nodes.push({ x: 0, y: radius / 2 });
-            let topo_g = variable.svg_force.append('g').selectAll('circle').data(topo_nodes).enter()
-                .append('circle')
-                .attr('cx', d => d.x)
-                .attr('cy', d => d.y)
-                .attr('r', radius / 8)
-                .attr('fill', 'white')
-                .attr('stroke', 'white')
-            return topo_g;
+        let topo_nodes = [], topo_links = [];
+        let radian_dict = {
+            'left_top': 162 * (2 * Math.PI / 360),
+            'left_bottom': 234 * (2 * Math.PI / 360),
+            'right_bottom': 308 * (2 * Math.PI / 360),
+            'right_top': 18 * (2 * Math.PI / 360)
         }
+        if (topo_type == 0) {
+            //*************环***************
+            topo_nodes.push({ x: 0, y: -radius / 2 });
+            for (let key in radian_dict) {
+                topo_nodes.push({ x: Math.cos(radian_dict[key]) * radius / 2, y: -Math.sin(radian_dict[key]) * radius / 2 });
+            }
+            for (let i = 0; i < 4; i++) {
+                topo_links.push([topo_nodes[i], topo_nodes[i + 1]]);
+            }
+            topo_links.push([topo_nodes[4], topo_nodes[0]]);
+
+        } else if (topo_type == 1) {
+            //*************弱连通***************
+            topo_nodes.push({ x: 0, y: -radius / 2 });
+            for (let key in radian_dict) {
+                topo_nodes.push({ x: Math.cos(radian_dict[key]) * radius / 2, y: -Math.sin(radian_dict[key]) * radius / 2 });
+            }
+            topo_nodes.push({ x: 0, y: 0 });
+            for (let i = 0; i < 4; i++) {
+                topo_links.push([topo_nodes[i], topo_nodes[i + 1]]);
+            }
+            topo_links.push([topo_nodes[4], topo_nodes[0]]);
+            topo_links.push([topo_nodes[5], topo_nodes[0]]);
+            topo_links.push([topo_nodes[5], topo_nodes[2]]);
+            topo_links.push([topo_nodes[5], topo_nodes[3]]);
+
+
+        } else if (topo_type == 2) {
+            //*************强连通***************
+            topo_nodes.push({ x: 0, y: -radius / 2 });
+            for (let key in radian_dict) {
+                topo_nodes.push({ x: Math.cos(radian_dict[key]) * radius / 2, y: -Math.sin(radian_dict[key]) * radius / 2 });
+            }
+            for (let i = 0; i < 4; i++) {
+                topo_links.push([topo_nodes[i], topo_nodes[i + 1]]);
+            }
+            topo_links.push([topo_nodes[4], topo_nodes[0]]);
+            topo_links.push([topo_nodes[0], topo_nodes[2]]);
+            topo_links.push([topo_nodes[0], topo_nodes[3]]);
+            topo_links.push([topo_nodes[1], topo_nodes[4]]);
+            topo_links.push([topo_nodes[1], topo_nodes[3]]);
+            topo_links.push([topo_nodes[2], topo_nodes[4]]);
+
+        } else if (topo_type == 3) {
+            //*************环中心发散***************
+            topo_nodes.push({ x: 0, y: -radius / 2 });
+            for (let key in radian_dict) {
+                topo_nodes.push({ x: Math.cos(radian_dict[key]) * radius / 2, y: -Math.sin(radian_dict[key]) * radius / 2 });
+            }
+            topo_nodes.push({ x: 0, y: 0 });
+            for (let i = 0; i < 5; i++) {
+                topo_links.push([topo_nodes[5], topo_nodes[i]]);
+            }
+        } else {
+            //*************链***************
+            for (let i = 0 ; i < 3; i++) {
+                topo_nodes.push({ x:  (-1 + i)*radius / 2, y:0});
+            }
+            for (let i = 0; i < 2; i++) {
+                topo_links.push([topo_nodes[i], topo_nodes[i + 1]]);
+            }
+        }
+        let topo_node_g = variable.svg_force.append('g').selectAll('circle').data(topo_nodes).enter()
+            .append('circle')
+            .attr('cx', d => d.x)
+            .attr('cy', d => d.y)
+            .attr('r', radius / 8)
+            .attr('fill', 'white')
+            .attr('stroke', 'white')
+
+        let line = d3.line()
+            .x(function (d) { return d.x })
+            .y(function (d) { return d.y })
+            .curve(d3.curveBasis)
+
+        let topo_link_g = variable.svg_force.append('g').selectAll('path').data(topo_links).enter()
+            .append('path')
+            .attr('d', function (d) { return line(d) })
+            .attr('stroke', 'white')
+            .attr('stroke-width', radius / 12)
+            .attr('fill', 'none')
+        return [topo_node_g, topo_link_g];
+
     }
 
     return {
