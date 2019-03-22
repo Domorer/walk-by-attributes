@@ -109,7 +109,7 @@ let ForceChart = (function () {
         let link_cluster = svg_cluster.append('g').selectAll('line').data(links).enter()
             .append('line')
             .attr('stroke', '#bfbfbf')
-            .attr('opacity',0.5)
+            .attr('opacity', 0.5)
             .attr('stroke-width', 2)
         //画点
         let node_cluster = svg_cluster.append('g').selectAll('circle').data(nodes).enter()
@@ -121,7 +121,11 @@ let ForceChart = (function () {
 
 
     }
-    //绘制聚类后的力引导图
+
+
+    //************绘制聚类后的力引导图************
+    let radian = 45 * 0.017453293;
+    console.log(Math.tan(radian));
     function Clustering(clusterids_dict, clusterLinks_dict, cluster_dict) {
         console.log('clusterLinks_dict: ', clusterLinks_dict);
         variable.svg_force.selectAll('*').remove();
@@ -131,7 +135,6 @@ let ForceChart = (function () {
         let color = d3.scaleOrdinal(d3.schemeCategory20);
 
         //统计每个簇内的点数量
-
         for (let key in clusterids_dict) {
             let tmp_dict = {};
             tmp_dict['id'] = key;
@@ -143,8 +146,6 @@ let ForceChart = (function () {
         r_extent = d3.extent(cluster_nodes, function (d) { return d.value; })
         let rScale = d3.scaleLinear().domain(r_extent).range([5, 20]);
         //统计每条连线的权重
-
-
         for (let key in clusterLinks_dict) {
             if (key.split('-')[0] != key.split('-')[1]) {
                 let tmp_dict = {};
@@ -237,40 +238,51 @@ let ForceChart = (function () {
             }).call(drag(simulation))
 
         //画园内的pattern
+
         let pattern_nodes = [];
         for (let i = 0; i < cluster_nodes.length; i++) {
-            pattern_nodes.push({ cluster: cluster_nodes[i].cluster, pos: 'left', value: cluster_nodes[i].value, index: i });
-            pattern_nodes.push({ 'cluster': cluster_nodes[i].cluster, 'pos': 'right', value: cluster_nodes[i].value, index: i });
+            let topo = i % 5;
+            pattern_nodes.push({ cluster: cluster_nodes[i].cluster, pos: 'left_top', value: cluster_nodes[i].value, index: i, tolo_type: topo });
+            pattern_nodes.push({ 'cluster': cluster_nodes[i].cluster, 'pos': 'left_bottom', value: cluster_nodes[i].value, index: i, tolo_type: topo });
+            pattern_nodes.push({ 'cluster': cluster_nodes[i].cluster, 'pos': 'right_top', value: cluster_nodes[i].value, index: i, tolo_type: topo });
+            pattern_nodes.push({ 'cluster': cluster_nodes[i].cluster, 'pos': 'right_bottom', value: cluster_nodes[i].value, index: i, tolo_type: topo });
+            pattern_nodes.push({ 'cluster': cluster_nodes[i].cluster, 'pos': 'top', value: cluster_nodes[i].value, index: i, tolo_type: topo });
+
+
         }
-        let node_pattern = variable.svg_force.append('g').selectAll('circle').data(pattern_nodes).enter()
-            .append('circle')
-            .attr('r', function (d) {
-                return rScale(d.value) / 6;
-            })
-            .attr('stroke', 'white')
-            .attr('fill', 'white')
-            .attr('class', function (d) {
-                return 'pattern_' + d.cluster + '_' + d.pos;
-            });
 
-        let line = d3.line()
-            .x(function (d) { return d[0] })
-            .y(function (d) { return d[1] })
-            .curve(d3.curveBasis)
-        let pattern_links = [];
-        for (let i = 0; i < cluster_nodes.length; i++) {
-            pattern_links.push({ loc: [[0, 0], [0, 0], [0, 0]], value: cluster_nodes[i].value, index: i })
+        // let node_pattern = variable.svg_force.append('g').selectAll('circle').data(pattern_nodes).enter()
+        //     .append('circle')
+        //     .attr('r', function (d) {
+        //         return rScale(d.value) / 8;
+        //     })
+        //     .attr('stroke', 'white')
+        //     .attr('fill', 'white')
+        //     .attr('class', function (d) {
+        //         return 'pattern_' + d.cluster + '_' + d.pos;
+        //     });
+
+        // let line = d3.line()
+        //     .x(function (d) { return d[0] })
+        //     .y(function (d) { return d[1] })
+        //     .curve(d3.curveBasis)
+        // let pattern_links = [];
+        // for (let i = 0; i < cluster_nodes.length; i++) {
+        //     pattern_links.push({ loc: [[0, 0], [0, 0], [0, 0]], value: cluster_nodes[i].value, index: i })
+        // }
+        // let link_pattern = variable.svg_force.append('g').selectAll('path').data(pattern_links).enter()
+        //     .append('path')
+        //     // .attr('d', function (d) { return line(d.loc) })
+        //     .attr('stroke', 'white')
+        //     .attr('stroke-width', d => rScale(d.value) / 12)
+        //     .attr('fill', 'none')
+
+        let radian_dict = {
+            'left_top': 162 * (2 * Math.PI / 360),
+            'left_bottom': 234 * (2 * Math.PI / 360),
+            'right_top': 18 * (2 * Math.PI / 360),
+            'right_bottom': 308 * (2 * Math.PI / 360)
         }
-        let link_pattern = variable.svg_force.append('g').selectAll('path').data(pattern_links).enter()
-            .append('path')
-            // .attr('d', function (d) { return line(d.loc) })
-            .attr('stroke', 'white')
-            .attr('stroke-width', d => rScale(d.value) / 12)
-            .attr('fill', 'none')
-
-        //画线内的pattern
-
-
         //设置tick函数
         simulation.on("tick", () => {
             link
@@ -283,24 +295,54 @@ let ForceChart = (function () {
                 .attr("cx", d => d.x)
                 .attr("cy", d => d.y);
 
-            node_pattern
-                .attr("cx", function (d) {
-                    if (d.pos == 'left')
-                        return cluster_nodes[d.index].x - rScale(d.value) / 3;
-                    else
-                        return cluster_nodes[d.index].x + rScale(d.value) / 3;
-                })
-                .attr("cy", d => cluster_nodes[d.index].y - rScale(d.value) / 10);
+            // node_pattern
+            //     .attr("cx", function (d) {
+            //         if (d.pos != 'top')
+            //             return cluster_nodes[d.index].x + Math.cos(radian_dict[d.pos]) * rScale(d.value) / 2;
+            //         else
+            //             return cluster_nodes[d.index].x;
+            //     })
+            //     .attr("cy", function (d) {
+            //         if (d.pos != 'top')
+            //             return cluster_nodes[d.index].y + Math.sin(radian_dict[d.pos]) * rScale(d.value) / 2;
+            //         else
+            //             return cluster_nodes[d.index].y + rScale(d.value) / 2;
+            //     });
 
-            link_pattern.attr('d', function (d) {
-                let tmp_source = [cluster_nodes[d.index].x - rScale(d.value) / 3, cluster_nodes[d.index].y + rScale(d.value) / 2];
-                let tmp_target = [cluster_nodes[d.index].x + rScale(d.value) / 3, cluster_nodes[d.index].y + rScale(d.value) / 2];
-                let tmp_middle = [cluster_nodes[d.index].x, cluster_nodes[d.index].y + rScale(d.value) * 4 / 5];
-                let tmp_loc = [tmp_source, tmp_middle, tmp_target];
-                return line(tmp_loc);
-            })
+            // link_pattern.attr('d', function (d) {
+            //     let tmp_source = [cluster_nodes[d.index].x - rScale(d.value) / 3, cluster_nodes[d.index].y + rScale(d.value) / 2];
+            //     let tmp_target = [cluster_nodes[d.index].x + rScale(d.value) / 3, cluster_nodes[d.index].y + rScale(d.value) / 2];
+            //     let tmp_middle = [cluster_nodes[d.index].x, cluster_nodes[d.index].y + rScale(d.value) * 4 / 5];
+            //     let tmp_loc = [tmp_source, tmp_middle, tmp_target];
+            //     return line(tmp_loc);
+            // })
         });
     }
+
+    function drawTopo(topo_type, radius) {
+        if (topo_type = 0) {
+            let radian_dict = {
+                'left_top': 162 * (2 * Math.PI / 360),
+                'left_bottom': 234 * (2 * Math.PI / 360),
+                'right_top': 18 * (2 * Math.PI / 360),
+                'right_bottom': 308 * (2 * Math.PI / 360)
+            }
+            let topo_nodes = [];
+            for (let key in radian_dict) {
+                topo_nodes.push({ x: Math.cos(radian_dict[d.pos]) * radius / 2, y: Math.sin(radian_dict[d.pos]) * radius / 2 });
+            }
+            topo_nodes.push({ x: 0, y: radius / 2 });
+            let topo_g = variable.svg_force.append('g').selectAll('circle').data(topo_nodes).enter()
+                .append('circle')
+                .attr('cx', d => d.x)
+                .attr('cy', d => d.y)
+                .attr('r', radius / 8)
+                .attr('fill', 'white')
+                .attr('stroke', 'white')
+            return topo_g;
+        }
+    }
+
     return {
         drawStaticForce,
         Clustering
