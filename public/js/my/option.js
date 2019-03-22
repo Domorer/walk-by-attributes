@@ -7,7 +7,7 @@ let option = (function () {
     let tmp_param = ["cited", '次', 'cited_chart'];
     let wt = 'wt_3', sl = 'sl_5', rl = 'rl_False';
     //读取数据和初始化各窗口
-    d3.json('data/all_param_k_clu_5.json', function (all_data) {
+    d3.json('data/dim3_param_k_clu_5.json', function (all_data) {
         console.log('all_data: ', all_data);
         //赋值总数据集合
         variable.all_data = all_data;

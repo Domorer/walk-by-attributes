@@ -48,8 +48,8 @@ let ForceChart = (function () {
 
     //绘制簇内点的原始力引导图
     function drawClusterForce(id_links) {
-        let forceClusterWidth = $('#svgCluster_force')[0].scrollWidth;
-        let forceClusterHeight = $('#svgCluster_force')[0].scrollHeight;
+        let forceClusterWidth = $('#svg_oriTopo')[0].scrollWidth;
+        let forceClusterHeight = $('#svg_oriTopo')[0].scrollHeight;
         let svg_cluster = d3.select('#svg_oriTopo');
         svg_cluster.selectAll('*').remove();
         let nodes = [], links = [], nodes_dict = {};
@@ -108,7 +108,7 @@ let ForceChart = (function () {
         //画线
         let link_cluster = svg_cluster.append('g').selectAll('line').data(links).enter()
             .append('line')
-            .attr('stroke', '#999')
+            .attr('stroke', '#bfbfbf')
             .attr('opacity',0.5)
             .attr('stroke-width', 2)
         //画点
