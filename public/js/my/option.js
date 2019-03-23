@@ -6,6 +6,8 @@ let option = (function () {
     let comb_record = [];//记录操作的具体参数元素格式为[当前属性选择，当前游走方式选择]
     let tmp_param = ["cited", '次', 'cited_chart'];
     let wt = 'wt_5', sl = 'sl_5', rl = 'rl_False';
+    //修改串窗口的大小
+    
     //读取数据和初始化各窗口
     d3.json('data/merge_corpus/topo_param_loc_0_3_4.json', function (all_data) {
         console.log('all_data: ', all_data);

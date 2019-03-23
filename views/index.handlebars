@@ -19,8 +19,8 @@
 {{!-- <nav id="nav" class="navbar navbar-dark sticky-top  flex-md-nowrap p-0" style="border-bottom:3px solid rgb(216, 216, 216);">
     <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#" style="border-bottom:0.1px solid rgb(216, 216, 216);background-color:white;box-shadow:none;color:rgb(124, 124, 124);font-size:1.5em;">胜利油田</a>
 </nav> --}}
-<div class='left'>
-    <div class='dataset'>
+<div id='left'>
+    <div id='dataset'>
         <div id="headLine">
             <a id='headline_a'>Dataset</a>
         </div>
@@ -40,11 +40,11 @@
             </div>
         </div>
     </div>
-    <div class='paramList'>
+    <div id='attributes'>
         <div id="headLine">
-            <a id='headline_a'>Parameters</a>
+            <a id='headline_a'>Attributes</a>
         </div>
-        <div id='paramInner'>
+        <div id='attrInner'>
             <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
                 <input type="checkbox" class="custom-control-input" id="cited">
                 <label class="custom-control-label" for="cited" id="citedLabel" style='color:gray'>Number of citations</label>
@@ -66,6 +66,14 @@
                 <label class="custom-control-label" for="aff" id="affLabel" style='color:gray'>First Author Affiliation</label>
             </div>
 
+        </div>
+
+    </div>
+    <div id='control_pannel'>
+        <div id="headLine">
+            <a id='headline_a'>Control Pannel</a>
+        </div>
+        <div id='controlInner'>
             <div class="custom-control custom-checkbox custom-control-inline" style='margin-top:7%;margin-left:13%;'>
                 <input type="checkbox" class="custom-control-input" id="wt_5" checked='true'>
                 <label class="custom-control-label" for="wt_5" id="wt_3_label" style='color:gray'>5 times</label>
@@ -97,41 +105,50 @@
                 <button id="confirm" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Confirm</button>
             </div>
         </div>
+
     </div>
 
-    <div class='OriTopo'>
+
+    <div id='OriTopo'>
         <div id="headLine">
             <a id='headline_a'>Original topology</a>
         </div>
-        <div class='svg_oriTopoDiv'>
-            <svg id='svg_oriTopo'></svg>
-        </div>
-
+        <svg id='svg_oriTopo'></svg>
     </div>
 </div>
 
-<div class='mid'>
-    <button id="cluster_layout" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Cluster Layout</button>
+<div id='mid'>
 
-    <div class='forceDiv'>
+    <div id='forceDiv'>
+        <div id="headLine">
+            <a id='headline_a'>Topology View</a>
+        </div>
+        <button id="cluster_layout" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Cluster Layout</button>
+
         <svg id='svg_force'></svg>
     </div>
 
-    <div class='sankeyDiv'>
+    <div id='sankeyDiv'>
+        <div id="headLine">
+            <a id='headline_a'>Parallel Coordinate View</a>
+        </div>
         <svg id='svg_sankey'></svg>
     </div>
 </div>
 
-<div class='right'>
+<div id='right'>
 
-    <div class='scatter'>
+    <div id='scatter'>
+        <div id="headLine">
+            <a id='headline_a'>AENRL View</a>
+        </div>
         {{!-- <button id="point" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Point</button> --}}
         <button id="brush" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Brush</button>
         <button id="cluster" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Cluster</button>
 
         <div class="dropdown" id='dropdown'>
             <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
-                aria-haspopup="true" aria-expanded="false" style='font-size:0.8em;padding:.0rem .5rem;color:gray;background-color:white;border-color:gray;'>
+                aria-haspopup="true" aria-expanded="false" style='font-size:0.8em;padding:.0rem .5rem;'>
                 walk combination
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id='options'>
@@ -140,7 +157,12 @@
         <svg id='svg_scatter'></svg>
     </div>
 
-    <div class='paramDiv'>
+    <div id='paramDiv'>
+        <div id="headLine">
+            <a id='headline_a'>Tree View</a>
+        </div>
+        <svg id='svg_tree'></svg>
+
     </div>
 
 </div>
