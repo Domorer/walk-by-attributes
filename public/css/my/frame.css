@@ -66,15 +66,6 @@ div#control_pannel {
     width: 100%;
 }
 
-button#confirm {
-    margin-left: 35%;
-    padding-left: 5;
-    padding-right: 5;
-    padding-top: 0;
-    padding-bottom: 0;
-    font-size: 1em;
-}
-
 
 
 #svg_oriTopo {
@@ -115,18 +106,6 @@ button#confirm {
     height: 69.7%;
 }
 
-button#cluster_layout {
-    position: absolute;
-    margin-left: 80%;
-    padding-left: 5;
-    padding-right: 5;
-    padding-top: 0;
-    padding-bottom: 0;
-    font-size: 0.8em;
-    top: 0.1%;
-    border: none;
-    color:white;
-}
 
 #svg_force {
     border-radius: 4px;

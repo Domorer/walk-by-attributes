@@ -123,9 +123,9 @@
         <div id="headLine">
             <a id='headline_a'>Topology View</a>
         </div>
+        <svg id='svg_force'></svg>
         <button id="cluster_layout" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Cluster Layout</button>
 
-        <svg id='svg_force'></svg>
     </div>
 
     <div id='sankeyDiv'>
@@ -143,6 +143,8 @@
             <a id='headline_a'>AENRL View</a>
         </div>
         {{!-- <button id="point" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Point</button> --}}
+
+        <svg id='svg_scatter'></svg>
         <button id="brush" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Brush</button>
         <button id="cluster" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Cluster</button>
 
@@ -154,7 +156,6 @@
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id='options'>
             </div>
         </div>
-        <svg id='svg_scatter'></svg>
     </div>
 
     <div id='paramDiv'>
