@@ -16,7 +16,7 @@ var hbs = exphbs.create({
     }
   }
 });
-
+require('./models/connect.js');
 var app = express();
 
 // view engine setup

@@ -112,6 +112,28 @@ let option = (function () {
         ForceChart.Clustering(variable.comb_data['clu_ids'], variable.comb_data['cluster_link'], variable.cluster_dict);
     })
 
+    function getCombData(param) {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: "get",
+                url: "/id/ChosenId",
+                async: false,
+                data: {
+                    'wt': param.wt,
+                    'sl': param.sl,
+                    'rl': param.rl,
+                    'comb': param.comb,
+                },
+                success: function (data) {
+                    resolve(data);
+                },
+                error: function () { 
+                    
+                }
+            });
+        });
+    }
+
     return {
         tmp_param
     }

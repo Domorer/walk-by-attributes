@@ -27,11 +27,12 @@ let scatter = (function () {
             }).attr('r', 2)
             .attr('fill', function (d, i) {
                 // return color[variable.info_dict[d['id']]['journal']];
-                d.cluster = parseInt(d.cluster);
-                if (d.cluster != -1)
-                    return color(d.cluster);
-                else
-                    return 'black'
+                // d.cluster = parseInt(d.cluster);
+                // if (d.cluster != -1)
+                //     return color(d.cluster);
+                // else
+                //     return 'black'
+                return '#329CCB';
             }).on('click', function (d) {
                 console.log(d);
             }).attr('class', function (d) {
@@ -120,7 +121,7 @@ let scatter = (function () {
                     for (let i in cluster_ids_dict[this.id]) {
                         tmp_cluster_data.push(variable.info_dict[cluster_ids_dict[this.id][i]])
                     }
-                    parameters.drawchart(tmp_cluster_data);
+                    // parameters.drawchart(tmp_cluster_data);
                 })
         })
         //设置选点按钮操作

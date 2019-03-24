@@ -1,6 +1,6 @@
 //连接数据库
 const mongoose= require('mongoose');
-mongoose.connect('mongodb://localhost:27017/well',{useNewUrlParser: true}).then(
+mongoose.connect('mongodb://localhost:27017/paper_walk',{useNewUrlParser: true}).then(
     (res) =>{
         console.log("Connected to Database Successfully !")
     }
