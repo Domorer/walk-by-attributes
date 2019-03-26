@@ -46,24 +46,24 @@
         </div>
         <div id='attrInner'>
             <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
-                <input type="checkbox" class="custom-control-input" id="cited">
-                <label class="custom-control-label" for="cited" id="citedLabel" style='color:gray'>Number of citations</label>
+                <input type="checkbox" class="custom-control-input" id="0" checked='true'>
+                <label class="custom-control-label" for="0" id="citedLabel" style='color:gray'>6:00 ~ 9:00</label>
             </div>
             <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
-                <input type="checkbox" class="custom-control-input" id="abt">
-                <label class="custom-control-label" for="abt" id="abtLabel" style='color:gray'>Abstract</label>
+                <input type="checkbox" class="custom-control-input" id="1">
+                <label class="custom-control-label" for="1" id="abtLabel" style='color:gray'>10:00 ~ 13:00</label>
             </div>
             <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
-                <input type="checkbox" class="custom-control-input" id="conf" checked='true'>
-                <label class="custom-control-label" for="conf" id="confLabel" style='color:gray'>Conference</label>
+                <input type="checkbox" class="custom-control-input" id="2">
+                <label class="custom-control-label" for="2" id="confLabel" style='color:gray'>14:00 ~ 17:00</label>
             </div>
             <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
-                <input type="checkbox" class="custom-control-input" id="year" checked='true'>
-                <label class="custom-control-label" for="year" id="yearLabel" style='color:gray'>Time</label>
+                <input type="checkbox" class="custom-control-input" id="3" >
+                <label class="custom-control-label" for="3" id="yearLabel" style='color:gray'>18:00 ~ 21:00</label>
             </div>
             <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
-                <input type="checkbox" class="custom-control-input" id="aff">
-                <label class="custom-control-label" for="aff" id="affLabel" style='color:gray'>First Author Affiliation</label>
+                <input type="checkbox" class="custom-control-input" id="4">
+                <label class="custom-control-label" for="4" id="affLabel" style='color:gray'>22:00 ~ 6:00</label>
             </div>
 
         </div>
@@ -128,11 +128,11 @@
 
     </div>
 
-    <div id='sankeyDiv'>
+    <div id='parallelDiv'>
         <div id="headLine">
             <a id='headline_a'>Parallel Coordinate View</a>
         </div>
-        <svg id='svg_sankey'></svg>
+        <svg id='svg_parallel'></svg>
     </div>
 </div>
 
@@ -145,7 +145,6 @@
         {{!-- <button id="point" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Point</button> --}}
 
         <svg id='svg_scatter'></svg>
-        <button id="brush" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Brush</button>
         <button id="cluster" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Cluster</button>
 
         <div class="dropdown" id='dropdown'>
@@ -153,7 +152,7 @@
                 aria-haspopup="true" aria-expanded="false" style='font-size:0.8em;padding:.0rem .5rem;'>
                 walk combination
             </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id='options'>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id='options' style='min-width:9rem;'>
             </div>
         </div>
     </div>
@@ -175,6 +174,8 @@
 <script src="/js/my/sactter.js"></script>
 <script src="/js/my/force.js"></script>
 <script src="/js/my/axis.js"></script>
+<script src="/js/my/parallel.js"></script>
+<script src="/js/my/cluster.js"></script>
 <script src="/js/my/sankeyChart.js"></script>
-<script src="/js/my/tree.js"></script>
+<script src="/js/my/pixel_tree.js"></script>
 <script src="/js/my/option.js"></script>

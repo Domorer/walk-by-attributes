@@ -5,67 +5,57 @@ let option = (function () {
     let optIndex = 0;//记录操作的index
     let comb_record = [];//记录操作的具体参数元素格式为[当前属性选择，当前游走方式选择]
     let tmp_param = ["cited", '次', 'cited_chart'];
-    let wt = 'wt_5', sl = 'sl_5', rl = 'rl_False';
+    let param = { wt: 'wt_5', sl: 'sl_10', rl: 'rl_False', comb: 'period_0' };
+    variable.param = param;
     //修改串窗口的大小
-    
-    //读取数据和初始化各窗口
-    d3.json('data/merge_corpus/topo_param_loc_0_3_4.json', function (all_data) {
-        console.log('all_data: ', all_data);
-        //赋值总数据集合
-        variable.all_data = all_data;
-        variable.all_comb = all_data['wt_5']['sl_5']['rl_False'];
-        //绘制降维散点图
-        scatter.drawScatter(variable.all_comb['conf_year']['info']);
-        variable.comb_data = variable.all_comb['conf_year']['info']
-        d3.json('data/links.json', function (error, link_data) {
-            if (error)
-                console.log(error);
-            d3.json('data/info.json', function (error, info_dict) {
-                d3.json('data/nodes.json', function (error, node_data) {
-                    if (error)
-                        console.log(error);
-                    //生成簇字典并赋值给varibale
-                    let tmp_dict = {};
-                    for (let i = 0; i < variable.all_comb['conf_year']['info'].length; i++) {
-                        tmp_dict[variable.all_comb['conf_year']['info'][i].id] = parseInt(variable.all_comb['conf_year']['info'][i].cluster);
-                    }
-                    variable.node_data = node_data;
-                    variable.info_dict = info_dict;
-                    variable.link_data = link_data;
-                    variable.cluster_dict = tmp_dict;
-                    variable.cluster_record.push(tmp_dict);
-                    //绘制静态力引导图
-                    // ForceChart.drawStaticForce(node_data, link_data, variable.cluster_dict);
 
-                    //保存当前簇数据
-                    let max_cluster = -1000;
-                    let tmp_index = variable.confirm_time;
-                    for (let id in variable.cluster_record[tmp_index]) {
-                        let tmp_cluster = variable.cluster_record[tmp_index][id];//该点的目标簇
-                        if (tmp_cluster > max_cluster)
-                            max_cluster = tmp_cluster;
-                    }
-                    for (let i = 0; i <= max_cluster; i++) {
-                        let tmp_id = tmp_index + '_' + i;
-                        variable.sankeyNode_data.push({ 'id': tmp_id });
-                    }
-                    $('#max_cluster').text(max_cluster);
-                });
+  
+    //初始化
+    getCombData(param).then(function (data) {
+        d3.csv('data/Chicago/undir_link_weight.csv', function (error, data_link) {
+            d3.json('data/Chicago/period_value_dict.json', function (error, data_period) {
+                variable.period_dict = data_period;
+                console.log('data_link: ', data_link);
+                for (let i = 0; i < data_link.length; i++) {
+                    if (variable.oriLink_dict[data_link[i].source] != null)
+                        variable.oriLink_dict[data_link[i].source].push(data_link[i].target)
+                    else
+                        variable.oriLink_dict[data_link[i].source] = [data_link[i].target];
+                }
+                variable.oriLinks = data_link;
+                variable.comb_data = data[0];
+                //通过用户选定的层级来生成类字典
+                let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
+                variable.level = max_level - 6;
+                clusterFun.cluster(variable.comb_data, max_level - 6)
+                console.log('variable.comb_data: ', variable.comb_data);
+                //绘制降维散点图
+                scatter.drawScatter(variable.comb_data['info']);
+                console.log(variable.comb_data['info'].length)
+                //绘制力引导图
+                forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
+                tree_view.draw_tree(data[0]);
             })
-        })
-    })
 
+        })
+
+
+    }).catch(function (error) {
+        console.log('error: ', error);
+    })
     //力引导图的簇展示
     $('#cluster_layout').on('click', function () {
-        ForceChart.Clustering(variable.comb_data['clu_ids'], variable.comb_data['cluster_link'], variable.cluster_dict);
-    })
+        forceChart.Clustering(variable.comb_data['clu_ids'], variable.comb_data['cluster_link'], variable.cluster_dict);
+    });
+
+
     //设置参数选择
     $('#confirm').on('click', function () {
         //操作次数加一
         variable.confirm_time += 1;
         //***********获取当前各参数的选择情况***********
         comb_len = 0; //记录当前选择的属性数量，用于后面key的格式定义
-        variable.attr = 'conf';
+        variable.attr = 'random';
         //循环判断每个checkbox的状态来获取当前的属性选择
         variable.attr_arr.forEach(Element => {
             let tmp_checked = $('#' + Element)[0].checked;
@@ -74,49 +64,56 @@ let option = (function () {
                 if (comb_len > 1) {
                     variable.attr += '_' + $('#' + Element)[0].id;
                 } else {
-                    variable.attr = $('#' + Element)[0].id;
+                    variable.attr = 'period_' + $('#' + Element)[0].id;
                 }
             }
         })
         console.log('variable.attr: ', variable.attr);
-
-        sl = $('#sl_5')[0].checked ? 'sl_5' : 'sl_10';
+        wt = $('#wt_5')[0].checked ? 'wt_5' : 'wt_10';
+        sl = $('#sl_5')[0].checked ? 'sl_10' : 'sl_15';
         rl = $('#ret_True')[0].checked ? 'rl_True' : 'rl_False';
+        let param = { wt: wt, sl: sl, rl: rl, comb: variable.attr }
+        variable.param = param;
+        //修改参数后修改各界面的view
+        getCombData(param).then(function (data) {
+            console.log('data: ', data);
+            variable.comb_data = data[0];
+            //通过用户选定的层级来生成类字典
+            let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
+            variable.level = max_level - 6;
+            clusterFun.cluster(variable.comb_data, max_level - 6)
+            scatter.drawScatter(data[0]['info']);
+            tree_view.draw_tree(data[0]);
+            forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
+        })
         console.log(wt, sl, rl, variable.attr)
         /*****************************************************/
 
         //将操作数据记录并添加到dropdown，格式为选择的属性 + 游走的方式
-        comb_record.push(variable.attr);
+        comb_record.push(param);
         let tmp_text = variable.attr;
         let tmp_option = $('<a></a>').text(tmp_text).attr("id", optIndex).attr('class', 'dropdown-item').on('click', function () {
-            variable.comb_data = variable.all_data[wt][sl][rl][comb_record[this.id]];
-            // scatter.drawScatter(variable.comb_data['info']);
-            ForceChart.Clustering(variable.comb_data['clu_ids'], variable.comb_data['cluster_link'], variable.cluster_dict);
+            getCombData(comb_record[this.id]).then(function (data) {
+                variable.comb_data = data[0];
+                //通过用户选定的层级来生成类字典
+                let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
+                clusterFun.cluster(variable.comb_data, max_level - 5)
+                scatter.drawScatter(data[0]['info']);
+                parallel.drawParallel(variable.clu_tpg);
+                tree_view.draw_tree(data[0]);
+                forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
+            })
         });
         $("#options").append(tmp_option);
         optIndex += 1;
 
-        //根据参数选择获取对应数据
-        variable.comb_data = variable.all_data[wt][sl][rl][variable.attr];
-        let tmpCombData = variable.comb_data['info'];
-        //生成簇字典
-        let tmp_dict = {};
-        for (let i = 0; i < tmpCombData.length; i++) {
-            tmp_dict[tmpCombData[i].id] = parseInt(tmpCombData[i].cluster);
-        }
-        //将当前操作的簇字典添加到cluster_record
-        variable.cluster_dict = tmp_dict;;
-        variable.cluster_record.push(tmp_dict);
-        scatter.drawScatter(tmpCombData);
-        axisChart.drawAxis(variable.comb_data);
-        ForceChart.Clustering(variable.comb_data['clu_ids'], variable.comb_data['cluster_link'], variable.cluster_dict);
     })
 
     function getCombData(param) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: "get",
-                url: "/id/ChosenId",
+                url: "/comb_data",
                 async: false,
                 data: {
                     'wt': param.wt,
@@ -127,8 +124,8 @@ let option = (function () {
                 success: function (data) {
                     resolve(data);
                 },
-                error: function () { 
-                    
+                error: function () {
+
                 }
             });
         });

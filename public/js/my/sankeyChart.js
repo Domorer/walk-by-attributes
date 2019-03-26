@@ -1,7 +1,7 @@
 let sankeyChart = (function () {
     // drawSankey();
-    let sankey_width = $('#svg_sankey')[0].scrollWidth;
-    let sankey_height = $('#svg_sankey')[0].scrollHeight;
+    let sankey_width = $('#svg_parallel')[0].scrollWidth;
+    let sankey_height = $('#svg_parallel')[0].scrollHeight;
     function drawSankey(nodes_data, links_data) {
         //nodes_data('id') link_data(source、target、value)
         variable.svg_sankey.selectAll('*').remove();

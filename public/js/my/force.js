@@ -1,4 +1,4 @@
-let ForceChart = (function () {
+let forceChart = (function () {
     let forceWidth = $('#svg_force')[0].scrollWidth;
     let forceHeight = $('#svg_force')[0].scrollHeight;
 
@@ -47,18 +47,18 @@ let ForceChart = (function () {
     }
 
     //绘制簇内点的原始力引导图
-    function drawClusterForce(id_links) {
+    function drawClusterForce(links) {
+        console.log(1);
         let forceClusterWidth = $('#svg_oriTopo')[0].scrollWidth;
         let forceClusterHeight = $('#svg_oriTopo')[0].scrollHeight;
         let svg_cluster = d3.select('#svg_oriTopo');
         svg_cluster.selectAll('*').remove();
-        let nodes = [], links = [], nodes_dict = {};
-        for (let i = 0; i < id_links.length; i++) {
-            links.push({ 'source': id_links[i][0], 'target': id_links[i][1] });
-            if (nodes_dict[id_links[i][0]] == undefined)
-                nodes_dict[id_links[i][0]] = true;
-            if (nodes_dict[id_links[i][1]] == undefined)
-                nodes_dict[id_links[i][1]] = true;
+        let nodes = [], nodes_dict = {};
+        for (let i = 0; i < links.length; i++) {
+            if (nodes_dict[links[i].source] == undefined)
+                nodes_dict[links[i].source] = true;
+            if (nodes_dict[links[i].target] == undefined)
+                nodes_dict[links[i].target] = true;
         }
         for (let key in nodes_dict) {
             nodes.push({ 'id': key });
@@ -124,8 +124,7 @@ let ForceChart = (function () {
 
 
     //************绘制聚类后的力引导图************
-    let radian = 45 * 0.017453293;
-    console.log(Math.tan(radian));
+
     function Clustering(clusterids_dict, clusterLinks_dict, cluster_dict) {
         console.log('clusterLinks_dict: ', clusterLinks_dict);
         variable.svg_force.selectAll('*').remove();
@@ -151,21 +150,27 @@ let ForceChart = (function () {
                 let tmp_dict = {};
                 tmp_dict['source'] = key.split('-')[0];
                 tmp_dict['target'] = key.split('-')[1];
-                tmp_dict['ratio'] = clusterLinks_dict[key]['ratio']
-                tmp_dict['value'] = parseInt(clusterLinks_dict[key]['value']);
+                tmp_dict['value'] = parseInt(clusterLinks_dict[key]);
                 cluster_links.push(tmp_dict);
             }
         }
         //设置线宽的比例尺
         lineW_extent = d3.extent(cluster_links, function (d) { return d.value; })
+
         console.log('cluster_links: ', cluster_links);
         let LWScale = d3.scaleLinear().domain(lineW_extent).range([1, 10]);
         let OPScale = d3.scaleLinear().domain(lineW_extent).range([0.05, 1]);
         console.log('lineW_extent: ', lineW_extent);
-
+        let index = 0;
+        while (index < cluster_links.length) {
+            if (LWScale(cluster_links[index].value) < 1.5)
+                cluster_links.splice(index, 1)
+            else
+                index += 1;
+        }
         //设置力的作用
         let simulation = d3.forceSimulation(cluster_nodes)
-            .force("charge", d3.forceManyBody().strength(-500).distanceMin(100))
+            .force("charge", d3.forceManyBody().strength(-3500).distanceMax(300))
             .force("link", d3.forceLink(cluster_links).id(d => d.id))
             .force("center", d3.forceCenter(forceWidth / 2, forceHeight / 2))
 
@@ -221,56 +226,48 @@ let ForceChart = (function () {
                 return rScale(d.value);
             })
             .attr('stroke', function (d) {
-                if (d.id != -1)
-                    return color(d.id)
-                else
-                    return 'black';
+                // if (d.id != -1)
+                //     return color(d.id)
+                // else
+                //     return 'black';
+                return '#329CCB';
             }).attr('fill', function (d) {
-                if (d.id != -1)
-                    return color(d.id)
-                else
-                    return 'black';
+                // if (d.id != -1)
+                //     return color(d.id)
+                // else
+                //     return 'black';
+                return '#329CCB';
             }).attr('class', function (d) {
-                return 'cluster_' + d.id;
-            })
+                return 'cluster_node';
+            }).attr('id', d => 'cluster_' + d.id)
             .on('click', function (d) {
-                drawClusterForce(variable.comb_data['clu_tpg'][d.id]);
+                if (variable.last_cluster != undefined) {
+                    d3.select('#area_' + variable.last_cluster).attr('fill', '#D5E2FF');
+                    d3.select('#cluster_' + variable.last_cluster).attr('fill', '#329CCB');
+                    d3.select('#tree_' + variable.last_cluster).attr('fill', '#B6E9FF').attr('stroke', '#329CCB')
+                }
+                d3.select('#area_' + d.id).attr('fill', '#FF9519');
+                d3.select('#cluster_' + d.id).attr('fill', '#FF9519');
+                d3.select('#tree_' + d.id).attr('fill', '#FFC889').attr('stroke', '#FF9519')
+                variable.last_cluster = d.id;
+                console.log(d.id)
+                parallel.drawParallel(d.id);
+                // forceChart.drawPie(d.id);
+                // drawClusterForce(clusterFun.deepCopy(variable.clu_tpg[d.id]));
             }).call(drag(simulation))
 
         //画园内的pattern
 
-        let pattern_g = [];
-
+        let pattern_g = [], pieArr = [];
         for (let i = 0; i < cluster_nodes.length; i++) {
-            let tmp_g = drawTopo(Math.floor(Math.random()*5), rScale(cluster_nodes[i].value))
+            let pie_g = drawPie(cluster_nodes[i].id, rScale(cluster_nodes[i].value));
+            let tmp_g = drawTopo(Math.floor(Math.random() * 5), rScale(cluster_nodes[i].value));
             pattern_g.push({ node: tmp_g[0], link: tmp_g[1], value: cluster_nodes[i].value });
+            pieArr.push(pie_g);
         }
-        console.log('pattern_g: ', pattern_g);
-        // let node_pattern = variable.svg_force.append('g').selectAll('circle').data(pattern_nodes).enter()
-        //     .append('circle')
-        //     .attr('r', function (d) {
-        //         return rScale(d.value) / 8;
-        //     })
-        //     .attr('stroke', 'white')
-        //     .attr('fill', 'white')
-        //     .attr('class', function (d) {
-        //         return 'pattern_' + d.cluster + '_' + d.pos;
-        //     });
-
-        // let line = d3.line()
-        //     .x(function (d) { return d[0] })
-        //     .y(function (d) { return d[1] })
-        //     .curve(d3.curveBasis)
-        // let pattern_links = [];
-        // for (let i = 0; i < cluster_nodes.length; i++) {
-        //     pattern_links.push({ loc: [[0, 0], [0, 0], [0, 0]], value: cluster_nodes[i].value, index: i })
-        // }
-        // let link_pattern = variable.svg_force.append('g').selectAll('path').data(pattern_links).enter()
-        //     .append('path')
-        //     // .attr('d', function (d) { return line(d.loc) })
-        //     .attr('stroke', 'white')
-        //     .attr('stroke-width', d => rScale(d.value) / 12)
-        //     .attr('fill', 'none')
+        //画圆外的属性方差值
+        // for()
+        // console.log('pattern_g: ', pattern_g);
 
         let radian_dict = {
             'left_top': 162 * (2 * Math.PI / 360),
@@ -292,31 +289,86 @@ let ForceChart = (function () {
             for (let i = 0; i < pattern_g.length; i++) {
                 pattern_g[i].node.attr('transform', "translate(" + cluster_nodes[i].x + ',' + cluster_nodes[i].y + ')');
                 pattern_g[i].link.attr('transform', "translate(" + cluster_nodes[i].x + ',' + cluster_nodes[i].y + ')');
-
+                pieArr[i].attr('transform', "translate(" + cluster_nodes[i].x + ',' + cluster_nodes[i].y + ')');
             }
-            // node_pattern
-            //     .attr("cx", function (d) {
-            //         if (d.pos != 'top')
-            //             return cluster_nodes[d.index].x + Math.cos(radian_dict[d.pos]) * rScale(d.value) / 2;
-            //         else
-            //             return cluster_nodes[d.index].x;
-            //     })
-            //     .attr("cy", function (d) {
-            //         if (d.pos != 'top')
-            //             return cluster_nodes[d.index].y + Math.sin(radian_dict[d.pos]) * rScale(d.value) / 2;
-            //         else
-            //             return cluster_nodes[d.index].y + rScale(d.value) / 2;
-            //     });
 
-            // link_pattern.attr('d', function (d) {
-            //     let tmp_source = [cluster_nodes[d.index].x - rScale(d.value) / 3, cluster_nodes[d.index].y + rScale(d.value) / 2];
-            //     let tmp_target = [cluster_nodes[d.index].x + rScale(d.value) / 3, cluster_nodes[d.index].y + rScale(d.value) / 2];
-            //     let tmp_middle = [cluster_nodes[d.index].x, cluster_nodes[d.index].y + rScale(d.value) * 4 / 5];
-            //     let tmp_loc = [tmp_source, tmp_middle, tmp_target];
-            //     return line(tmp_loc);
-            // })
         });
     }
+
+
+    function drawPie(cluster, radius) {
+        let color = ["#1DFF74", '#A597FF', '#FFAB7C', '#EE89FF', '#00D8FF'];
+        let tmp_tpg = clusterFun.deepCopy(variable.clu_tpg[cluster]);
+        let tmp_attrs = variable.param.comb.split('_');
+        tmp_attrs.shift()
+
+        // let attrs_value = new Array(5).fill(0);
+        // for (let i = 0; i < tmp_tpg.length; i++) {
+        //     for (let j = 0; j < 5; j++) {
+        //         attrs_value[j] += tmp_tpg[i].value[j];
+        //     }
+        // }
+        let attrs_value = calVariance(tmp_tpg);
+        for(let i = 0; i < attrs_value.length; i++){
+            attrs_value[i] = 1 / attrs_value[i];
+        }
+        let rScale = d3.scaleLinear()
+            .domain(d3.extent(attrs_value))
+            .range([radius, radius * 1.5])
+
+
+        let pie_data = d3.pie()(attrs_value)
+        for (let i = 0; i < pie_data.length; i++) {
+            pie_data[i].startAngle = i * Math.PI * 2 / pie_data.length;
+            pie_data[i].endAngle = (i + 1) * Math.PI * 2 / pie_data.length;
+            pie_data[i].innerRadius = radius;
+            pie_data[i].outerRadius = rScale(pie_data[i].data);
+        }
+        // let r_scale = 
+
+
+        let arc = d3.arc()
+            .innerRadius(radius)
+            .outerRadius(d => rScale(d.data))
+            .cornerRadius(d => (d.outerRadius - d.innerRadius) / 5)
+            .padAngle(.02)
+
+        let pie_g = variable.svg_force.append('g').selectAll('path').data(pie_data).enter()
+            .append('path')
+            .attr('d', d => arc(d))
+            .attr('fill', function (d, i) {
+                if (tmp_attrs.indexOf(i.toString()) != -1) {
+                    return color[i]
+                } else {
+                    return 'grey'
+                }
+            })
+            .attr('stroke', function (d, i) {
+                if (tmp_attrs.indexOf(i.toString()) != -1) {
+                    return color[i]
+                } else {
+                    return 'grey'
+                }
+            })
+            .attr('stroke-width', 0.1)
+        // console.log('pie_data: ', pie_data);
+        return pie_g;
+    }
+
+    function calVariance(link_arr) {
+        let varianceArr = new Array(5).fill(0), ave_arr = new Array(5).fill(0);
+        for (let i = 0; i < link_arr.length; i++) {
+            for (let j = 0; j < 5; j++)
+                ave_arr[j] += link_arr[i].value[j] / link_arr.length;
+        }
+        for (let i = 0; i < link_arr.length; i++) {
+            for (let j = 0; j < 5; j++) {
+                varianceArr[j] += Math.pow(ave_arr[j] - link_arr[i].value[j], 2) / link_arr.length;
+            }
+        }
+        return varianceArr;
+    }
+
 
     function drawTopo(topo_type, radius) {
         let topo_nodes = [], topo_links = [];
@@ -381,8 +433,8 @@ let ForceChart = (function () {
             }
         } else {
             //*************链***************
-            for (let i = 0 ; i < 3; i++) {
-                topo_nodes.push({ x:  (-1 + i)*radius / 2, y:0});
+            for (let i = 0; i < 3; i++) {
+                topo_nodes.push({ x: (-1 + i) * radius / 2, y: 0 });
             }
             for (let i = 0; i < 2; i++) {
                 topo_links.push([topo_nodes[i], topo_nodes[i + 1]]);
@@ -413,6 +465,7 @@ let ForceChart = (function () {
 
     return {
         drawStaticForce,
-        Clustering
+        Clustering,
+        drawPie
     }
 }())

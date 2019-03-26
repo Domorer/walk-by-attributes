@@ -1,6 +1,7 @@
 let scatter = (function () {
 
     function drawScatter(comb_data) {
+        console.log('comb_data: ', comb_data);
         variable.svg_scatter.selectAll('*').remove();
         let svg_width = $("#svg_scatter")[0].scrollWidth;
         let svg_height = $("#svg_scatter")[0].scrollHeight;
@@ -26,12 +27,8 @@ let scatter = (function () {
                 return yScale(parseFloat(d.y));
             }).attr('r', 2)
             .attr('fill', function (d, i) {
-                // return color[variable.info_dict[d['id']]['journal']];
-                // d.cluster = parseInt(d.cluster);
-                // if (d.cluster != -1)
-                //     return color(d.cluster);
-                // else
-                //     return 'black'
+                d.cluster = variable.cluster_dict[d.id].cluster;
+                // return color(variable.cluster_dict[d.id].index)
                 return '#329CCB';
             }).on('click', function (d) {
                 console.log(d);
@@ -45,7 +42,7 @@ let scatter = (function () {
         let cluster_ids_dict = {};//保存每个簇内点的id
         for (let i = 0; i < comb_data.length; i++) {
             if (comb_data[i].cluster != -1) {
-                let tmp_cluster = 'cluster_' + comb_data[i]['cluster'];
+                let tmp_cluster = 'cluster-' + comb_data[i]['cluster'];
                 if (cluster_point_dict[tmp_cluster]) {
                     cluster_ids_dict[tmp_cluster].push(comb_data[i]['id']);
                     cluster_point_dict[tmp_cluster].push([comb_data[i].x, comb_data[i].y])
@@ -79,21 +76,23 @@ let scatter = (function () {
             .attr('stroke-width', 1)
             .attr('opacity', 0)
             .attr('id', function (d, i) {
-                return key_list[i];
+                d.id = key_list[i];
+                d.id = d.id.split('-').pop();
+                return 'area_' + d.id;
             });
         //设置刷子
         var brush = d3.brush()
             .on("end", brushed);
         function brushed() {
-            let selection = d3.event.selection;
-            let inner_paper = [];
-            comb_data.forEach(Element => {
-                Element.x = parseFloat(Element.x);
-                Element.y = parseFloat(Element.y);
-                if ((xScale(Element.x) + 10) > selection[0][0] && (xScale(Element.x) + 10) < selection[1][0] && yScale(Element.y) > selection[0][1] && yScale(Element.y) < selection[1][1])
-                    inner_paper.push(variable.info_dict[Element.id]);
-            })
-            parameters.drawchart(inner_paper);
+            // let selection = d3.event.selection;
+            // let inner_paper = [];
+            // comb_data.forEach(Element => {
+            //     Element.x = parseFloat(Element.x);
+            //     Element.y = parseFloat(Element.y);
+            //     if ((xScale(Element.x) + 10) > selection[0][0] && (xScale(Element.x) + 10) < selection[1][0] && yScale(Element.y) > selection[0][1] && yScale(Element.y) < selection[1][1])
+            //         inner_paper.push(variable.info_dict[Element.id]);
+            // })
+            // parameters.drawchart(inner_paper);
         }
         $("#brush").click(function () {
             variable.svg_scatter.append("a")
@@ -116,13 +115,19 @@ let scatter = (function () {
                     d3.select(this).attr('opacity', 0.5);
                 }).on('mouseout', function () {
                     d3.select(this).attr('opacity', 0.2);
-                }).on('click', function () {
-                    let tmp_cluster_data = [];//当前簇内点的数据集
-                    for (let i in cluster_ids_dict[this.id]) {
-                        tmp_cluster_data.push(variable.info_dict[cluster_ids_dict[this.id][i]])
+                }).on('click', function (d) {
+                    if (variable.last_cluster != undefined) {
+                        d3.select('#cluster_' + variable.last_cluster).attr('fill', '#329CCB');
+                        d3.select('#area_' + variable.last_cluster).attr('fill', '#D5E2FF');
+                        d3.select('#tree_' + variable.last_cluster).attr('fill', '#B6E9FF').attr('stroke', '#329CCB')
                     }
-                    // parameters.drawchart(tmp_cluster_data);
-                })
+                    d3.select('#cluster_' + d.id).attr('fill', '#FF9519');
+                    d3.select('#area_' + d.id).attr('fill', '#FF9519');
+                    d3.select('#tree_' + d.id).attr('fill', '#FFC889').attr('stroke', '#FF9519')
+                    variable.last_cluster = d.id;
+                    console.log(d.id)
+                    parallel.drawParallel(d.id);
+                });
         })
         //设置选点按钮操作
         // $("#point").click(function () {

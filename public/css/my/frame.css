@@ -17,6 +17,7 @@
 #headline_a {
     font-size: 0.9em;
     color: white;
+    font-weight:600
 }
 
 div#headLine {
@@ -114,14 +115,14 @@ div#control_pannel {
     height: 96.5%;
 }
 
-div#sankeyDiv {
+div#parallelDiv {
     position: absolute;
     top: 70%;
     width: 99.5%;
     height: 30%;
 }
 
-#svg_sankey {
+#svg_parallel {
     width: 100%;
     height: 91%;
     border: 1.5px solid #ecebeb;
