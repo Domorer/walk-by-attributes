@@ -10,7 +10,7 @@ let tree_view = (function () {
         let top_node = level_dict[max_level][0];
         function getChildren(node) {
             let tmp_dict = { name: node };
-            if (parseInt(children_dict[node]['level']) > 1) {
+            if (parseInt(children_dict[node]['level']) > variable.level) {
                 tmp_dict['children'] = [];
                 tmp_dict['children'].push(getChildren(children_dict[node]['left']))
                 if (children_dict[node]['right']) {

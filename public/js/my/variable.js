@@ -23,6 +23,7 @@ let variable = (function () {
     let treeData;
     let oriLinks;
     let oriLink_dict = {};
+    let station_links_dict = {};
     let period_dict;
     let level;
     let param;
@@ -54,6 +55,7 @@ let variable = (function () {
         period_dict,
         level,
         param,
-        last_cluster
+        last_cluster,
+        station_links_dict
     }
 })()

@@ -133,18 +133,22 @@ let forceChart = (function () {
         let r_extent = [], lineW_extent = [];
         let color = d3.scaleOrdinal(d3.schemeCategory20);
 
-        //统计每个簇内的点数量
+        //*********统计每个簇内的点数量**********
         for (let key in clusterids_dict) {
             let tmp_dict = {};
             tmp_dict['id'] = key;
             tmp_dict['value'] = parseInt(clusterids_dict[key].length);
-
             cluster_nodes.push(tmp_dict);
+        }
+        let index_dict = {};
+        for (let i = 0; i < cluster_nodes.length; i++) {
+            index_dict[cluster_nodes[i].id] = i;
         }
         //设置半径的比例尺
         r_extent = d3.extent(cluster_nodes, function (d) { return d.value; })
-        let rScale = d3.scaleLinear().domain(r_extent).range([5, 30]);
-        //统计每条连线的权重
+        let rScale = d3.scaleLinear().domain(r_extent).range([5, 20]);
+        //***********统计每条连线的权重************
+        let bundling_edge = [];
         for (let key in clusterLinks_dict) {
             if (key.split('-')[0] != key.split('-')[1]) {
                 let tmp_dict = {};
@@ -152,22 +156,30 @@ let forceChart = (function () {
                 tmp_dict['target'] = key.split('-')[1];
                 tmp_dict['value'] = parseInt(clusterLinks_dict[key]);
                 cluster_links.push(tmp_dict);
+                let tmp_bundling = {};
+                tmp_bundling['source'] = index_dict[key.split('-')[0]];
+                tmp_bundling['target'] = index_dict[key.split('-')[1]];
+                tmp_bundling['weight'] = parseInt(clusterLinks_dict[key]);
+                bundling_edge.push(tmp_bundling);
             }
         }
-        //设置线宽的比例尺
+        //******设置线宽的比例尺**********
         lineW_extent = d3.extent(cluster_links, function (d) { return d.value; })
 
         console.log('cluster_links: ', cluster_links);
-        let LWScale = d3.scaleLinear().domain(lineW_extent).range([1, 10]);
-        let OPScale = d3.scaleLinear().domain(lineW_extent).range([0.05, 1]);
+        let LWScale = d3.scaleLinear().domain(lineW_extent).range([1, 6]);
+        let OPScale = d3.scaleLinear().domain(lineW_extent).range([0.05, 0.5]);
         console.log('lineW_extent: ', lineW_extent);
         let index = 0;
         while (index < cluster_links.length) {
-            if (LWScale(cluster_links[index].value) < 1.5)
+            if (LWScale(cluster_links[index].value) < 1.5){
+                bundling_edge.splice(index, 1)
                 cluster_links.splice(index, 1)
+            }
             else
                 index += 1;
         }
+
         //设置力的作用
         let simulation = d3.forceSimulation(cluster_nodes)
             .force("charge", d3.forceManyBody().strength(-3500).distanceMax(300))
@@ -216,11 +228,12 @@ let forceChart = (function () {
             .attr('opacity', function (d) {
                 return OPScale(d.value);
             })
-            .attr('class', function (d) {
+            .attr('class', 'force_link')
+            .attr('id', function (d) {
                 return d.source + '_' + d.target;
             })
         //画点
-        let node = variable.svg_force.append('g').selectAll('circle').data(cluster_nodes).enter()
+        let node = variable.svg_force.append('g').attr('class', 'node').selectAll('circle').data(cluster_nodes).enter()
             .append('circle')
             .attr('r', function (d) {
                 return rScale(d.value);
@@ -246,15 +259,15 @@ let forceChart = (function () {
                     d3.select('#cluster_' + variable.last_cluster).attr('fill', '#329CCB');
                     d3.select('#tree_' + variable.last_cluster).attr('fill', '#B6E9FF').attr('stroke', '#329CCB')
                 }
-                d3.select('#area_' + d.id).attr('fill', '#FF9519');
-                d3.select('#cluster_' + d.id).attr('fill', '#FF9519');
-                d3.select('#tree_' + d.id).attr('fill', '#FFC889').attr('stroke', '#FF9519')
+                d3.select('#area_' + d.id).attr('fill', '#E83A00');
+                d3.select('#cluster_' + d.id).attr('fill', '#E83A00');
+                d3.select('#tree_' + d.id).attr('fill', '#FFC889').attr('stroke', '#E83A00')
                 variable.last_cluster = d.id;
                 console.log(d.id)
                 parallel.drawParallel(d.id);
                 // forceChart.drawPie(d.id);
                 // drawClusterForce(clusterFun.deepCopy(variable.clu_tpg[d.id]));
-            }).call(drag(simulation))
+            });
 
         //画园内的pattern
 
@@ -275,6 +288,8 @@ let forceChart = (function () {
             'right_top': 18 * (2 * Math.PI / 360),
             'right_bottom': 308 * (2 * Math.PI / 360)
         }
+        console.log('cluster_nodes: ', cluster_nodes);
+
         //设置tick函数
         simulation.on("tick", () => {
             link
@@ -282,10 +297,10 @@ let forceChart = (function () {
                 .attr("y1", d => d.source.y)
                 .attr("x2", d => d.target.x)
                 .attr("y2", d => d.target.y);
-
             node
                 .attr("cx", d => d.x)
                 .attr("cy", d => d.y);
+
             for (let i = 0; i < pattern_g.length; i++) {
                 pattern_g[i].node.attr('transform', "translate(" + cluster_nodes[i].x + ',' + cluster_nodes[i].y + ')');
                 pattern_g[i].link.attr('transform', "translate(" + cluster_nodes[i].x + ',' + cluster_nodes[i].y + ')');
@@ -293,28 +308,98 @@ let forceChart = (function () {
             }
 
         });
+
+        $('#edge_bundling').on('click', () => {
+            edgeBundling(cluster_nodes, bundling_edge, clusterLinks_dict)
+        })
+
     }
 
+    //***************边邦定***************
+    function edgeBundling(cluster_nodes, bundling_edge, clusterLinks_dict) {
+
+        d3.selectAll('.force_link').remove();
+
+        //***********布局稳定后进行边邦定************
+        var fbundling = d3.ForceEdgeBundling()
+            .nodes(cluster_nodes)
+            .edges(bundling_edge);
+        var results = fbundling();
+        console.log('results: ', results);
+        for (let i = 0; i < results.length; i++) {
+            let tmp_key = results[i][0].id + '-' + results[i][results[i].length - 1].id
+            results[i].value = clusterLinks_dict[tmp_key]
+        }
+
+        let lineW_extent = d3.extent(results, function (d) { return d.value; })
+        let OPScale = d3.scaleLinear().domain(lineW_extent).range([0.2, 0.8]);
+        let LWScale = d3.scaleLinear().domain(lineW_extent).range([1, 6]);
+
+       
+        var d3line = d3.line()
+            .x(d => d.x)
+            .y(d => d.y)
+            .curve(d3.curveBundle)
+
+        variable.svg_force.insert("g", '.node').selectAll('path').data(results).enter()
+            .append('path')
+            .attr("d", d => d3line(d))
+            .attr("stroke-width", d => LWScale(d.value))
+            .attr("stroke", "#d8d8d8")
+            .attr("fill", "none")
+            .attr('stroke-opacity', d=>OPScale(d.value));
+    }
 
     function drawPie(cluster, radius) {
         let color = ["#1DFF74", '#A597FF', '#FFAB7C', '#EE89FF', '#00D8FF'];
         let tmp_tpg = clusterFun.deepCopy(variable.clu_tpg[cluster]);
         let tmp_attrs = variable.param.comb.split('_');
         tmp_attrs.shift()
-
+        //计算总和
         // let attrs_value = new Array(5).fill(0);
         // for (let i = 0; i < tmp_tpg.length; i++) {
         //     for (let j = 0; j < 5; j++) {
         //         attrs_value[j] += tmp_tpg[i].value[j];
         //     }
         // }
-        let attrs_value = calVariance(tmp_tpg);
-        for(let i = 0; i < attrs_value.length; i++){
-            attrs_value[i] = 1 / attrs_value[i];
+
+        let attrs_value = new Array(5).fill(0);
+        let tmp_ids = variable.cluster_ids_dict[cluster]
+        let value_arr = [];
+        for (let i = 0; i < tmp_ids.length; i++) {
+            let tmp_targets = variable.station_links_dict[tmp_ids[i]];
+            let inner_value = new Array(5).fill(0), outer_value = new Array(5).fill(0);
+            for (let j = 0; j < tmp_targets.length; j++) {
+                let tmp_link_key = Math.min(parseInt(tmp_ids[i]), parseInt(tmp_targets[j])) + '_' + Math.max(parseInt(tmp_ids[i]), parseInt(tmp_targets[j]));
+                if (tmp_ids.indexOf(tmp_targets[j]) != -1)
+                    for (let a = 0; a < 5; a++)
+                        inner_value[a] += variable.period_dict[tmp_link_key][a]
+                if (tmp_ids.indexOf(tmp_targets[j]) == -1)
+                    for (let a = 0; a < 5; a++)
+                        outer_value[a] += variable.period_dict[tmp_link_key][a]
+            }
+            let ratio_arr = new Array(5);
+            for (let a = 0; a < 5; a++) {
+                if (inner_value[a] == 0 && outer_value[a] == 0)
+                    ratio_arr[a] = 0;
+                else
+                    ratio_arr[a] = inner_value[a] / (inner_value[a] + outer_value[a])
+            }
+            value_arr.push(ratio_arr);
+
+            for (let a = 0; a < ratio_arr.length; a++) {
+                attrs_value[a] += ratio_arr[a] / tmp_ids.length;
+            }
         }
+
+        //计算方差
+        // let attrs_value = calVariance(tmp_tpg);
+        // for(let i = 0; i < attrs_value.length; i++){
+        //     attrs_value[i] = 1 / attrs_value[i];
+        // }
         let rScale = d3.scaleLinear()
             .domain(d3.extent(attrs_value))
-            .range([radius, radius * 1.5])
+            .range([radius * 1.2, radius * 2.3])
 
 
         let pie_data = d3.pie()(attrs_value)
@@ -337,18 +422,20 @@ let forceChart = (function () {
             .append('path')
             .attr('d', d => arc(d))
             .attr('fill', function (d, i) {
-                if (tmp_attrs.indexOf(i.toString()) != -1) {
-                    return color[i]
-                } else {
-                    return 'grey'
-                }
+                // if (tmp_attrs.indexOf(i.toString()) != -1) {
+                //     return color[i]
+                // } else {
+                //     return 'grey'
+                // }
+                return color[i];
             })
             .attr('stroke', function (d, i) {
-                if (tmp_attrs.indexOf(i.toString()) != -1) {
-                    return color[i]
-                } else {
-                    return 'grey'
-                }
+                // if (tmp_attrs.indexOf(i.toString()) != -1) {
+                //     return color[i]
+                // } else {
+                //     return 'grey'
+                // }
+                return color[i]
             })
             .attr('stroke-width', 0.1)
         // console.log('pie_data: ', pie_data);
@@ -380,9 +467,9 @@ let forceChart = (function () {
         }
         if (topo_type == 0) {
             //*************环***************
-            topo_nodes.push({ x: 0, y: -radius / 2 });
+            topo_nodes.push({ x: 0, y: -2 * radius / 3 });
             for (let key in radian_dict) {
-                topo_nodes.push({ x: Math.cos(radian_dict[key]) * radius / 2, y: -Math.sin(radian_dict[key]) * radius / 2 });
+                topo_nodes.push({ x: Math.cos(radian_dict[key]) * 2 * radius / 3, y: -Math.sin(radian_dict[key]) * 2 * radius / 3 });
             }
             for (let i = 0; i < 4; i++) {
                 topo_links.push([topo_nodes[i], topo_nodes[i + 1]]);
@@ -391,9 +478,9 @@ let forceChart = (function () {
 
         } else if (topo_type == 1) {
             //*************弱连通***************
-            topo_nodes.push({ x: 0, y: -radius / 2 });
+            topo_nodes.push({ x: 0, y: -2 * radius / 3 });
             for (let key in radian_dict) {
-                topo_nodes.push({ x: Math.cos(radian_dict[key]) * radius / 2, y: -Math.sin(radian_dict[key]) * radius / 2 });
+                topo_nodes.push({ x: Math.cos(radian_dict[key]) * 2 * radius / 3, y: -Math.sin(radian_dict[key]) * 2 * radius / 3 });
             }
             topo_nodes.push({ x: 0, y: 0 });
             for (let i = 0; i < 4; i++) {
@@ -407,9 +494,9 @@ let forceChart = (function () {
 
         } else if (topo_type == 2) {
             //*************强连通***************
-            topo_nodes.push({ x: 0, y: -radius / 2 });
+            topo_nodes.push({ x: 0, y: -2 * radius / 3 });
             for (let key in radian_dict) {
-                topo_nodes.push({ x: Math.cos(radian_dict[key]) * radius / 2, y: -Math.sin(radian_dict[key]) * radius / 2 });
+                topo_nodes.push({ x: Math.cos(radian_dict[key]) * 2 * radius / 3, y: -Math.sin(radian_dict[key]) * 2 * radius / 3 });
             }
             for (let i = 0; i < 4; i++) {
                 topo_links.push([topo_nodes[i], topo_nodes[i + 1]]);
@@ -423,9 +510,9 @@ let forceChart = (function () {
 
         } else if (topo_type == 3) {
             //*************环中心发散***************
-            topo_nodes.push({ x: 0, y: -radius / 2 });
+            topo_nodes.push({ x: 0, y: -2 * radius / 3 });
             for (let key in radian_dict) {
-                topo_nodes.push({ x: Math.cos(radian_dict[key]) * radius / 2, y: -Math.sin(radian_dict[key]) * radius / 2 });
+                topo_nodes.push({ x: Math.cos(radian_dict[key]) * 2 * radius / 3, y: -Math.sin(radian_dict[key]) * 2 * radius / 3 });
             }
             topo_nodes.push({ x: 0, y: 0 });
             for (let i = 0; i < 5; i++) {
@@ -434,7 +521,7 @@ let forceChart = (function () {
         } else {
             //*************链***************
             for (let i = 0; i < 3; i++) {
-                topo_nodes.push({ x: (-1 + i) * radius / 2, y: 0 });
+                topo_nodes.push({ x: (-1 + i) * 2 * radius / 3, y: 0 });
             }
             for (let i = 0; i < 2; i++) {
                 topo_links.push([topo_nodes[i], topo_nodes[i + 1]]);

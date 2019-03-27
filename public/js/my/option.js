@@ -9,7 +9,7 @@ let option = (function () {
     variable.param = param;
     //修改串窗口的大小
 
-  
+
     //初始化
     getCombData(param).then(function (data) {
         d3.csv('data/Chicago/undir_link_weight.csv', function (error, data_link) {
@@ -17,10 +17,20 @@ let option = (function () {
                 variable.period_dict = data_period;
                 console.log('data_link: ', data_link);
                 for (let i = 0; i < data_link.length; i++) {
-                    if (variable.oriLink_dict[data_link[i].source] != null)
+                    if (variable.oriLink_dict[data_link[i].source] != null) {
                         variable.oriLink_dict[data_link[i].source].push(data_link[i].target)
-                    else
+                        variable.station_links_dict[data_link[i].source].push(data_link[i].target)
+                    }
+                    else {
                         variable.oriLink_dict[data_link[i].source] = [data_link[i].target];
+                        variable.station_links_dict[data_link[i].source] = [data_link[i].target]
+                    }
+                    if (variable.oriLink_dict[data_link[i].target] != null) {
+                        variable.station_links_dict[data_link[i].target].push(data_link[i].source)
+                    }
+                    else {
+                        variable.station_links_dict[data_link[i].target] = [data_link[i].source]
+                    }
                 }
                 variable.oriLinks = data_link;
                 variable.comb_data = data[0];
@@ -97,7 +107,7 @@ let option = (function () {
                 variable.comb_data = data[0];
                 //通过用户选定的层级来生成类字典
                 let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
-                clusterFun.cluster(variable.comb_data, max_level - 5)
+                clusterFun.cluster(variable.comb_data, max_level - 6)
                 scatter.drawScatter(data[0]['info']);
                 parallel.drawParallel(variable.clu_tpg);
                 tree_view.draw_tree(data[0]);
@@ -106,7 +116,6 @@ let option = (function () {
         });
         $("#options").append(tmp_option);
         optIndex += 1;
-
     })
 
     function getCombData(param) {
