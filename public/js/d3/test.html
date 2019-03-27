@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin="" />
+
+  <!-- Make sure you put this AFTER Leaflet's CSS -->
+  <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin=""></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" type="text/css" href="leaflet/debug/css/screen.css" />
+
+
+
+
+
+  <title>PageRank</title>
+  <style>
+    #map {
+      margin-left: 5px;
+      margin-top: 5px;
+      width: 800px;
+      height:800px;
+    }
+  </style>
+
+  <script src="js/d3.min.js" charset="utf-8"></script>
+  <script src="js/heatmap.min.js"></script>
+  <script type="text/javascript" src="js/jLouvain_1.js"></script>
+
+</head>
+
+<body>
+  <div id="map"></div>
+	
+  <script type="text/javascript">
+    var map = L.map('map')
+      .setView([41.8952, -87.55965], 11)
+
+     var osmUrl = 'https://api.mapbox.com/styles/v1/keypro/cjjs6cawt25iq2snp6kqxu3r3/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia2V5cHJvIiwiYSI6ImNqamliaTJtbjV0YTMzcG82bmthdW03OHEifQ.UBWsyfRiWMYly4gIc2H7cQ',
+        layer = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'
+
+    L.tileLayer(osmUrl, {
+
+      minZoom: 10,
+      maxZoom: 17,
+      //用了mapbox的图层
+      attribution: layer,
+      //访问令牌
+      accessToken: 'your.mapbox.access.token'
+    }).addTo(map);
+
+
+  </script>
+
+
+</body>
+
+</html>

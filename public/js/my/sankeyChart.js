@@ -1,8 +1,11 @@
 let sankeyChart = (function () {
     // drawSankey();
-    let sankey_width = $('#svg_parallel')[0].scrollWidth;
-    let sankey_height = $('#svg_parallel')[0].scrollHeight;
+
     function drawSankey(nodes_data, links_data) {
+        console.log('links_data: ', links_data);
+        console.log('nodes_data: ', nodes_data);
+        let sankey_width = $('#svg_sankey')[0].scrollWidth;
+        let sankey_height = $('#svg_sankey')[0].scrollHeight;
         //nodes_data('id') link_data(source、target、value)
         variable.svg_sankey.selectAll('*').remove();
         let sankey = d3.sankey()
@@ -48,13 +51,13 @@ let sankeyChart = (function () {
             .data(nodes)
             .enter()
             .append("rect")
-            .attr("x", function (d) { return d.x0 })
-            .attr("y", function (d) { return d.y0 })
-            .attr("height", function (d) { return Math.abs(d.y1 - d.y0) })
-            .attr("width", function (d) { return Math.abs(d.x1 - d.x0) })
-            .attr("stroke", function (d) { return color(parseInt([d.id.split('_')[1]])) })
-            .attr("fill", function (d) { return color(parseInt([d.id.split('_')[1]])) })
-            .attr('id', function (d) { return d.id })
+            .attr("x", d => d.x0)
+            .attr("y", d => d.y0)
+            .attr("height", d => Math.abs(d.y1 - d.y0))
+            .attr("width", d => Math.abs(d.x1 - d.x0))
+            .attr("stroke", '#329ccb')
+            .attr("fill", '#329ccb')
+            .attr('id', d => d.id)
             .on("mouseover", function (d) {
                 let sourceLinks = d.sourceLinks, targetLinks = d.targetLinks;
                 variable.svg_sankey.selectAll('path').attr('opacity', 0.1);
@@ -64,7 +67,6 @@ let sankeyChart = (function () {
             }).on('mouseout', function () {
                 variable.svg_sankey.selectAll('path').attr('opacity', 1);
                 variable.svg_sankey.selectAll('rect').attr('opacity', 1)
-
             })
             .append("title");
 
@@ -84,7 +86,6 @@ let sankeyChart = (function () {
                 return d.id;
             });
     }
-
     return {
         drawSankey
     }

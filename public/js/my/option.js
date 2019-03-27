@@ -5,17 +5,16 @@ let option = (function () {
     let optIndex = 0;//记录操作的index
     let comb_record = [];//记录操作的具体参数元素格式为[当前属性选择，当前游走方式选择]
     let tmp_param = ["cited", '次', 'cited_chart'];
-    let param = { wt: 'wt_5', sl: 'sl_10', rl: 'rl_False', comb: 'period_0' };
-    variable.param = param;
     //修改串窗口的大小
 
-
+    d3.selectAll('.tuli').attr('background-color', (d,i)=>variable.attr_color[i])
     //初始化
-    getCombData(param).then(function (data) {
+    getCombData(variable.param).then(function (data) {
         d3.csv('data/Chicago/undir_link_weight.csv', function (error, data_link) {
             d3.json('data/Chicago/period_value_dict.json', function (error, data_period) {
                 variable.period_dict = data_period;
                 console.log('data_link: ', data_link);
+                //获取原始link的字典
                 for (let i = 0; i < data_link.length; i++) {
                     if (variable.oriLink_dict[data_link[i].source] != null) {
                         variable.oriLink_dict[data_link[i].source].push(data_link[i].target)
@@ -34,6 +33,7 @@ let option = (function () {
                 }
                 variable.oriLinks = data_link;
                 variable.comb_data = data[0];
+
                 //通过用户选定的层级来生成类字典
                 let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
                 variable.level = max_level - 6;
@@ -44,7 +44,14 @@ let option = (function () {
                 console.log(variable.comb_data['info'].length)
                 //绘制力引导图
                 forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
+                //树图
                 tree_view.draw_tree(data[0]);
+                radarChart.draw('1131');
+
+                //初始化桑基图
+                for (let key in variable.cluster_ids_dict) {
+                    variable.sankeyNode_data.push({ 'id': 'option' + variable.sankey_count.toString() + '-' + key })
+                }
             })
 
         })
@@ -58,11 +65,35 @@ let option = (function () {
         forceChart.Clustering(variable.comb_data['clu_ids'], variable.comb_data['cluster_link'], variable.cluster_dict);
     });
 
+    var slider_times = $("#walk_times").slider({
+        orientation: "horizontal",
+        range: "min",
+        max: 10,
+        value: 5,
+        slide: function (event, ui) {
+            if (ui.value <= 5)
+                variable.param.wt = 'wt_5';
+            else
+                variable.param.wt = 'wt_10';
 
+            $("#times_text").val(ui.value);
+        }
+    })
+    var slider_length = $("#walk_length").slider({
+        orientation: "horizontal",
+        range: "min",
+        max: 10,
+        value: 5,
+        slide: function (event, ui) {
+            if (ui.value <= 5)
+                variable.param.sl = 'sl_10';
+            else
+                variable.param.sl = 'sl_15';
+            $("#length_text").val(ui.value);
+        }
+    })
     //设置参数选择
     $('#confirm').on('click', function () {
-        //操作次数加一
-        variable.confirm_time += 1;
         //***********获取当前各参数的选择情况***********
         comb_len = 0; //记录当前选择的属性数量，用于后面key的格式定义
         variable.attr = 'random';
@@ -79,13 +110,12 @@ let option = (function () {
             }
         })
         console.log('variable.attr: ', variable.attr);
-        wt = $('#wt_5')[0].checked ? 'wt_5' : 'wt_10';
-        sl = $('#sl_5')[0].checked ? 'sl_10' : 'sl_15';
-        rl = $('#ret_True')[0].checked ? 'rl_True' : 'rl_False';
-        let param = { wt: wt, sl: sl, rl: rl, comb: variable.attr }
-        variable.param = param;
+        let rl = $('#ret_True')[0].checked ? 'rl_True' : 'rl_False';
+        variable.param['rl'] = rl;
+        variable.param['comb'] = variable.attr;
         //修改参数后修改各界面的view
-        getCombData(param).then(function (data) {
+        getCombData(variable.param).then(function (data) {
+            variable.sankey_count += 1;
             console.log('data: ', data);
             variable.comb_data = data[0];
             //通过用户选定的层级来生成类字典
@@ -95,12 +125,40 @@ let option = (function () {
             scatter.drawScatter(data[0]['info']);
             tree_view.draw_tree(data[0]);
             forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
+
+            //桑基图
+            console.log(variable.param)
+            if (variable.sankey_count >= 2) {
+                for (let key in variable.cluster_ids_dict)
+                    variable.sankeyNode_data.push({ 'id': 'option' + variable.sankey_count.toString() + '-' + key })
+                //计算类变化连线的权重
+                let link_weight_dict = {};
+
+                for (let key in variable.last_cluster_dict) {
+                    let s_clu = variable.last_cluster_dict[key].cluster, t_clu;
+                    if (variable.cluster_dict[key] != null) {
+                        t_clu = variable.cluster_dict[key].cluster;
+                        let tmp_key = s_clu + '-' + t_clu
+                        if (link_weight_dict[tmp_key] != null)
+                            link_weight_dict[tmp_key] += 1
+                        else
+                            link_weight_dict[tmp_key] = 1
+                    }
+                }
+                //将变化曲线添加到桑基图数据
+                for (let key in link_weight_dict) {
+                    let tmp_source = 'option' + (variable.sankey_count - 1).toString() + '-' + key.split('-')[0],
+                        tmp_target = 'option' + variable.sankey_count.toString() + '-' + key.split('-')[1];
+                    variable.sankeyLink_data.push({ 'id': tmp_source +'-' + tmp_target, 'source': tmp_source, 'target': tmp_target, 'value': link_weight_dict[key] })
+                }
+                sankeyChart.drawSankey(variable.sankeyNode_data, variable.sankeyLink_data);
+            }
+
         })
-        console.log(wt, sl, rl, variable.attr)
         /*****************************************************/
 
         //将操作数据记录并添加到dropdown，格式为选择的属性 + 游走的方式
-        comb_record.push(param);
+        comb_record.push(variable.param);
         let tmp_text = variable.attr;
         let tmp_option = $('<a></a>').text(tmp_text).attr("id", optIndex).attr('class', 'dropdown-item').on('click', function () {
             getCombData(comb_record[this.id]).then(function (data) {
@@ -116,6 +174,9 @@ let option = (function () {
         });
         $("#options").append(tmp_option);
         optIndex += 1;
+
+
+
     })
 
     function getCombData(param) {

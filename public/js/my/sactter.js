@@ -59,7 +59,7 @@ let scatter = (function () {
         let line = d3.line()
             .x(function (d) { return xScale(parseFloat(d[0])) + 10; })
             .y(function (d) { return yScale(parseFloat(d[1])); })
-        // .curve(d3.curveCardinalClosed)
+            .curve(d3.curveCatmullRom)
         let points_arr = [];
         let length_arr = [];
         for (let key in key_list) {
@@ -126,7 +126,7 @@ let scatter = (function () {
                     d3.select('#tree_' + d.id).attr('fill', '#FFC889').attr('stroke', '#FF9519')
                     variable.last_cluster = d.id;
                     console.log(d.id)
-                    parallel.drawParallel(d.id);
+                    // parallel.drawParallel(d.id);
                 });
         })
         //设置选点按钮操作

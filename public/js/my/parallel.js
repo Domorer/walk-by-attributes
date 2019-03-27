@@ -5,7 +5,6 @@ let parallel = (function () {
         svg_parallel.selectAll('*').remove();
         let svg_width = $("#svg_parallel")[0].scrollWidth;
         let svg_height = $("#svg_parallel")[0].scrollHeight;
-        let color = ["#1DFF74", '#A597FF', '#FFAB7C', '#EE89FF', '#00D8FF']
         //添加标签
         let periods = ['6-9', '10-13', '14-17', '18-21', '22-5']
         let texts = svg_parallel.append('g').selectAll('text').data(periods).enter()
@@ -13,10 +12,10 @@ let parallel = (function () {
             .attr('x', (d, i) => (i + 0.5) * svg_width / 5)
             .attr('y', 0.07 * svg_height)
             .attr('font-size', 13)
-            .attr('color', (d, i) => color[i])
+            .attr('color', (d, i) => variable.attr_color[i])
             .attr('stroke-width', 1)
-            .attr('stroke', (d, i) => color[i])
-            .attr('fill', (d, i) => color[i])
+            .attr('stroke', (d, i) => variable.attr_color[i])
+            .attr('fill', (d, i) => variable.attr_color[i])
             .attr('text-anchor', 'middle')
             .text(d => d)
 
@@ -37,7 +36,7 @@ let parallel = (function () {
         let yaxis = svg_parallel.append('g').selectAll('path').data(attrs_line).enter()
             .append('path')
             .attr('d', d => line(d))
-            .attr('stroke', (d, i) => color[i])
+            .attr('stroke', (d, i) => variable.attr_color[i])
             .attr('stroke-width', 2);
 
         //此时的每条线应该代表的是类内的一个点，点在每个属性上的值代表该点与类内点的连线轨迹的权重值和除于该点所有连线的权重之和

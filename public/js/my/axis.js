@@ -1,7 +1,8 @@
 let axisChart = (function () {
-    let sankey_width = $('#svg_parallel')[0].scrollWidth;
-    let sankey_height = $('#svg_parallel')[0].scrollHeight;
+   
     function drawAxis(comb_data) {
+        let sankey_width = $('#svg_parallel')[0].scrollWidth;
+        let sankey_height = $('#svg_parallel')[0].scrollHeight;
         variable.svg_sankey.selectAll('circle').remove();
         let loc_arr = [];
 

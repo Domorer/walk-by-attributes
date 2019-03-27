@@ -220,7 +220,7 @@ let forceChart = (function () {
                 if (d.source.id === d.target.id)
                     return color(d.target.id);
                 else
-                    return '#999';
+                    return '#A9C3E4';
             }).attr('stroke-width', function (d) {
                 return LWScale(d.value);
                 // return 2;
@@ -243,13 +243,13 @@ let forceChart = (function () {
                 //     return color(d.id)
                 // else
                 //     return 'black';
-                return '#329CCB';
+                return '#004358';
             }).attr('fill', function (d) {
                 // if (d.id != -1)
                 //     return color(d.id)
                 // else
                 //     return 'black';
-                return '#329CCB';
+                return '#004358';
             }).attr('class', function (d) {
                 return 'cluster_node';
             }).attr('id', d => 'cluster_' + d.id)
@@ -264,7 +264,11 @@ let forceChart = (function () {
                 d3.select('#tree_' + d.id).attr('fill', '#FFC889').attr('stroke', '#E83A00')
                 variable.last_cluster = d.id;
                 console.log(d.id)
-                parallel.drawParallel(d.id);
+                //雷达图
+                radarChart.draw(d.id);
+
+                //平行坐标轴
+                // parallel.drawParallel(d.id);
                 // forceChart.drawPie(d.id);
                 // drawClusterForce(clusterFun.deepCopy(variable.clu_tpg[d.id]));
             });
@@ -345,13 +349,13 @@ let forceChart = (function () {
             .append('path')
             .attr("d", d => d3line(d))
             .attr("stroke-width", d => LWScale(d.value))
-            .attr("stroke", "#d8d8d8")
+            .attr("stroke", "#a9c3e4")
             .attr("fill", "none")
             .attr('stroke-opacity', d=>OPScale(d.value));
     }
 
+    //画圆外的扇形
     function drawPie(cluster, radius) {
-        let color = ["#1DFF74", '#A597FF', '#FFAB7C', '#EE89FF', '#00D8FF'];
         let tmp_tpg = clusterFun.deepCopy(variable.clu_tpg[cluster]);
         let tmp_attrs = variable.param.comb.split('_');
         tmp_attrs.shift()
@@ -427,7 +431,7 @@ let forceChart = (function () {
                 // } else {
                 //     return 'grey'
                 // }
-                return color[i];
+                return variable.attr_color[i];
             })
             .attr('stroke', function (d, i) {
                 // if (tmp_attrs.indexOf(i.toString()) != -1) {
@@ -435,7 +439,7 @@ let forceChart = (function () {
                 // } else {
                 //     return 'grey'
                 // }
-                return color[i]
+                return variable.attr_color[i]
             })
             .attr('stroke-width', 0.1)
         // console.log('pie_data: ', pie_data);

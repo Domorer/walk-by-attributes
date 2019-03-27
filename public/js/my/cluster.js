@@ -37,11 +37,15 @@ let clusterFun = (function () {
             }
             index += 1;
         }
-
+        if (variable.sankey_count == 1)
+            variable.last_cluster_dict = deepCopy(id_cluster_dict);
+        else{
+            variable.last_cluster_dict = {}
+            variable.last_cluster_dict = deepCopy(variable.cluster_dict);
+        }
         variable.cluster_dict = id_cluster_dict;
-        console.log(' variable.cluster_dict: ', variable.cluster_dict);
         variable.cluster_ids_dict = cluster_ids_dict;
-        
+
         //*************计算各个簇之间的连线权重字典*************
         let clusterLink_dict = {};
         for (let i = 0; i < variable.oriLinks.length; i++) {
@@ -56,7 +60,7 @@ let clusterFun = (function () {
                     clusterLink_dict[tmp_link_key] = 1;
             }
         }
-    
+
         variable.clusterLink_weight_dict = clusterLink_dict;  //每条轨迹作为键，边的权重作为value
         console.log('clusterLink_dict: ', clusterLink_dict);
         let clu_tpg = {};
@@ -68,9 +72,9 @@ let clusterFun = (function () {
                 if (variable.oriLink_dict[cluster_ids_dict[key][i]] != null) {
                     let tmp_targets = variable.oriLink_dict[cluster_ids_dict[key][i]];
                     for (let j = 0; j < tmp_targets.length; j++) {
-                        if (cluster_ids_dict[key].indexOf(tmp_targets[j]) != -1){
-                        let tmp_value = variable.period_dict[cluster_ids_dict[key][i] +'_' +tmp_targets[j]]
-                            clu_tpg[key].push({ 'source': cluster_ids_dict[key][i] ,'target':tmp_targets[j], value:tmp_value})
+                        if (cluster_ids_dict[key].indexOf(tmp_targets[j]) != -1) {
+                            let tmp_value = variable.period_dict[cluster_ids_dict[key][i] + '_' + tmp_targets[j]]
+                            clu_tpg[key].push({ 'source': cluster_ids_dict[key][i], 'target': tmp_targets[j], value: tmp_value })
                         }
                     }
                 }

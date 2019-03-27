@@ -10,25 +10,30 @@ let variable = (function () {
     let svg_sankey = d3.select('#svg_sankey');
     let svg_force = d3.select('#svg_force');
     let attr_arr = ['0', '1', '2', '3', '4'];
+    let time_arr = ['6:00~9:00', '10:00~13:00', '14:00~17:00', '18:00~21:00', '22:00~5:00',];
     let info_dict = {};//节点的信息字典
     let ChoseCluster = false;//判断当前选择点的方式
     let cluster_dict = {};//点的簇字典
+    let last_cluster_dict = {};
     let cluster_ids_dict = {} //每个簇内的点的集合字典
     let clusterLink_weight_dict;
     let clu_tpg;
-    // let confirm_time = 0;//记录操作了几次，用于判断是否需要绘制桑基图
-    // let sankeyNode_data = [];//保存桑基图的节点数据
-    // let nodes_dict;//用来判断节点的数据是否已经存在里面
-    // let sankeyLink_data = [];//保存桑基图的连线数据
+    let attr_color = ["#1F8A70", '#BEDB38', '#FFE11A', '#FD7400', '#EE89FF'];//["#50ab4c", '#A597FF', '#FFAB7C', '#EE89FF', '#00D8FF'];
+    let sankey_count = 1;
+    let sankeyNode_data = [];//保存桑基图的节点数据
+    let sankeyNodes_dict;//用来判断节点的数据是否已经存在里面
+    let sankeyLink_data = [];//保存桑基图的连线数据
+
     let treeData;
     let oriLinks;
     let oriLink_dict = {};
     let station_links_dict = {};
     let period_dict;
     let level;
-    let param;
+    let param = { wt: 'wt_5', sl: 'sl_10', rl: 'rl_False', comb: 'period_0' };
     let last_cluster;// 记录上次选择的cluster，用于还原对应元素的样式
     return {
+        time_arr,
         all_comb,
         comb_data,
         link_data,
@@ -40,11 +45,12 @@ let variable = (function () {
         info_dict,
         ChoseCluster,
         cluster_dict,
+        last_cluster_dict,
         svg_sankey,
-        // confirm_time,
-        // sankeyNode_data,
-        // sankeyLink_data,
-        // nodes_dict,
+        sankeyNode_data,
+        sankeyLink_data,
+        sankey_count,
+        sankeyNodes_dict,
         all_data,
         treeData,
         cluster_ids_dict,
@@ -56,6 +62,7 @@ let variable = (function () {
         level,
         param,
         last_cluster,
-        station_links_dict
+        station_links_dict,
+        attr_color
     }
 })()

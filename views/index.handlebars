@@ -2,20 +2,23 @@
 <link rel="stylesheet" type="text/css" href="/css/jq22-demo.css"> --}}
 
 
-<script src="/js/jquery/jquery-3.3.1.min.js"></script>
-<script src="/js/jquery/jquery-ui.min.js"></script>
-
 <script src="/js/echarts/echarts.js"></script>
 <script src="/js/d3/d3.v4.min.js"></script>
 <script src="/js/bootstrap/Popper.js"></script>
-<script src="/js/jquery/jquery-ui.min.js"></script>
 <script src="/js/jquery/jquery-3.3.1.min.js"></script>
+<script src="/js/jquery/jquery-ui.min.js"></script>
 <script src="/js/bootstrap/bootstrap.min.js"></script>
 <script src="/js/hull.js"></script>
 <script src="/js/d3.layout.cloud.js"></script>
 <script src="/js/d3/sankey.js"></script>
 <script src="/js/FileSaver.js"></script>
 <script src="/js/d3/d3-ForceEdgeBundling.js"></script>
+<script src="/js/leaflet/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+    crossorigin="" />
+<!-- Make sure you put this AFTER Leaflet's CSS -->
+<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+    crossorigin=""></script>
 
 
 {{!-- <nav id="nav" class="navbar navbar-dark sticky-top  flex-md-nowrap p-0" style="border-bottom:3px solid rgb(216, 216, 216);">
@@ -47,26 +50,35 @@
             <a id='headline_a'>Attributes</a>
         </div>
         <div id='attrInner'>
-            <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
+            <div class="custom-control custom-checkbox custom-control-inline" style='margin-top:7%;margin-left:13%;'>
                 <input type="checkbox" class="custom-control-input" id="0" checked='true'>
                 <label class="custom-control-label" for="0" id="citedLabel" style='color:gray'>6:00 ~ 9:00</label>
             </div>
+            <div class='tuli' style='background-color:#50ab4c'></div>
+
             <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
                 <input type="checkbox" class="custom-control-input" id="1">
                 <label class="custom-control-label" for="1" id="abtLabel" style='color:gray'>10:00 ~ 13:00</label>
             </div>
+            <div class='tuli' style='background-color:#A597FF'></div>
+
             <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
                 <input type="checkbox" class="custom-control-input" id="2">
                 <label class="custom-control-label" for="2" id="confLabel" style='color:gray'>14:00 ~ 17:00</label>
             </div>
+            <div class='tuli' style='background-color:#FFAB7C'></div>
+
             <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
-                <input type="checkbox" class="custom-control-input" id="3" >
+                <input type="checkbox" class="custom-control-input" id="3">
                 <label class="custom-control-label" for="3" id="yearLabel" style='color:gray'>18:00 ~ 21:00</label>
             </div>
+            <div class='tuli' style='background-color:#EE89FF'></div>
+
             <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
                 <input type="checkbox" class="custom-control-input" id="4">
                 <label class="custom-control-label" for="4" id="affLabel" style='color:gray'>22:00 ~ 6:00</label>
             </div>
+            <div class='tuli' style='background-color:#00D8FF'></div>
 
         </div>
 
@@ -76,33 +88,31 @@
             <a id='headline_a'>Control Pannel</a>
         </div>
         <div id='controlInner'>
-            <div class="custom-control custom-checkbox custom-control-inline" style='margin-top:7%;margin-left:13%;'>
-                <input type="checkbox" class="custom-control-input" id="wt_5" checked='true'>
-                <label class="custom-control-label" for="wt_5" id="wt_3_label" style='color:gray'>5 times</label>
+            <div class='slider_out'>
+                <span class='slider_span'>Walk Times:
+                </span>
+                <input type="text" id="times_text" class='slider_input' value=5>
+                <div id='walk_times' class='slider'></div>
+            </div>
+            <div class='slider_out'>
+                <span class='slider_span'>Walk Length:
+                </span>
+                <input type="text" id="length_text" class='slider_input' value=5>
+                <div id='walk_length' class='slider'></div>
+            </div>
+            <div id='radio_out'>
+                <span class='slider_span'>Return:</span>
+                <div class="custom-control custom-radio custom-control-inline" style='margin-left:5%;margin-top:5%;color:gray'>
+                    <input type="radio" id="ret_True" name="customRadioInline_return" class="custom-control-input"
+                        checked=True>
+                    <label class="custom-control-label" for="ret_True">True</label>
+                </div>
+                <div class="custom-control custom-radio custom-control-inline" style='margin-left:0%;margin-top:3%;color:gray'>
+                    <input type="radio" id="ret_False" name="customRadioInline_return" class="custom-control-input">
+                    <label class="custom-control-label" for="ret_False">False</label>
+                </div>
             </div>
 
-            <div class="custom-control custom-checkbox custom-control-inline" style='margin-top:7%;'>
-                <input type="checkbox" class="custom-control-input" id="wt_10">
-                <label class="custom-control-label" for="wt_10" id="wt_3_label" style='color:gray'>10 times</label>
-            </div>
-
-            <div class="custom-control custom-checkbox custom-control-inline" style='margin-top:7%;margin-left:13%;'>
-                <input type="checkbox" class="custom-control-input" id="sl_5" checked='true'>
-                <label class="custom-control-label" for="sl_5" id="sl_5_label" style='color:gray'>5 steps</label>
-            </div>
-            <div class="custom-control custom-checkbox custom-control-inline" style='margin-top:7%;'>
-                <input type="checkbox" class="custom-control-input" id="sl_10">
-                <label class="custom-control-label" for="sl_10" id="sl_10_label" style='color:gray'>10 steps</label>
-            </div>
-
-            <div class="custom-control custom-checkbox custom-control-inline" style='margin-top:7%;margin-left:13%;'>
-                <input type="checkbox" class="custom-control-input" id="ret_True">
-                <label class="custom-control-label" for="ret_True" id="ret_True_label">True</label>
-            </div>
-            <div class="custom-control custom-checkbox custom-control-inline" style='margin-top:7%;margin-left:13%;'>
-                <input type="checkbox" class="custom-control-input" id="ret_False" checked='true'>
-                <label class="custom-control-label" for="ret_False" id="ret_False_label">False</label>
-            </div>
             <div class='btn_out'>
                 <button id="confirm" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Confirm</button>
             </div>
@@ -110,12 +120,11 @@
 
     </div>
 
-
     <div id='OriTopo'>
         <div id="headLine">
-            <a id='headline_a'>Original topology</a>
+            <a id='headline_a'>Original Topology</a>
         </div>
-        <svg id='svg_oriTopo'></svg>
+        <div id='map'></div>
     </div>
 </div>
 
@@ -123,7 +132,7 @@
 
     <div id='forceDiv'>
         <div id="headLine">
-            <a id='headline_a'>Topology View</a>
+            <a id='headline_a'>Abstraction View</a>
         </div>
         <svg id='svg_force'></svg>
         <button id="cluster_layout" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Cluster Layout</button>
@@ -132,18 +141,25 @@
     </div>
 
     <div id='parallelDiv'>
-        <div id="headLine">
-            <a id='headline_a'>Parallel Coordinate View</a>
+        <div id='sankeyDiv'>
+            <div id="headLine">
+                <a id='headline_a'>Sankey View</a>
+            </div>
+            <svg id='svg_sankey'></svg>
         </div>
-        <svg id='svg_parallel'></svg>
+        <div id='radarDiv'>
+            <div id="headLine">
+                <a id='headline_a'>Radar View</a>
+            </div>
+            <svg id='svg_radar'></svg>
+        </div>
     </div>
-</div>
-
+</div>>
 <div id='right'>
 
     <div id='scatter'>
         <div id="headLine">
-            <a id='headline_a'>AENRL View</a>
+            <a id='headline_a'>Projection View</a>
         </div>
         {{!-- <button id="point" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Point</button> --}}
 
@@ -175,6 +191,8 @@
 </div>
 <script src="/js/my/variable.js"></script>
 <script src="/js/my/sactter.js"></script>
+<script src="/js/my/mapView.js"></script>
+<script src="/js/my/radar.js"></script>
 <script src="/js/my/force.js"></script>
 <script src="/js/my/axis.js"></script>
 <script src="/js/my/parallel.js"></script>
