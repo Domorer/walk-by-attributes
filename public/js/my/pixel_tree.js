@@ -1,16 +1,21 @@
 let tree_view = (function () {
+    let modifyCount = 1;
 
-    let svg_tree = d3.select('#svg_tree');
-    let svg_width = $("#svg_tree")[0].scrollWidth;
-    let svg_height = $("#svg_tree")[0].scrollHeight;
-    function draw_tree(data) {
+    function draw_tree(data, level) {
+
+
+        let svg_width = $("#svg_tree")[0].scrollWidth;
+        let svg_height = $("#svg_tree")[0].scrollHeight;
+        let svg_tree = d3.select('#svg_tree');
+
         svg_tree.selectAll('*').remove();
         let level_dict = data['level_dict'], children_dict = data['children_dict'];
         let max_level = d3.max(Object.keys(data['level_dict']), d => parseInt(d))
         let top_node = level_dict[max_level][0];
+
         function getChildren(node) {
             let tmp_dict = { name: node };
-            if (parseInt(children_dict[node]['level']) > variable.level) {
+            if (parseInt(children_dict[node]['level']) > level) {
                 tmp_dict['children'] = [];
                 tmp_dict['children'].push(getChildren(children_dict[node]['left']))
                 if (children_dict[node]['right']) {
@@ -19,76 +24,134 @@ let tree_view = (function () {
             }
             return tmp_dict;
         }
+        //初始化河流图
+        riverView.drawRiver(data, data['level_dict'][level]);
 
+        let diagonal = d3.linkVertical().x(d => d.x).y(d => d.y);
         let iter_data = getChildren(top_node)
-        let hierarchyData = d3.hierarchy(iter_data).sum(d => d.value ? 1 : 0);
+        let margin = { top: 10, right: 10, bottom: 10, left: 10 };
+
+        const root = d3.hierarchy(iter_data);
+        const dy = 100;
+        root.x0 = dy / 2;
+        root.y0 = 0;
+        root.descendants().forEach((d, i) => {
+            d.id = i;
+            d._children = d.children;
+        });
         let tree = d3.tree()
-            .size([svg_width - 20, svg_height - 20]);
-        let treeData = tree(hierarchyData);
-        let nodes = treeData.descendants();
-        console.log('nodes: ', nodes);
+            .size([svg_width - 20, svg_height * 0.6]);
 
-        let links = treeData.links();
 
-        let g = svg_tree.append('g').attr('transform', 'translate(10,10)')
-        g.selectAll('.link').data(links).enter()
-            .append('path')
-            .attr('class', 'link')
-            .attr('d', d3.linkVertical()
-                .x(function (d) { return d.x; })
-                .y(function (d) { return d.y; }))
-            .attr('stroke', '#b1b1b1')
-            .attr('stroke-width', 1.5)
-            .attr('fill', 'none')
-        g.selectAll('.node').data(nodes).enter()
-            .append('circle')
-            .attr('class', 'node')
-            .attr('cx', d => d.x)
-            .attr('cy', d => d.y)
-            .attr('r', 3)
-            .attr('fill', '#B6E9FF')
-            .attr('stroke', '#329CCB')
-            .attr('stroke-width', 1)
-            .attr('id', d=>'tree_' + d.data.name)
-            .on('click',function(d){
-                if (variable.last_cluster != undefined){
-                    d3.select('#area_' + variable.last_cluster).attr('fill', '#D5E2FF');
-                    d3.select('#cluster_' + variable.last_cluster).attr('fill', '#329CCB');
-                    d3.select('#tree_' + variable.last_cluster).attr('fill', '#B6E9FF').attr('stroke', '#329CCB')
-                }
-                d3.select('#area_' + d.id).attr('fill', '#FF9519');
-                d3.select('#cluster_' + d.id).attr('fill', '#FF9519');
-                d3.select('#tree_' + d.id).attr('fill', '#FFC889').attr('stroke', '#FF9519')
-            })
+        const gLink = svg_tree.append("g")
+            .attr("fill", "none")
+            .attr("stroke", "#555")
+            .attr("stroke-opacity", 0.4)
+            .attr("stroke-width", 1.5)
+            .attr('transform', 'translate(10,' + (0.37 * svg_height) + ')');
 
-        //绘制断层线
-        let nodeLoc_dict = {}
-        for (let i = 0; i < nodes.length; i++) {
-            nodeLoc_dict[nodes[i].data.name] = [nodes[i].x, nodes[i].y];
+        const gNode = svg_tree.append("g")
+            .attr("cursor", "pointer")
+            .attr('transform', 'translate(10,' + (0.37 * svg_height) + ')');
+
+        update(root);
+
+        function update(source) {
+            const duration = d3.event && d3.event.altKey ? 2500 : 250;
+            const nodes = root.descendants().reverse();
+            const links = root.links();
+            // Compute the new tree layout.
+            tree(root);
+            //通过判断节点的children来确定当前选中的类
+            variable.cluster_arr = [];
+            for (let i = 0; i < nodes.length; i++) {
+                if (nodes[i].children == null)
+                    variable.cluster_arr.push(nodes[i].data.name);
+            }
+
+            console.log('variable.cluster_arr: ', variable.cluster_arr);
+            let left = root;
+            let right = root;
+            root.eachBefore(node => {
+                if (node.x < left.x) left = node;
+                if (node.x > right.x) right = node;
+            });
+            const height = right.x - left.x + margin.top + margin.bottom;
+            const transition = svg_tree.transition()
+                .duration(duration)
+                .attr("height", height)
+                .tween("resize", window.ResizeObserver ? null : () => () => svg_tree.dispatch("toggle"));
+
+            // Update the nodes…
+            gNode.selectAll("g").selectAll('circle')
+                .attr("fill", d => {
+                    return d.children ? "#999" : "#329CCB"
+                })
+            const node = gNode.selectAll("g")
+                .data(nodes, d => d.id);
+
+            // Enter any new nodes at the parent's previous position.
+            const nodeEnter = node.enter().append("g")
+                .attr("transform", d => `translate(${source.y0},${source.x0})`)
+                .attr("fill-opacity", 0)
+                .attr("stroke-opacity", 0)
+                .on("click", d => {
+                    tree_view.modifyCount += 1;
+                    d.children = d.children ? null : d._children;
+                    update(d);
+                    riverView.modifyRiver(variable.comb_data, variable.cluster_arr)
+                });
+
+            nodeEnter.append("circle")
+                .attr("r", 5)
+                .attr("fill", d => d.children ? "#999" : "#329CCB")
+
+            // Transition nodes to their new position.
+            const nodeUpdate = node.merge(nodeEnter).transition(transition)
+                .attr("transform", d => `translate(${d.x},${d.y})`)
+                .attr("fill-opacity", 1)
+                .attr("stroke-opacity", 1);
+
+            // Transition exiting nodes to the parent's new position.
+            const nodeExit = node.exit().transition(transition).remove()
+                .attr("transform", d => `translate(${source.x},${source.y})`)
+                .attr("fill-opacity", 0)
+                .attr("stroke-opacity", 0);
+
+            // Update the links…
+            const link = gLink.selectAll("path")
+                .data(links, d => d.target.id);
+
+            // Enter any new links at the parent's previous position.
+            const linkEnter = link.enter().append("path")
+                .attr("d", d => {
+                    const o = { x: source.x0, y: source.y0 };
+                    return diagonal({ source: o, target: o });
+                });
+
+            // Transition links to their new position.
+            link.merge(linkEnter).transition(transition)
+                .attr("d", diagonal);
+
+            // Transition exiting nodes to the parent's new position.
+            link.exit().transition(transition).remove()
+                .attr("d", d => {
+                    const o = { x: source.x, y: source.y };
+                    return diagonal({ source: o, target: o });
+                });
+
+            // Stash the old positions for transition.
+            root.eachBefore(d => {
+                d.x0 = d.x;
+                d.y0 = d.y;
+            });
         }
-        let level_line = [];
-        console.log('level_dict: ', level_dict);
-        console.log(variable.level);
-        for (let i = 0; i < level_dict[variable.level].length; i++) {
-            
-            level_line.push(nodeLoc_dict[level_dict[variable.level][i]]);
-        }
-        level_line.sort((a, b)=>a[0] - b[0])
-        console.log('level_line: ', level_line);
-        let line = d3.line()
-            .x(d => d[0])
-            .y(d => d[1])
-        svg_tree
-            .append('path')
-            .attr('d',line(level_line))
-            .attr('stroke','red')
-            .attr('stroke-width', 1)
-            .attr('stroke-dasharray','4 4')
-            .attr('transform', 'translate(10,10)')
     }
 
 
+
     return {
-        draw_tree
+        draw_tree,
+        modifyCount
     }
 })()

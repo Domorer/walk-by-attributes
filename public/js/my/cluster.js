@@ -1,8 +1,10 @@
 let clusterFun = (function () {
-    function cluster(data, level) {
+    function cluster(data, level, cluster_ids) {
+        console.log('cluster_ids: ', cluster_ids);
         console.log('level: ', level);
         let children_dict = data['children_dict'], level_dict = data['level_dict'];
-        let cluster_arr = level_dict[level];
+        let cluster_arr = cluster_ids ? cluster_ids : level_dict[level];
+        console.log('cluster_arr: ', cluster_arr);
         let cluster_ids_dict = {}
 
         let dfs = function (root) {
@@ -24,12 +26,13 @@ let clusterFun = (function () {
             }
             return res;
         }
-
+        //计算每个类内所有站点的集合
         for (let i = 0; i < cluster_arr.length; i++) {
             let tmp_topNode = cluster_arr[i];
             cluster_ids_dict[tmp_topNode] = dfs(children_dict[tmp_topNode]);
         }
-        console.log('cluster_ids_dict: ', cluster_ids_dict);
+        // console.log('cluster_ids_dict: ', cluster_ids_dict);
+        //计算站点的所在类字典
         let id_cluster_dict = {}, index = 0;
         for (let key in cluster_ids_dict) {
             for (let i = 0; i < cluster_ids_dict[key].length; i++) {
@@ -37,9 +40,10 @@ let clusterFun = (function () {
             }
             index += 1;
         }
+        
         if (variable.sankey_count == 1)
             variable.last_cluster_dict = deepCopy(id_cluster_dict);
-        else{
+        else {
             variable.last_cluster_dict = {}
             variable.last_cluster_dict = deepCopy(variable.cluster_dict);
         }
@@ -62,7 +66,8 @@ let clusterFun = (function () {
         }
 
         variable.clusterLink_weight_dict = clusterLink_dict;  //每条轨迹作为键，边的权重作为value
-        console.log('clusterLink_dict: ', clusterLink_dict);
+        // console.log('clusterLink_dict: ', clusterLink_dict);
+        //计算每个簇内的所有连线的字典
         let clu_tpg = {};
         console.time('XX')
         //使用字典对比法
@@ -91,10 +96,11 @@ let clusterFun = (function () {
         //     }
         // }
         variable.clu_tpg = clu_tpg;
-        console.log('clu_tpg: ', clu_tpg);
-        console.log('cluster_ids_dict: ', cluster_ids_dict);
+        // console.log('clu_tpg: ', clu_tpg);
+        // console.log('cluster_ids_dict: ', cluster_ids_dict);
         console.timeEnd('XX');
     }
+
 
     //深拷贝函数
     function deepCopy(o) {

@@ -12,7 +12,7 @@ let sankeyChart = (function () {
             .nodeId(function (d) { return d.id })
             .nodePadding(5)
             .nodeAlign(d3.sankeyCenter)
-            .extent([[1, 5], [sankey_width - 1, sankey_height - 1]]);
+            .extent([[0.05*sankey_width, 0.3*sankey_height], [0.95*sankey_width, 1*sankey_height]]);
         const { nodes, links } = sankey({ nodes: nodes_data, links: links_data });
         const color = d3.scaleOrdinal(d3.schemeCategory20);
 

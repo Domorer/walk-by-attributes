@@ -74,11 +74,27 @@ let scatter = (function () {
             .attr('fill', '#D5E2FF')
             .attr('stroke', 'blue')
             .attr('stroke-width', 1)
-            .attr('opacity', 0)
+            .attr('opacity', 0.2)
             .attr('id', function (d, i) {
                 d.id = key_list[i];
                 d.id = d.id.split('-').pop();
                 return 'area_' + d.id;
+            }).on('mouseover', function () {
+                d3.select(this).attr('opacity', 0.5);
+            }).on('mouseout', function () {
+                d3.select(this).attr('opacity', 0.2);
+            }).on('click', function (d) {
+                if (variable.last_cluster != undefined) {
+                    d3.select('#cluster_' + variable.last_cluster).attr('fill', '#329CCB');
+                    d3.select('#area_' + variable.last_cluster).attr('fill', '#D5E2FF');
+                    d3.select('#tree_' + variable.last_cluster).attr('fill', '#B6E9FF').attr('stroke', '#329CCB')
+                }
+                d3.select('#cluster_' + d.id).attr('fill', '#FF9519');
+                d3.select('#area_' + d.id).attr('fill', '#FF9519');
+                d3.select('#tree_' + d.id).attr('fill', '#FFC889').attr('stroke', '#FF9519')
+                variable.last_cluster = d.id;
+                console.log(d.id)
+                // parallel.drawParallel(d.id);
             });
         //设置刷子
         var brush = d3.brush()

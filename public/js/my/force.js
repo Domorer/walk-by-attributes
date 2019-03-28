@@ -220,10 +220,9 @@ let forceChart = (function () {
                 if (d.source.id === d.target.id)
                     return color(d.target.id);
                 else
-                    return '#A9C3E4';
+                    return '#c5c5c5';
             }).attr('stroke-width', function (d) {
                 return LWScale(d.value);
-                // return 2;
             })
             .attr('opacity', function (d) {
                 return OPScale(d.value);
@@ -232,6 +231,9 @@ let forceChart = (function () {
             .attr('id', function (d) {
                 return d.source + '_' + d.target;
             })
+
+
+
         //画点
         let node = variable.svg_force.append('g').attr('class', 'node').selectAll('circle').data(cluster_nodes).enter()
             .append('circle')
@@ -253,7 +255,9 @@ let forceChart = (function () {
             }).attr('class', function (d) {
                 return 'cluster_node';
             }).attr('id', d => 'cluster_' + d.id)
-            .on('click', function (d) {
+            .on('click', function (d,i) {
+                const a = i;
+                console.log(a)
                 if (variable.last_cluster != undefined) {
                     d3.select('#area_' + variable.last_cluster).attr('fill', '#D5E2FF');
                     d3.select('#cluster_' + variable.last_cluster).attr('fill', '#329CCB');
@@ -266,6 +270,8 @@ let forceChart = (function () {
                 console.log(d.id)
                 //雷达图
                 radarChart.draw(d.id);
+
+                mapView.drawPL(variable.clu_tpg[d.id], variable.cluster_ids_dict[d.id]);
 
                 //平行坐标轴
                 // parallel.drawParallel(d.id);
@@ -349,7 +355,7 @@ let forceChart = (function () {
             .append('path')
             .attr("d", d => d3line(d))
             .attr("stroke-width", d => LWScale(d.value))
-            .attr("stroke", "#a9c3e4")
+            .attr("stroke", "#c5c5c5")
             .attr("fill", "none")
             .attr('stroke-opacity', d=>OPScale(d.value));
     }

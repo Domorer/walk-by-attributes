@@ -1,11 +1,11 @@
 let AttrValue = (function () {
 
     d3.csv('data/index_id_infor.csv', function (data_infor) {
-        console.log('data_infor: ', data_infor);
+        // console.log('data_infor: ', data_infor);
         d3.csv('data/year_id.csv', function (data_id) {
-            console.log('data_id: ', data_id);
+            // console.log('data_id: ', data_id);
             d3.csv('data/year_p.csv', function (data_pos) {
-                console.log('data_pos: ', data_pos);
+                // console.log('data_pos: ', data_pos);
                 let year_list = [];
                 let year_dict = {};
                 for (let i = 0; i < data_infor.length; i++) {

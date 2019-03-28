@@ -12,12 +12,15 @@ let variable = (function () {
     let attr_arr = ['0', '1', '2', '3', '4'];
     let time_arr = ['6:00~9:00', '10:00~13:00', '14:00~17:00', '18:00~21:00', '22:00~5:00',];
     let info_dict = {};//节点的信息字典
+
     let ChoseCluster = false;//判断当前选择点的方式
+    let cluster_arr = [];
     let cluster_dict = {};//点的簇字典
     let last_cluster_dict = {};
     let cluster_ids_dict = {} //每个簇内的点的集合字典
     let clusterLink_weight_dict;
     let clu_tpg;
+
     let attr_color = ["#1F8A70", '#BEDB38', '#FFE11A', '#FD7400', '#EE89FF'];//["#50ab4c", '#A597FF', '#FFAB7C', '#EE89FF', '#00D8FF'];
     let sankey_count = 1;
     let sankeyNode_data = [];//保存桑基图的节点数据
@@ -32,6 +35,8 @@ let variable = (function () {
     let level;
     let param = { wt: 'wt_5', sl: 'sl_10', rl: 'rl_False', comb: 'period_0' };
     let last_cluster;// 记录上次选择的cluster，用于还原对应元素的样式
+
+    let loc_dict; //坐标字典
     return {
         time_arr,
         all_comb,
@@ -63,6 +68,8 @@ let variable = (function () {
         param,
         last_cluster,
         station_links_dict,
-        attr_color
+        attr_color,
+        loc_dict,
+        cluster_arr
     }
 })()

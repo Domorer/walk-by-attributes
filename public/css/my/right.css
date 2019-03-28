@@ -9,8 +9,8 @@ button#confirm {
 
 button#cluster_layout {
     position: absolute;
-    top:3%;
-    right:1%;
+    top: 3%;
+    right: 1%;
     padding-left: 5;
     padding-right: 5;
     padding-top: 0;
@@ -20,8 +20,19 @@ button#cluster_layout {
 
 button#edge_bundling {
     position: absolute;
-    top:3%;
-    right:14%;
+    top: 3%;
+    right: 14%;
+    padding-left: 5;
+    padding-right: 5;
+    padding-top: 0;
+    padding-bottom: 0;
+    font-size: 0.8em;
+}
+
+button#confirm_cluster {
+    position: absolute;
+    top: 6%;
+    right: 2%;
     padding-left: 5;
     padding-right: 5;
     padding-top: 0;

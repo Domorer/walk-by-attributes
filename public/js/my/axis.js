@@ -13,7 +13,7 @@ let axisChart = (function () {
             tmp_node['k_clu'] = comb_data['id_k_clu'][key];
             loc_arr.push(tmp_node)
         }
-        console.log('loc_arr: ', loc_arr);
+        // console.log('loc_arr: ', loc_arr);
         let min_x = d3.min(loc_arr, d => d.loc[0]);
         let min_y = d3.min(loc_arr, d => d.loc[1]);
         let max_x = d3.max(loc_arr, d => d.loc[0]);
