@@ -5,6 +5,7 @@ let variable = (function () {
     let node_data;//力引导点的数据
     let all_comb;//所有游走类型的数据集合
     let all_data;//所有参数的集合
+    let svg_tree = d3.select('#svg_tree')
     let svg_scatter = d3.select('#svg_scatter');
     let svg_brush = d3.select('#svg_brush');
     let svg_sankey = d3.select('#svg_sankey');
@@ -46,6 +47,7 @@ let variable = (function () {
         svg_scatter,
         svg_force,
         svg_brush,
+        svg_tree,
         attr_arr,
         info_dict,
         ChoseCluster,

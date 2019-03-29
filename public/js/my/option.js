@@ -25,7 +25,7 @@ let option = (function () {
                         variable.oriLink_dict[data_link[i].source] = [data_link[i].target];
                         variable.station_links_dict[data_link[i].source] = [data_link[i].target]
                     }
-                    if (variable.oriLink_dict[data_link[i].target] != null) {
+                    if (variable.station_links_dict[data_link[i].target] != null) {
                         variable.station_links_dict[data_link[i].target].push(data_link[i].source)
                     }
                     else {
@@ -139,7 +139,6 @@ let option = (function () {
                 let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
                 clusterFun.cluster(variable.comb_data, max_level - 6, null)
                 scatter.drawScatter(data[0]['info']);
-                parallel.drawParallel(variable.clu_tpg);
                 tree_view.draw_tree(data[0], variable.level);
                 forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
             })
@@ -150,7 +149,7 @@ let option = (function () {
 
     //用户自定义的类数组确定按钮
     $('#confirm_cluster').on('click', () => {
-        modify_cluster(variable.all_comb, variable.cluster_arr);
+        modify_cluster(variable.comb_data, variable.cluster_arr);
     })
 
 
@@ -159,7 +158,7 @@ let option = (function () {
         //桑基图的列数加一
         variable.sankey_count += 1;
         console.log('data: ', data);
-        variable.comb_data = data[0];
+        variable.comb_data = data;
         //通过用户选定的层级中的类   或者选中的断层的类   来生成类字典
         let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
         variable.level = max_level - 6;

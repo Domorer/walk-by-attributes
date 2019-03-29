@@ -63,16 +63,7 @@ let parallel = (function () {
             }
             value_arr.push(ratio_arr);
         }
-        // for (let i = 0; i < variable.clu_tpg[cluster].length; i++) {
-        //     let tmp_value = variable.clu_tpg[cluster][i].value;
-
-        //     let tmp_link = [];
-        //     for (let attr in tmp_value) {
-        //         tmp_link.push(tmp_value[attr])
-        //     }
-        //     value_arr.push(tmp_link);
-        // }
-        // console.log('value_arr: ', value_arr);
+        
 
         let scale_arr = [];
         for (let i = 0; i < 5; i++) {

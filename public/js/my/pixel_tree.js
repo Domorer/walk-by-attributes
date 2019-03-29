@@ -80,8 +80,6 @@ let tree_view = (function () {
             const transition = svg_tree.transition()
                 .duration(duration)
                 .attr("height", height)
-                .tween("resize", window.ResizeObserver ? null : () => () => svg_tree.dispatch("toggle"));
-
             // Update the nodes…
             gNode.selectAll("g").selectAll('circle')
                 .attr("fill", d => {
@@ -99,7 +97,8 @@ let tree_view = (function () {
                     tree_view.modifyCount += 1;
                     d.children = d.children ? null : d._children;
                     update(d);
-                    riverView.modifyRiver(variable.comb_data, variable.cluster_arr)
+                    //如果该节点的children为null则代表该节点的操作为合并
+                    riverView.modifyRiver(variable.comb_data, variable.cluster_arr, d.children, d.data.name)
                 });
 
             nodeEnter.append("circle")

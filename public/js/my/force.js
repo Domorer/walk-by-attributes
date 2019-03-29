@@ -276,7 +276,6 @@ let forceChart = (function () {
                 //平行坐标轴
                 // parallel.drawParallel(d.id);
                 // forceChart.drawPie(d.id);
-                // drawClusterForce(clusterFun.deepCopy(variable.clu_tpg[d.id]));
             });
 
         //画园内的pattern
@@ -362,7 +361,6 @@ let forceChart = (function () {
 
     //画圆外的扇形
     function drawPie(cluster, radius) {
-        let tmp_tpg = clusterFun.deepCopy(variable.clu_tpg[cluster]);
         let tmp_attrs = variable.param.comb.split('_');
         tmp_attrs.shift()
         //计算总和
@@ -372,7 +370,7 @@ let forceChart = (function () {
         //         attrs_value[j] += tmp_tpg[i].value[j];
         //     }
         // }
-
+        //计算类内每个点的类内流量除于总流量 的均值， 不是计算类内流量除于总流量
         let attrs_value = new Array(5).fill(0);
         let tmp_ids = variable.cluster_ids_dict[cluster]
         let value_arr = [];
