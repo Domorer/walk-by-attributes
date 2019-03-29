@@ -179,7 +179,7 @@ let riverView = (function () {
             area_arr[2].push(tmp_counts)
         }
         console.log('area_arr: ', area_arr);
-        let river_color = ['#a7ff4e', '#4e4eff', '#ffa74e']
+        let river_color = ['#A7BEAD', '#8CAFB8', '#7B7C94']
         //修改三条path的路径
         riverView.river_g
             .attr('d', (d, i) => areaInitial(area_arr[i]))
@@ -200,7 +200,7 @@ let riverView = (function () {
         }
         //新添加标志
         riverView.symbol_g.append('path')
-            .attr('d', d3.symbol().type(symbol[symbol.length - 1].symbol).size(20))
+            .attr('d', d3.symbol().type(symbol[symbol.length - 1].symbol).size(50))
             .attr('transform', `translate(${symbol[symbol.length - 1].x},${symbol[symbol.length - 1].y})`
             )
             .attr('fill', 'blue')
@@ -209,20 +209,44 @@ let riverView = (function () {
         riverView.symbol_g.selectAll('path')
             .on('click', (d, i) => {
                 //修改显示的指向线
-                d3.selectAll('.directionLine').attr('opacity', 0)
-                d3.select('#dirLine_' + i.toString()).attr('opacity', 1)
+                d3.selectAll('.directionLine').attr('opacity', 0.2)
+                d3.select('#dirLine_' + i.toString())
+                    .transition()
+                    .duration(1000)
+                    .attr('opacity', 1)
                 //修改当前的类数组
                 variable.cluster_arr = clusterFun.deepCopy(symbol[i].cluster_arr)
                 console.log('symbol: ', symbol);
                 //修改树图的选中节点显示
                 variable.svg_tree.selectAll('.node')
+                    .transition()
+                    .duration(1000)
                     .attr('fill', colorOri.fill)
                     .attr('stroke', colorOri.stroke)
                 for (let n = 0; n < variable.cluster_arr.length; n++) {
                     d3.select('#tree_' + variable.cluster_arr[n])
+                        .transition()
+                        .duration(1000)
                         .attr('fill', colorSelected.fill)
                         .attr('stroke', colorSelected.stroke)
                 }
+
+                //修改断层线
+                //修改类断层的连线路径
+                let faultage = [];
+                for (let i = 0; i < variable.cluster_arr.length; i++) {
+                    faultage.push(tree_view.cluLoc_dict[variable.cluster_arr[i]])
+                }
+                faultage.sort((a, b) => a[0] - b[0]);
+
+                let falutageLine = d3.line()
+                    .x(d => d[0])
+                    .y(d => d[1])
+                    .curve(d3.curveStep)
+                tree_view.levelLine_g.selectAll('path')
+                    .transition()
+                    .duration(1000)
+                    .attr('d', falutageLine(faultage))
             }).transition()
             .duration(2000)
             .attr('transform', (d, i) => {
@@ -243,6 +267,7 @@ let riverView = (function () {
         let dirLine = d3.line()
             .x(d => d[0])
             .y(d => d[1])
+        //添加新增操作的指向线
         riverView.directLine_g.append('path')
             .attr('d', dirLine(dirLine_arr[dirLine_arr.length - 1]))
             .attr('stroke', '#ff957c')
@@ -251,14 +276,32 @@ let riverView = (function () {
             .attr('fill', 'none')
             .attr('class', 'directionLine')
             .attr('id', 'dirLine_' + (dirLine_arr.length - 1).toString())
+        //修改所有操作指向线的位置
         riverView.directLine_g.selectAll('path')
+            .transition()
+            .duration(2000)
             .attr('d', (d, i) => dirLine(dirLine_arr[i]))
             .attr('opacity', (d, i) => {
                 if (i != dirLine_arr.length - 1)
-                    return 0
+                    return 0.2
                 return 1
             })
+        //修改类断层的连线路径
+        let faultage = [];
+        for (let i = 0; i < cluster_arr.length; i++) {
+            faultage.push(tree_view.cluLoc_dict[cluster_arr[i]])
 
+        }
+        faultage.sort((a, b) => a[0] - b[0]);
+
+        let falutageLine = d3.line()
+            .x(d => d[0])
+            .y(d => d[1])
+            .curve(d3.curveStep)
+        tree_view.levelLine_g.selectAll('path')
+            .transition()
+            .duration(1000)
+            .attr('d', falutageLine(faultage))
 
     }
 
@@ -296,7 +339,7 @@ let riverView = (function () {
         // }
         console.log('area_arr: ', area_arr);
 
-        let river_color = ['#a7ff4e', '#4e4eff', '#ffa74e']
+        let river_color = ['#A7BEAD', '#8CAFB8', '#7B7C94']
 
         riverView.river_g = variable.svg_tree.append('g').selectAll('path').data(area_arr).enter()
             .append('path')
@@ -328,7 +371,24 @@ let riverView = (function () {
         riverView.symbol_g = variable.svg_tree.append('g')
         riverView.directLine_g = variable.svg_tree.append('g')
 
+        let labels = ['Label Cost', 'Data Cost', 'Smooth Cost']
+        variable.svg_tree.append('g').selectAll('text').data(labels).enter()
+            .append('text')
+            .attr('x', 0.85 * svg_width)
+            .attr('y', (d, i) => 0.15 * svg_height + i * 20)
+            .text(d => d)
+            .attr('font-weight', 500)
+            .attr('font-size', '0.8em')
 
+        variable.svg_tree.append('g').selectAll('rect').data(labels).enter()
+            .append('rect')
+            .attr('x', 0.85 * svg_width - 20)
+            .attr('y', (d, i) => 0.12 * svg_height + i * 20)
+            .attr('height', 15)
+            .attr('width', 15)
+            .attr('rx', 5)
+            .attr('ry', 5)
+            .attr('fill', (d, i)=>river_color[i])
     }
     return {
         drawRiver,

@@ -150,7 +150,7 @@ let option = (function () {
 
     //用户自定义的类数组确定按钮
     $('#confirm_cluster').on('click', () => {
-        modify_cluster(variable.comb_data, variable.cluster_arr);
+        modify_cluster(variable.comb_data, true);
     })
 
 
@@ -164,7 +164,7 @@ let option = (function () {
         let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
         variable.level = max_level - 6;
         //通过判断当前的类是用户选择的还是自定层级的， 来确定参数
-        if (!tree_confirm)
+        if (tree_confirm == false)
             clusterFun.cluster(variable.comb_data, max_level - 6, null)
         else
             clusterFun.cluster(variable.comb_data, max_level - 6, variable.cluster_arr)
@@ -172,7 +172,7 @@ let option = (function () {
         //更新力引导图
         scatter.drawScatter(data['info']);
         //如果不是通过修改断层来修改类数组则需要重绘树图
-        if (!tree_confirm)
+        if (tree_confirm == false)
             tree_view.draw_tree(data, variable.level);
         forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
 

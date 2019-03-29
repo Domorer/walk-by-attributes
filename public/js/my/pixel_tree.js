@@ -1,9 +1,8 @@
 let tree_view = (function () {
-    let modifyCount = 1;
+    let modifyCount = 1, levelLine_g, cluLoc_dict = {};
 
 
     function draw_tree(data, level) {
-
         let colorSelected = { fill: '#ff957c', stroke: '#ff4416' }, colorOri = { fill: '#B6E9FF', stroke: '#329CCB' }
         let svg_tree = d3.select('#svg_tree');
         let svg_width = $("#svg_tree")[0].scrollWidth;
@@ -67,7 +66,11 @@ let tree_view = (function () {
 
         //获取节点和树的数据
         let nodes = treeData.descendants();
-        
+        //获取类坐标字典
+        tree_view.cluLoc_dict = {}
+        for (let i = 0; i < nodes.length; i++) {
+            tree_view.cluLoc_dict[nodes[i].data.name] = [nodes[i].x, nodes[i].y]
+        }
         console.log('nodes: ', nodes);
         let links = treeData.links();
         //设置线宽、透明度、圆半径的比例尺
@@ -122,7 +125,11 @@ let tree_view = (function () {
                         separate = true;
                         console.log('separate: ', separate);
                         variable.cluster_arr.splice(variable.cluster_arr.indexOf(parent[p]), 1);
-                        d3.select('#tree_' + parent[p]).attr('fill', colorOri.fill).attr('stroke', colorOri.stroke)
+                        d3.select('#tree_' + parent[p])
+                            .transition()
+                            .duration(1000)
+                            .attr('fill', colorOri.fill)
+                            .attr('stroke', colorOri.stroke)
                         tmp_parentId = parent[p];
                     }
                 }
@@ -134,7 +141,11 @@ let tree_view = (function () {
                     console.log('levelIds: ', levelIds);
                     for (let i = 0; i < levelIds.length; i++) {
                         if (parent_childrens.indexOf(levelIds[i]) != -1) {
-                            d3.select('#tree_' + levelIds[i]).attr('fill', colorSelected.fill).attr('stroke', colorSelected.stroke)
+                            d3.select('#tree_' + levelIds[i])
+                                .transition()
+                                .duration(1000)
+                                .attr('fill', colorSelected.fill)
+                                .attr('stroke', colorSelected.stroke)
                             variable.cluster_arr.push(levelIds[i]);
                         }
                     }
@@ -147,18 +158,26 @@ let tree_view = (function () {
                         separate = false;
                         console.log('separate: ', separate);
                         variable.cluster_arr.splice(variable.cluster_arr.indexOf(children[c]), 1);
-                        d3.select('#tree_' + children[c]).attr('fill', colorOri.fill).attr('stroke', colorOri.stroke)
+                        d3.select('#tree_' + children[c])
+                            .transition()
+                            .duration(1000)
+                            .attr('fill', colorOri.fill)
+                            .attr('stroke', colorOri.stroke)
                     }
                 }
                 //如果当前操作属于合并，则将当前节点加入类数组
                 if (separate == false) {
-                    d3.select('#tree_' + d.data.name).attr('fill', colorSelected.fill).attr('stroke', colorSelected.stroke)
+                    d3.select('#tree_' + d.data.name)
+                        .transition()
+                        .duration(1000)
+                        .attr('fill', colorSelected.fill)
+                        .attr('stroke', colorSelected.stroke)
                     variable.cluster_arr.push(d.data.name);
 
                 }
                 console.log('variable.cluster_arr: ', variable.cluster_arr);
                 console.log('separate: ', separate);
-                let tmp_info = { name: d.data.name, x: d.x + 10, y: d.y + 0.37*svg_height};
+                let tmp_info = { name: d.data.name, x: d.x + 10, y: d.y + 0.37 * svg_height };
                 riverView.modifyRiver(data, variable.cluster_arr, separate, tmp_info)
 
 
@@ -167,29 +186,30 @@ let tree_view = (function () {
         //初始化河流图
         riverView.drawRiver(data, level_dict[variable.level])
         //绘制断层线
-        // let nodeLoc_dict = {}
-        // for (let i = 0; i < nodes.length; i++) {
-        //     nodeLoc_dict[nodes[i].data.name] = [nodes[i].x, nodes[i].y];
-        // }
-        // let level_line = [];
-        // console.log('level_dict: ', level_dict);
-        // console.log(variable.level);
-        // for (let i = 0; i < level_dict[variable.level].length; i++) {
+        let nodeLoc_dict = {}
+        for (let i = 0; i < nodes.length; i++) {
+            nodeLoc_dict[nodes[i].data.name] = [nodes[i].x, nodes[i].y];
+        }
+        let level_line = [];
+        console.log('level_dict: ', level_dict);
+        console.log(variable.level);
+        for (let i = 0; i < level_dict[variable.level].length; i++) {
 
-        //     level_line.push(nodeLoc_dict[level_dict[variable.level][i]]);
-        // }
-        // level_line.sort((a, b) => a[0] - b[0])
-        // console.log('level_line: ', level_line);
-        // let line = d3.line()
-        //     .x(d => d[0])
-        //     .y(d => d[1])
-        // svg_tree
-        //     .append('path')
-        //     .attr('d', line(level_line))
-        //     .attr('stroke', 'red')
-        //     .attr('stroke-width', 1)
-        //     .attr('stroke-dasharray', '4 4')
-        //     .attr('transform', `translate(10,${0.37 * svg_height})`)
+            level_line.push(nodeLoc_dict[level_dict[variable.level][i]]);
+        }
+        level_line.sort((a, b) => a[0] - b[0])
+        console.log('level_line: ', level_line);
+        let line = d3.line()
+            .x(d => d[0])
+            .y(d => d[1])
+        tree_view.levelLine_g = svg_tree.append('g')
+        tree_view.levelLine_g.append('path')
+            .attr('d', line(level_line))
+            .attr('stroke', 'gray')
+            .attr('fill','none')
+            .attr('stroke-width', 2)
+            .attr('stroke-dasharray', '4 4')
+            .attr('transform', `translate(10,${0.37 * svg_height})`)
     }
 
     //通过判断节点的children来确定当前选中的类
@@ -204,5 +224,7 @@ let tree_view = (function () {
     return {
         draw_tree,
         modifyCount,
+        levelLine_g,
+        cluLoc_dict
     }
 })()
