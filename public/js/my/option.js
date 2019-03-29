@@ -37,14 +37,14 @@ let option = (function () {
 
                 //通过用户选定的层级来生成类字典
                 let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
-                variable.level = max_level - 6;
-                clusterFun.cluster(variable.comb_data, max_level - 6, null)
+                variable.level = 1;
+                clusterFun.cluster(variable.comb_data, 1, null)
                 console.log('variable.comb_data: ', variable.comb_data);
                 //绘制降维散点图
                 scatter.drawScatter(variable.comb_data['info']);
                 console.log(variable.comb_data['info'].length)
                 //绘制力引导图
-                forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
+                // forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
                 //树图
                 tree_view.draw_tree(data[0], variable.level);
                 radarChart.draw('1131');
