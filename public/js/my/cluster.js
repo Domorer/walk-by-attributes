@@ -5,6 +5,7 @@ let clusterFun = (function () {
         let children_dict = data['children_dict'], level_dict = data['level_dict'];
         let cluster_arr = cluster_ids ? cluster_ids : level_dict[level];
         console.log('cluster_arr: ', cluster_arr);
+        variable.cluster_arr = deepCopy(cluster_arr);
         let cluster_ids_dict = {}
 
         let dfs = function (root) {

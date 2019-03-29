@@ -37,8 +37,9 @@ let option = (function () {
 
                 //通过用户选定的层级来生成类字典
                 let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
-                variable.level = 1;
-                clusterFun.cluster(variable.comb_data, 1, null)
+                //当前选中的层级
+                variable.level = max_level - 6;
+                clusterFun.cluster(variable.comb_data,  variable.level, null)
                 console.log('variable.comb_data: ', variable.comb_data);
                 //绘制降维散点图
                 scatter.drawScatter(variable.comb_data['info']);
@@ -46,7 +47,7 @@ let option = (function () {
                 //绘制力引导图
                 // forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
                 //树图
-                tree_view.draw_tree(data[0], variable.level);
+                tree_view.draw_tree(data[0], 1);
                 radarChart.draw('1131');
 
                 //初始化桑基图
