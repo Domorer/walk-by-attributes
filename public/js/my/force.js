@@ -1,7 +1,11 @@
 let forceChart = (function () {
     let forceWidth = $('#svg_force')[0].scrollWidth;
     let forceHeight = $('#svg_force')[0].scrollHeight;
-
+    let cluster_nodes, bundling_edge;
+    //设置边绑定按钮
+    $('#edge_bundling').on('click', () => {
+        forceChart.edgeBundling(forceChart.cluster_nodes, forceChart.bundling_edge, variable.clusterLink_weight_dict)
+    })
     function drawStaticForce(nodes, links, cluster_dict) {
         let color = d3.scaleOrdinal(d3.schemeCategory20);
         //绘制节点
@@ -126,6 +130,7 @@ let forceChart = (function () {
     //************绘制聚类后的力引导图************
 
     function Clustering(clusterids_dict, clusterLinks_dict, cluster_dict) {
+        console.log('clusterids_dict: ', clusterids_dict);
         console.log('clusterLinks_dict: ', clusterLinks_dict);
         variable.svg_force.selectAll('*').remove();
         //直接只画类的点，不画类内的点
@@ -140,6 +145,7 @@ let forceChart = (function () {
             tmp_dict['value'] = parseInt(clusterids_dict[key].length);
             cluster_nodes.push(tmp_dict);
         }
+        
         let index_dict = {};
         for (let i = 0; i < cluster_nodes.length; i++) {
             index_dict[cluster_nodes[i].id] = i;
@@ -172,14 +178,17 @@ let forceChart = (function () {
         console.log('lineW_extent: ', lineW_extent);
         let index = 0;
         while (index < cluster_links.length) {
-            if (LWScale(cluster_links[index].value) < 1.5){
+            if (LWScale(cluster_links[index].value) < 1.5) {
                 bundling_edge.splice(index, 1)
                 cluster_links.splice(index, 1)
             }
             else
                 index += 1;
         }
-
+        //更新边绑定数据
+        forceChart.bundling_edge = bundling_edge;
+        forceChart.cluster_nodes = cluster_nodes;
+        
         //设置力的作用
         let simulation = d3.forceSimulation(cluster_nodes)
             .force("charge", d3.forceManyBody().strength(-3500).distanceMax(300))
@@ -241,35 +250,25 @@ let forceChart = (function () {
                 return rScale(d.value);
             })
             .attr('stroke', function (d) {
-                // if (d.id != -1)
-                //     return color(d.id)
-                // else
-                //     return 'black';
                 return '#004358';
             }).attr('fill', function (d) {
-                // if (d.id != -1)
-                //     return color(d.id)
-                // else
-                //     return 'black';
                 return '#004358';
             }).attr('class', function (d) {
                 return 'cluster_node';
             }).attr('id', d => 'cluster_' + d.id)
-            .on('click', function (d,i) {
+            .on('click', function (d, i) {
                 const a = i;
                 console.log(a)
                 if (variable.last_cluster != undefined) {
                     d3.select('#area_' + variable.last_cluster).attr('fill', '#D5E2FF');
-                    d3.select('#cluster_' + variable.last_cluster).attr('fill', '#329CCB');
-                    d3.select('#tree_' + variable.last_cluster).attr('fill', '#B6E9FF').attr('stroke', '#329CCB')
+                    d3.select('#cluster_' + variable.last_cluster).attr('fill', '#004358');
                 }
                 d3.select('#area_' + d.id).attr('fill', '#E83A00');
                 d3.select('#cluster_' + d.id).attr('fill', '#E83A00');
-                d3.select('#tree_' + d.id).attr('fill', '#FFC889').attr('stroke', '#E83A00')
                 variable.last_cluster = d.id;
                 console.log(d.id)
                 //雷达图
-                radarChart.draw(d.id);
+                radarChart.addRadar(d.id);
 
                 mapView.drawPL(variable.clu_tpg[d.id], variable.cluster_ids_dict[d.id]);
 
@@ -318,14 +317,14 @@ let forceChart = (function () {
 
         });
 
-        $('#edge_bundling').on('click', () => {
-            edgeBundling(cluster_nodes, bundling_edge, clusterLinks_dict)
-        })
+
 
     }
 
     //***************边邦定***************
     function edgeBundling(cluster_nodes, bundling_edge, clusterLinks_dict) {
+        console.log('bundling_edge: ', bundling_edge);
+        console.log('cluster_nodes: ', cluster_nodes);
 
         d3.selectAll('.force_link').remove();
 
@@ -334,7 +333,7 @@ let forceChart = (function () {
             .nodes(cluster_nodes)
             .edges(bundling_edge);
         var results = fbundling();
-        console.log('results: ', results);
+        
         for (let i = 0; i < results.length; i++) {
             let tmp_key = results[i][0].id + '-' + results[i][results[i].length - 1].id
             results[i].value = clusterLinks_dict[tmp_key]
@@ -344,7 +343,7 @@ let forceChart = (function () {
         let OPScale = d3.scaleLinear().domain(lineW_extent).range([0.2, 0.8]);
         let LWScale = d3.scaleLinear().domain(lineW_extent).range([1, 6]);
 
-       
+
         var d3line = d3.line()
             .x(d => d.x)
             .y(d => d.y)
@@ -356,7 +355,7 @@ let forceChart = (function () {
             .attr("stroke-width", d => LWScale(d.value))
             .attr("stroke", "#c5c5c5")
             .attr("fill", "none")
-            .attr('stroke-opacity', d=>OPScale(d.value));
+            .attr('stroke-opacity', d => OPScale(d.value));
     }
 
     //画圆外的扇形
@@ -561,6 +560,9 @@ let forceChart = (function () {
     return {
         drawStaticForce,
         Clustering,
-        drawPie
+        drawPie,
+        cluster_nodes,
+        bundling_edge,
+        edgeBundling
     }
 }())

@@ -45,44 +45,7 @@
             </div>
         </div>
     </div>
-    <div id='attributes'>
-        <div id="headLine">
-            <a id='headline_a'>Attributes</a>
-        </div>
-        <div id='attrInner'>
-            <div class="custom-control custom-checkbox custom-control-inline" style='margin-top:7%;margin-left:13%;'>
-                <input type="checkbox" class="custom-control-input" id="0" checked='true'>
-                <label class="custom-control-label" for="0" id="citedLabel" style='color:gray'>6:00 ~ 9:00</label>
-            </div>
-            <div class='tuli' style='background-color:#50ab4c'></div>
 
-            <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
-                <input type="checkbox" class="custom-control-input" id="1">
-                <label class="custom-control-label" for="1" id="abtLabel" style='color:gray'>10:00 ~ 13:00</label>
-            </div>
-            <div class='tuli' style='background-color:#A597FF'></div>
-
-            <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
-                <input type="checkbox" class="custom-control-input" id="2">
-                <label class="custom-control-label" for="2" id="confLabel" style='color:gray'>14:00 ~ 17:00</label>
-            </div>
-            <div class='tuli' style='background-color:#FFAB7C'></div>
-
-            <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
-                <input type="checkbox" class="custom-control-input" id="3">
-                <label class="custom-control-label" for="3" id="yearLabel" style='color:gray'>18:00 ~ 21:00</label>
-            </div>
-            <div class='tuli' style='background-color:#EE89FF'></div>
-
-            <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
-                <input type="checkbox" class="custom-control-input" id="4">
-                <label class="custom-control-label" for="4" id="affLabel" style='color:gray'>22:00 ~ 6:00</label>
-            </div>
-            <div class='tuli' style='background-color:#00D8FF'></div>
-
-        </div>
-
-    </div>
     <div id='control_pannel'>
         <div id="headLine">
             <a id='headline_a'>Control Pannel</a>
@@ -103,12 +66,12 @@
             <div id='radio_out'>
                 <span class='slider_span'>Return:</span>
                 <div class="custom-control custom-radio custom-control-inline" style='margin-left:5%;margin-top:5%;color:gray'>
-                    <input type="radio" id="ret_True" name="customRadioInline_return" class="custom-control-input"
-                        checked=True>
+                    <input type="radio" id="ret_True" name="customRadioInline_return" class="custom-control-input">
                     <label class="custom-control-label" for="ret_True">True</label>
                 </div>
                 <div class="custom-control custom-radio custom-control-inline" style='margin-left:0%;margin-top:3%;color:gray'>
-                    <input type="radio" id="ret_False" name="customRadioInline_return" class="custom-control-input">
+                    <input type="radio" id="ret_False" name="customRadioInline_return" class="custom-control-input"
+                        checked=True>
                     <label class="custom-control-label" for="ret_False">False</label>
                 </div>
             </div>
@@ -138,6 +101,53 @@
         <button id="cluster_layout" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Cluster Layout</button>
         <button id="edge_bundling" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Edge Bundling</button>
 
+        {{!-- <button type="button" class="btn btn-default" aria-label="Left Align" id='zoomIn'>
+            <span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="btn btn-default" aria-label="Left Align" id='zoomOut'>
+            <span class="glyphicon glyphicon-zoom-out" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="btn btn-default" aria-label="Left Align" id='Buttonleft'>
+            <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="btn btn-default" aria-label="Left Align" id='Buttonright'>
+            <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+        </button> --}}
+        <div id='attributes'>
+            <div id='attrInner'>
+                <div class="custom-control custom-checkbox custom-control-inline" style='margin-top:7%;margin-left:13%;'>
+                    <input type="checkbox" class="custom-control-input" id="0" checked='true'>
+                    <label class="custom-control-label" for="0" id="citedLabel" style='color:gray'>6:00 ~ 9:00</label>
+                </div>
+                <div class='tuli' style='background-color:#50ab4c'></div>
+
+                <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
+                    <input type="checkbox" class="custom-control-input" id="1">
+                    <label class="custom-control-label" for="1" id="abtLabel" style='color:gray'>10:00 ~ 13:00</label>
+                </div>
+                <div class='tuli' style='background-color:#A597FF'></div>
+
+                <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
+                    <input type="checkbox" class="custom-control-input" id="2">
+                    <label class="custom-control-label" for="2" id="confLabel" style='color:gray'>14:00 ~ 17:00</label>
+                </div>
+                <div class='tuli' style='background-color:#FFAB7C'></div>
+
+                <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
+                    <input type="checkbox" class="custom-control-input" id="3">
+                    <label class="custom-control-label" for="3" id="yearLabel" style='color:gray'>18:00 ~ 21:00</label>
+                </div>
+                <div class='tuli' style='background-color:#EE89FF'></div>
+
+                <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
+                    <input type="checkbox" class="custom-control-input" id="4">
+                    <label class="custom-control-label" for="4" id="affLabel" style='color:gray'>22:00 ~ 6:00</label>
+                </div>
+                <div class='tuli' style='background-color:#00D8FF'></div>
+
+            </div>
+
+        </div>
     </div>
 
     <div id='parallelDiv'>

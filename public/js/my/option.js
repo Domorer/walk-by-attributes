@@ -9,6 +9,8 @@ let option = (function () {
     //*************修改图例颜色**************
     $('.tuli').css('background-color', (i) => variable.attr_color[i])
     $('.leaflet-control-attribution, .leaflet-control').remove();
+    comb_record.push(clusterFun.deepCopy(variable.param));
+
     //*************初始化******************
     getCombData(variable.param).then(function (data) {
         d3.csv('data/Chicago/undir_link_weight.csv', function (error, data_link) {
@@ -39,16 +41,15 @@ let option = (function () {
                 let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
                 //当前选中的层级
                 variable.level = max_level - 6;
-                clusterFun.cluster(variable.comb_data,  variable.level, null)
+                clusterFun.cluster(variable.comb_data, variable.level, null)
                 console.log('variable.comb_data: ', variable.comb_data);
                 //绘制降维散点图
                 scatter.drawScatter(variable.comb_data['info']);
-                console.log(variable.comb_data['info'].length)
                 //绘制力引导图
-                // forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
+                forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
                 //树图
                 tree_view.draw_tree(data[0], 1);
-                radarChart.draw('1131');
+                radarChart.draw();
 
                 //初始化桑基图
                 for (let key in variable.cluster_ids_dict) {
@@ -124,17 +125,17 @@ let option = (function () {
         let rl = $('#ret_True')[0].checked ? 'rl_True' : 'rl_False';
         variable.param['rl'] = rl;
         variable.param['comb'] = variable.attr;
-        //修改参数后修改各界面的view
+        //*************修改参数后修改各界面的view****************
         getCombData(variable.param).then(function (data) {
             modify_cluster(data[0], false);
         })
         /*****************************************************/
 
         //将操作数据记录并添加到dropdown，格式为选择的属性 + 游走的方式
-        comb_record.push(variable.param);
+        option.comb_record.push(clusterFun.deepCopy(variable.param));
         let tmp_text = variable.attr;
-        let tmp_option = $('<a></a>').text(tmp_text).attr("id", optIndex).attr('class', 'dropdown-item').on('click', function () {
-            getCombData(comb_record[this.id]).then(function (data) {
+        let tmp_option = $('<a></a>').text(tmp_text).attr("id", option.optIndex).attr('class', 'dropdown-item').on('click', function () {
+            getCombData(option.comb_record[this.id]).then(function (data) {
                 variable.comb_data = data[0];
                 //通过用户选定的层级来生成类字典
                 let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
@@ -145,14 +146,13 @@ let option = (function () {
             })
         });
         $("#options").append(tmp_option);
-        optIndex += 1;
+        option.optIndex += 1;
     })
 
     //用户自定义的类数组确定按钮
     $('#confirm_cluster').on('click', () => {
         modify_cluster(variable.comb_data, true);
     })
-
 
     //每次类变化后页面进行的操作
     function modify_cluster(data, tree_confirm) {
@@ -169,12 +169,13 @@ let option = (function () {
         else
             clusterFun.cluster(variable.comb_data, max_level - 6, variable.cluster_arr)
 
-        //更新力引导图
+        //更新散点图
         scatter.drawScatter(data['info']);
+        forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
         //如果不是通过修改断层来修改类数组则需要重绘树图
         if (tree_confirm == false)
             tree_view.draw_tree(data, variable.level);
-        forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
+        radarChart.draw();
 
         //桑基图
         console.log(variable.param)
@@ -229,6 +230,8 @@ let option = (function () {
     }
 
     return {
-        tmp_param
+        tmp_param,
+        comb_record,
+        optIndex
     }
 })()

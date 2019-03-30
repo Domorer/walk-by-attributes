@@ -12,7 +12,7 @@ let sankeyChart = (function () {
             .nodeId(function (d) { return d.id })
             .nodePadding(5)
             .nodeAlign(d3.sankeyCenter)
-            .extent([[0.05*sankey_width, 0.3*sankey_height], [0.95*sankey_width, 1*sankey_height]]);
+            .extent([[0.05 * sankey_width, 0.2 * sankey_height], [0.95 * sankey_width, 1 * sankey_height]]);
         const { nodes, links } = sankey({ nodes: nodes_data, links: links_data });
         const color = d3.scaleOrdinal(d3.schemeCategory20);
 
@@ -85,7 +85,78 @@ let sankeyChart = (function () {
             .attr('id', function (d) {
                 return d.id;
             });
+        console.log(option.comb_record)
+        let option_status = [];
+        for (let i = 0; i < option.comb_record.length; i++) {
+            //当前选中的时间段数组
+            let tmp_attrs = option.comb_record[i]['comb'].split('_');
+
+            tmp_attrs.shift()
+            option_status.push({
+                wt: parseInt(option.comb_record[i].wt.split('_')[1]),
+                sl: parseInt(option.comb_record[i].sl.split('_')[1]),
+                rl: option.comb_record[i].rl.split('_')[1],
+                comb: tmp_attrs
+            })
+        }
+        let lineCal = d3.line()
+            .x(d => d[0])
+            .y(d => d[1])
+        variable.svg_sankey.append('defs').append('marker')
+            .attr('id', 'marker')
+            .attr("viewBox", "0 0 12 12")
+            .attr("refX", "6")
+            .attr("refY", "6")
+            .attr('orient', 'auto')
+            .attr('markerWidth', 5)
+            .attr('markerHeight', 5)
+            .attr('xoverflow', 'visible')
+            .append('path')
+            .attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2")
+            .attr('fill', 'gray')
+            .attr('stroke', 'gray');
+
+        let True = [[0, 5], [4, 10], [10, 0]], False = [[0, 10], [5, 5], [0, 0], [5, 5], [10, 0], [5, 5], [10, 10]]
+
+        for (let op = 0; op < option_status.length; op++) {
+            let colSpace = ((0.85 / (option_status.length - 1)) * op + 0.05) * sankey_width
+            variable.svg_sankey.append('g').selectAll('circle').data(option_status[op].comb).enter()
+                .append('circle')
+                .attr('cx', (d, i) => i * 10 + colSpace)
+                .attr('cy', 0.15 * sankey_height)
+                .attr('r', 4)
+                .attr('fill', (d) => variable.attr_color[d])
+            let updownLine = [
+                [[colSpace, 0.15 * sankey_height - 10], [colSpace, 0.15 * sankey_height - 20]],
+                [[colSpace + 10, 0.15 * sankey_height - 23], [colSpace + 10, 0.15 * sankey_height - 13]]
+            ]
+            let tmp_g = variable.svg_sankey.append('g')
+            tmp_g.append('path')
+                .attr('d', lineCal(updownLine[0]))
+                .attr('stroke', 'gray')
+                .attr('stroke-width', 2)
+                .attr('fill', 'none')
+                .attr('marker-end', 'url(#marker)')
+            tmp_g.append('path')
+                .attr('d', lineCal(updownLine[1]))
+                .attr('stroke', 'gray')
+                .attr('stroke-width', 2)
+                .attr('fill', 'none')
+                .attr('marker-end', 'url(#marker)')
+            let tmp_tf = option_status[op].rl == 'True' ? [True] : [False]
+            variable.svg_sankey.append('g').selectAll('path').data(tmp_tf).enter()
+                .append('path')
+                .attr('d', d => lineCal(d))
+                .attr('stroke', 'gray')
+                .attr('stroke-width', 2)
+                .attr('fill', 'none')
+                .attr('transform', `translate(${colSpace + 20}, ${0.15 * sankey_height - 23})`)
+
+        }
+
     }
+
+
     return {
         drawSankey
     }

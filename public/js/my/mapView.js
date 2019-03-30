@@ -1,6 +1,7 @@
 let mapView = (function () {
     var map = L.map('map', {
-        zoomControl: false
+        zoomControl: false,
+        zoomDelta:0.5
     }).setView([41.8952, -87.55965], 11)
 
     var osmUrl = 'https://api.mapbox.com/styles/v1/keypro/cjjs6cawt25iq2snp6kqxu3r3/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia2V5cHJvIiwiYSI6ImNqamliaTJtbjV0YTMzcG82bmthdW03OHEifQ.UBWsyfRiWMYly4gIc2H7cQ',

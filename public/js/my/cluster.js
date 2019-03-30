@@ -32,7 +32,7 @@ let clusterFun = (function () {
             let tmp_topNode = cluster_arr[i];
             cluster_ids_dict[tmp_topNode] = dfs(children_dict[tmp_topNode]);
         }
-        // console.log('cluster_ids_dict: ', cluster_ids_dict);
+        console.log('cluster_ids_dict: ', cluster_ids_dict);
         //计算站点的所在类字典
         let id_cluster_dict = {}, index = 0;
         for (let key in cluster_ids_dict) {
@@ -48,8 +48,9 @@ let clusterFun = (function () {
             variable.last_cluster_dict = {}
             variable.last_cluster_dict = deepCopy(variable.cluster_dict);
         }
-        variable.cluster_dict = id_cluster_dict;
-        variable.cluster_ids_dict = cluster_ids_dict;
+        variable.cluster_dict = {}, variable.cluster_ids_dict = {};
+        variable.cluster_dict = deepCopy(id_cluster_dict);
+        variable.cluster_ids_dict = deepCopy(cluster_ids_dict);
 
         //*************计算各个簇之间的连线权重字典*************
         let clusterLink_dict = {};
@@ -65,8 +66,9 @@ let clusterFun = (function () {
                     clusterLink_dict[tmp_link_key] = 1;
             }
         }
-
-        variable.clusterLink_weight_dict = clusterLink_dict;  //每条轨迹作为键，边的权重作为value
+        //更新类间连线权重的字典(每条轨迹作为键，边的权重作为value)
+        variable.clusterLink_weight_dict = {};
+        variable.clusterLink_weight_dict = deepCopy(clusterLink_dict);  
         // console.log('clusterLink_dict: ', clusterLink_dict);
         //计算每个簇内的所有连线的字典
         let clu_tpg = {};
@@ -97,8 +99,6 @@ let clusterFun = (function () {
         //     }
         // }
         variable.clu_tpg = clu_tpg;
-        // console.log('clu_tpg: ', clu_tpg);
-        // console.log('cluster_ids_dict: ', cluster_ids_dict);
         console.timeEnd('XX');
     }
 

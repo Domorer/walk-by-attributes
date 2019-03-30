@@ -21,7 +21,7 @@ button#cluster_layout {
 button#edge_bundling {
     position: absolute;
     top: 3%;
-    right: 14%;
+    right: 12%;
     padding-left: 5;
     padding-right: 5;
     padding-top: 0;
@@ -39,7 +39,26 @@ button#confirm_cluster {
     padding-bottom: 0;
     font-size: 0.8em;
 }
-
+button#zoomOut{
+    position: absolute;
+    top:13%;
+    right:2%;
+}
+button#zoomIn{
+    position: absolute;
+    top:10%;
+    right:2%;
+}
+button#Buttonleft{
+    position: absolute;
+    top:16%;
+    right:2%;
+}
+button#Buttonright{
+    position: absolute;
+    top:19%;
+    right:2%;
+}
 button#brush {
     position: absolute;
     top: 6%;
@@ -55,13 +74,14 @@ button#brush {
 button#cluster {
     position: absolute;
     top: 6%;
-    right: 28%;
+    right: 23%;
     padding-left: 5;
     padding-right: 5;
     padding-top: 0;
     padding-bottom: 0;
     font-size: 0.8em;
 }
+
 
 #dropdownMenuButton {
     background-color: white;
