@@ -39,26 +39,38 @@ button#confirm_cluster {
     padding-bottom: 0;
     font-size: 0.8em;
 }
-button#zoomOut{
+
+div#moveButtons{
     position: absolute;
-    top:13%;
+    top:7%;
     right:2%;
+    width:20px;
+}
+div#moveButtons button{
+    padding: 2
+}
+
+/* button#zoomOut{
+    margin-top: 2;
+    padding:2
 }
 button#zoomIn{
-    position: absolute;
-    top:10%;
-    right:2%;
+        margin-top: 2;
+
+    padding:2
 }
-button#Buttonleft{
-    position: absolute;
-    top:16%;
-    right:2%;
+button#ButtonLeft{
+    padding:2
 }
-button#Buttonright{
-    position: absolute;
-    top:19%;
-    right:2%;
+button#ButtonRight{
+    padding:2
 }
+button#ButtonUp{
+    padding:2
+}
+button#ButtonDown{
+    padding:2
+} */
 button#brush {
     position: absolute;
     top: 6%;

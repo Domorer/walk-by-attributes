@@ -1,7 +1,7 @@
 let scatter = (function () {
 
     function drawScatter(comb_data) {
-        console.log('comb_data: ', comb_data);
+        // console.log('comb_data: ', comb_data);
         variable.svg_scatter.selectAll('*').remove();
         let svg_width = $("#svg_scatter")[0].scrollWidth;
         let svg_height = $("#svg_scatter")[0].scrollHeight;
@@ -31,7 +31,7 @@ let scatter = (function () {
                 // return color(variable.cluster_dict[d.id].index)
                 return '#329CCB';
             }).on('click', function (d) {
-                console.log(d);
+                // console.log(d);
             }).attr('class', function (d) {
                 return d.cluster;
             }).attr('id', function (d) {
@@ -87,13 +87,16 @@ let scatter = (function () {
                 if (variable.last_cluster != undefined) {
                     d3.select('#cluster_' + variable.last_cluster).attr('fill', '#329CCB');
                     d3.select('#area_' + variable.last_cluster).attr('fill', '#D5E2FF');
-                    d3.select('#tree_' + variable.last_cluster).attr('fill', '#B6E9FF').attr('stroke', '#329CCB')
                 }
                 d3.select('#cluster_' + d.id).attr('fill', '#FF9519');
                 d3.select('#area_' + d.id).attr('fill', '#FF9519');
-                d3.select('#tree_' + d.id).attr('fill', '#FFC889').attr('stroke', '#FF9519')
                 variable.last_cluster = d.id;
-                console.log(d.id)
+                // console.log(d.id)
+                //雷达图
+                radarChart.addRadar(d.id);
+
+                mapView.drawPL(variable.clu_tpg[d.id], variable.cluster_ids_dict[d.id]);
+
                 // parallel.drawParallel(d.id);
             });
         //设置刷子
@@ -141,7 +144,7 @@ let scatter = (function () {
                     d3.select('#area_' + d.id).attr('fill', '#FF9519');
                     d3.select('#tree_' + d.id).attr('fill', '#FFC889').attr('stroke', '#FF9519')
                     variable.last_cluster = d.id;
-                    console.log(d.id)
+                    // console.log(d.id)
                     // parallel.drawParallel(d.id);
                 });
         })

@@ -168,8 +168,8 @@ let riverView = (function () {
                 y: tmp_inner.y - intervalScale(riverView.value_arr[i]['interval']),
                 y0: tmp_inner.y
             }, tmp_counts = {
-                'type': 'ratioSum',
-                value: riverView.value_arr[i]['ratioSum'],
+                'type': 'clusterCounts',
+                value: riverView.value_arr[i]['clusterCounts'],
                 x: i * (svg_width * 0.7) / (tree_view.modifyCount - 1) + 10,
                 y: tmp_interval.y - countScale(riverView.value_arr[i]['clusterCounts']),
                 y0: tmp_interval.y
@@ -198,6 +198,8 @@ let riverView = (function () {
             };
             symbol.push(tmp_dict)
         }
+        console.log('symbol: ', symbol);
+
         //新添加标志
         riverView.symbol_g.append('path')
             .attr('d', d3.symbol().type(symbol[symbol.length - 1].symbol).size(50))
@@ -309,6 +311,9 @@ let riverView = (function () {
 
         let svg_width = $("#svg_tree")[0].scrollWidth;
         let svg_height = $("#svg_tree")[0].scrollHeight;
+        //每次更新数据是，都需要将value_arr清空
+        riverView.value_arr = [];
+
         Cal(data, cluster_arr, null, null);
         riverView.clusterArr_record.push([]);
         //计算当前的最值，用于设置比例尺
@@ -361,6 +366,7 @@ let riverView = (function () {
             .attr('fill', 'none')
 
         //添加文字
+
         variable.svg_tree.append('text')
             .attr('x', 10)
             .attr('y', 0.05 * svg_height)
@@ -370,25 +376,30 @@ let riverView = (function () {
             .text('Energy')
         riverView.symbol_g = variable.svg_tree.append('g')
         riverView.directLine_g = variable.svg_tree.append('g')
-
+        //添加图例
+        let text_x = 0.85 * svg_width,
+            y_space = 0.05 * svg_height,
+            text_sy = 0.15 * svg_height,
+            rect_sy = 0.125 * svg_height;
         let labels = ['Label Cost', 'Data Cost', 'Smooth Cost']
         variable.svg_tree.append('g').selectAll('text').data(labels).enter()
             .append('text')
-            .attr('x', 0.85 * svg_width)
-            .attr('y', (d, i) => 0.15 * svg_height + i * 20)
+            .attr('x', text_x)
+            .attr('y', (d, i) => text_sy + i * y_space)
             .text(d => d)
             .attr('font-weight', 500)
-            .attr('font-size', '0.8em')
+            .attr('fill','#999')
+            .attr('font-size', '0.9em')
 
         variable.svg_tree.append('g').selectAll('rect').data(labels).enter()
             .append('rect')
-            .attr('x', 0.85 * svg_width - 20)
-            .attr('y', (d, i) => 0.12 * svg_height + i * 20)
+            .attr('x', text_x - 20)
+            .attr('y', (d, i) => rect_sy + i * y_space)
             .attr('height', 15)
             .attr('width', 15)
             .attr('rx', 5)
             .attr('ry', 5)
-            .attr('fill', (d, i)=>river_color[i])
+            .attr('fill', (d, i) => river_color[i])
     }
     return {
         drawRiver,

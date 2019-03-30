@@ -53,7 +53,7 @@ let option = (function () {
 
                 //初始化桑基图
                 for (let key in variable.cluster_ids_dict) {
-                    variable.sankeyNode_data.push({ 'id': 'option' + variable.sankey_count.toString() + '-' + key })
+                    variable.sankeyNode_data.push({ 'id': 'option' + variable.sankey_count.toString() + '-' + key, stations: clusterFun.deepCopy(variable.cluster_ids_dict[key]) })
                 }
             })
 
@@ -163,6 +163,7 @@ let option = (function () {
         //通过用户选定的层级中的类   或者选中的断层的类   来生成类字典
         let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
         variable.level = max_level - 6;
+        
         //通过判断当前的类是用户选择的还是自定层级的， 来确定参数
         if (tree_confirm == false)
             clusterFun.cluster(variable.comb_data, max_level - 6, null)
@@ -174,14 +175,14 @@ let option = (function () {
         forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
         //如果不是通过修改断层来修改类数组则需要重绘树图
         if (tree_confirm == false)
-            tree_view.draw_tree(data, variable.level);
+            tree_view.draw_tree(data, 1);
         radarChart.draw();
 
         //桑基图
         console.log(variable.param)
         if (variable.sankey_count >= 2) {
             for (let key in variable.cluster_ids_dict)
-                variable.sankeyNode_data.push({ 'id': 'option' + variable.sankey_count.toString() + '-' + key })
+                variable.sankeyNode_data.push({ 'id': 'option' + variable.sankey_count.toString() + '-' + key ,stations:clusterFun.deepCopy(variable.cluster_ids_dict[key])})
             //计算类变化连线的权重
             let link_weight_dict = {};
 
@@ -190,17 +191,27 @@ let option = (function () {
                 if (variable.cluster_dict[key] != null) {
                     t_clu = variable.cluster_dict[key].cluster;
                     let tmp_key = s_clu + '-' + t_clu
-                    if (link_weight_dict[tmp_key] != null)
-                        link_weight_dict[tmp_key] += 1
-                    else
-                        link_weight_dict[tmp_key] = 1
+                    if (link_weight_dict[tmp_key] != null) {
+                        link_weight_dict[tmp_key]['value'] += 1
+                        link_weight_dict[tmp_key]['stations'].push(key)
+                    }
+                    else {
+                        link_weight_dict[tmp_key] = { value: 1, stations: [key] }
+                    }
+
                 }
             }
             //将变化曲线添加到桑基图数据
             for (let key in link_weight_dict) {
                 let tmp_source = 'option' + (variable.sankey_count - 1).toString() + '-' + key.split('-')[0],
                     tmp_target = 'option' + variable.sankey_count.toString() + '-' + key.split('-')[1];
-                variable.sankeyLink_data.push({ 'id': tmp_source + '-' + tmp_target, 'source': tmp_source, 'target': tmp_target, 'value': link_weight_dict[key] })
+                variable.sankeyLink_data.push({
+                    'id': tmp_source + '-' + tmp_target,
+                    'source': tmp_source,
+                    'target': tmp_target,
+                    'value': link_weight_dict[key]['value'],
+                    'stations': link_weight_dict[key]['stations']
+                })
             }
             sankeyChart.drawSankey(variable.sankeyNode_data, variable.sankeyLink_data);
         }

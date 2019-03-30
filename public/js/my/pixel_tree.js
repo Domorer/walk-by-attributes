@@ -11,6 +11,7 @@ let tree_view = (function () {
 
         let level_dict = data['level_dict'], children_dict = data['children_dict'];
         let max_level = d3.max(Object.keys(data['level_dict']), d => parseInt(d))
+        console.log('max_level: ', max_level);
         let top_node = level_dict[max_level][0];
         function getChildren(node) {
             let tmp_dict = { name: node };
@@ -108,7 +109,7 @@ let tree_view = (function () {
             .attr('stroke-width', d => LWScale(d.height))
             .attr('id', d => 'tree_' + d.data.name)
             .on('click', function (d) {
-                console.log('d: ', d);
+                // console.log('d: ', d);
                 tree_view.modifyCount += 1
 
                 let parent = [], children = [], separate;

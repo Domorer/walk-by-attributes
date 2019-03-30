@@ -13,29 +13,46 @@ let sankeyChart = (function () {
             .nodePadding(5)
             .nodeAlign(d3.sankeyCenter)
             .extent([[0.05 * sankey_width, 0.2 * sankey_height], [0.95 * sankey_width, 1 * sankey_height]]);
-        const { nodes, links } = sankey({ nodes: nodes_data, links: links_data });
+        let { nodes, links } = sankey({ nodes: nodes_data, links: links_data });
+        for (let i = 0; i < nodes.length; i++) {
+            nodes[i].clu = nodes[i].id.split('-').pop();
+        }
         const color = d3.scaleOrdinal(d3.schemeCategory20);
 
-        function DIguiS(node) {
+        function DIguiS(node, stations_arr) {
             $('#' + node.id).attr('opacity', 1);
             if (node.sourceLinks.length > 0) {
                 let tmp_sourceLinks = node.sourceLinks;
                 for (let l = 0; l < tmp_sourceLinks.length; l++) {
-                    $('#' + tmp_sourceLinks[l].id).attr('opacity', 1);
-                    // DIguiS(tmp_sourceLinks[l].target);
+                    for (let s = 0; s < stations_arr.length; s++) {
+                        if (tmp_sourceLinks[l].stations.indexOf(stations_arr[s]) != -1) {
+                            $('#' + tmp_sourceLinks[l].id).attr('opacity', 1);
+                            DIguiS(tmp_sourceLinks[l].target, stations_arr);
+                            break;
+                        }
+                        continue;
+                    }
+                    // if (tmp_sourceLinks[l].stations.indexOf(node.clu) != -1) {
                     $('#' + tmp_sourceLinks[l].target.id).attr('opacity', 1);
+                    // }
                 }
             } else {
                 return;
             }
         }
-        function DIguiT(node) {
+        function DIguiT(node, stations_arr) {
             $('#' + node.id).attr('opacity', 1);
             if (node.targetLinks.length > 0) {
                 let tmp_targetLinks = node.targetLinks;
                 for (let l = 0; l < tmp_targetLinks.length; l++) {
-                    $('#' + tmp_targetLinks[l].id).attr('opacity', 1);
-
+                    for (let s = 0; s < stations_arr.length; s++) {
+                        if (tmp_targetLinks[l].stations.indexOf(stations_arr[s]) != -1) {
+                            $('#' + tmp_targetLinks[l].id).attr('opacity', 1);
+                            DIguiT(tmp_targetLinks[l].source, stations_arr);
+                            break;
+                        }
+                        continue;
+                    }
                     $('#' + tmp_targetLinks[l].source.id).attr('opacity', 1);
                     // DIguiT(tmp_targetLinks[l].source);
                 }
@@ -60,15 +77,15 @@ let sankeyChart = (function () {
             .attr('id', d => d.id)
             .on("mouseover", function (d) {
                 let sourceLinks = d.sourceLinks, targetLinks = d.targetLinks;
-                variable.svg_sankey.selectAll('path').attr('opacity', 0.1);
-                variable.svg_sankey.selectAll('rect').attr('opacity', 0.1)
-                DIguiS(d);
-                DIguiT(d);
+                variable.svg_sankey.selectAll('.sankeyLink').attr('opacity', 0.1);
+                variable.svg_sankey.selectAll('rect').attr('opacity', 0.1);
+
+                DIguiS(d, d.stations);
+                DIguiT(d, d.stations);
             }).on('mouseout', function () {
                 variable.svg_sankey.selectAll('path').attr('opacity', 1);
                 variable.svg_sankey.selectAll('rect').attr('opacity', 1)
-            })
-            .append("title");
+            });
 
 
         const link = variable.svg_sankey.append("g")
@@ -84,7 +101,7 @@ let sankeyChart = (function () {
             .attr("stroke-width", d => Math.max(1, d.width))
             .attr('id', function (d) {
                 return d.id;
-            });
+            }).attr('class', 'sankeyLink')
         console.log(option.comb_record)
         let option_status = [];
         for (let i = 0; i < option.comb_record.length; i++) {
@@ -126,6 +143,11 @@ let sankeyChart = (function () {
                 .attr('cy', 0.15 * sankey_height)
                 .attr('r', 4)
                 .attr('fill', (d) => variable.attr_color[d])
+            let upline = [[colSpace, 0.15 * sankey_height - 10], [colSpace, 0.15 * sankey_height - 20]],
+                downline = [[colSpace + 10, 0.15 * sankey_height - 23], [colSpace + 10, 0.15 * sankey_height - 13]],
+                sameline = [[]]
+
+            if(op == 0 || )
             let updownLine = [
                 [[colSpace, 0.15 * sankey_height - 10], [colSpace, 0.15 * sankey_height - 20]],
                 [[colSpace + 10, 0.15 * sankey_height - 23], [colSpace + 10, 0.15 * sankey_height - 13]]
