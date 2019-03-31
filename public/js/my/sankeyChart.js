@@ -144,27 +144,48 @@ let sankeyChart = (function () {
                 .attr('r', 4)
                 .attr('fill', (d) => variable.attr_color[d])
             let upline = [[colSpace, 0.15 * sankey_height - 10], [colSpace, 0.15 * sankey_height - 20]],
-                downline = [[colSpace + 10, 0.15 * sankey_height - 23], [colSpace + 10, 0.15 * sankey_height - 13]],
-                sameline = [[]]
+                downline = [[colSpace, 0.15 * sankey_height - 23], [colSpace, 0.15 * sankey_height - 13]],
+                sameline = [[colSpace - 4, 0.15 * sankey_height - 17], [colSpace + 4, 0.15 * sankey_height - 17]]
+            let updownLine = [[], []]
+            let wtArrow = true, slArrow = true
+            if (op == 0) {
+                updownLine = [sameline, sameline];
+                wtArrow = false
+                slArrow = false
+            }
+            //判断wt
+            if (op > 0 && option_status[op].wt > option_status[op - 1].wt)
+                updownLine[0] = upline
+            else if (op > 0 && option_status[op].wt < option_status[op - 1].wt)
+                updownLine[0] = downline
+            else if (op > 0 && option_status[op].wt == option_status[op - 1].wt) {
+                wtArrow = false
+                updownLine[0] = sameline
+            }
+            //判断sl
+            if (op > 0 && option_status[op].sl > option_status[op - 1].sl)
+                updownLine[1] = upline
+            else if (op > 0 && option_status[op].sl < option_status[op - 1].sl)
+                updownLine[1] = downline
+            else if (op > 0 && option_status[op].sl == option_status[op - 1].sl) {
+                slArrow = false
+                updownLine[1] = sameline
+            }
 
-            if(op == 0 || )
-            let updownLine = [
-                [[colSpace, 0.15 * sankey_height - 10], [colSpace, 0.15 * sankey_height - 20]],
-                [[colSpace + 10, 0.15 * sankey_height - 23], [colSpace + 10, 0.15 * sankey_height - 13]]
-            ]
             let tmp_g = variable.svg_sankey.append('g')
             tmp_g.append('path')
                 .attr('d', lineCal(updownLine[0]))
                 .attr('stroke', 'gray')
                 .attr('stroke-width', 2)
                 .attr('fill', 'none')
-                .attr('marker-end', 'url(#marker)')
+                .attr('marker-end', wtArrow ? 'url(#marker)' : 'none')
             tmp_g.append('path')
                 .attr('d', lineCal(updownLine[1]))
                 .attr('stroke', 'gray')
                 .attr('stroke-width', 2)
                 .attr('fill', 'none')
-                .attr('marker-end', 'url(#marker)')
+                .attr('marker-end', slArrow ? 'url(#marker)': 'none')
+                .attr('transform', 'translate(10,0)')
             let tmp_tf = option_status[op].rl == 'True' ? [True] : [False]
             variable.svg_sankey.append('g').selectAll('path').data(tmp_tf).enter()
                 .append('path')

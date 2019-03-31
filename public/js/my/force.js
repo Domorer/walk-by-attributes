@@ -2,10 +2,39 @@ let forceChart = (function () {
     let forceWidth = $('#svg_force')[0].scrollWidth;
     let forceHeight = $('#svg_force')[0].scrollHeight;
     let cluster_nodes, bundling_edge;
+    variable.viewbox.right = forceWidth,
+        variable.viewbox.bottom = forceHeight;
     //设置边绑定按钮
     $('#edge_bundling').on('click', () => {
         forceChart.edgeBundling(forceChart.cluster_nodes, forceChart.bundling_edge, variable.clusterLink_weight_dict)
     })
+    //svg 拖曳
+
+
+    let dragSvg = () => {
+
+        function dragstarted(d) {
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(d) {
+            d.fx = d3.event.x;
+            d.fy = d3.event.y;
+        }
+
+        function dragended(d) {
+            d.fx = null;
+            d.fy = null;
+        }
+
+        return d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended);
+    }
+    variable.svg_force.call(dragSvg())
+
     function drawStaticForce(nodes, links, cluster_dict) {
         let color = d3.scaleOrdinal(d3.schemeCategory20);
         //绘制节点
@@ -133,6 +162,7 @@ let forceChart = (function () {
         console.log('clusterids_dict: ', clusterids_dict);
         console.log('clusterLinks_dict: ', clusterLinks_dict);
         variable.svg_force.selectAll('*').remove();
+        // variable.svg_force.attr('viewBox', '-200 -200 1000 1000')
         //直接只画类的点，不画类内的点
         let cluster_links = [], cluster_nodes = [];
         let r_extent = [], lineW_extent = [];
@@ -145,7 +175,7 @@ let forceChart = (function () {
             tmp_dict['value'] = parseInt(clusterids_dict[key].length);
             cluster_nodes.push(tmp_dict);
         }
-        
+
         let index_dict = {};
         for (let i = 0; i < cluster_nodes.length; i++) {
             index_dict[cluster_nodes[i].id] = i;
@@ -188,7 +218,7 @@ let forceChart = (function () {
         //更新边绑定数据
         forceChart.bundling_edge = bundling_edge;
         forceChart.cluster_nodes = cluster_nodes;
-        
+
         //设置力的作用
         let simulation = d3.forceSimulation(cluster_nodes)
             .force("charge", d3.forceManyBody().strength(-3500).distanceMax(300))
@@ -275,7 +305,7 @@ let forceChart = (function () {
                 //平行坐标轴
                 // parallel.drawParallel(d.id);
                 // forceChart.drawPie(d.id);
-            });
+            }).call(drag(simulation))
 
         //画园内的pattern
 
@@ -333,7 +363,7 @@ let forceChart = (function () {
             .nodes(cluster_nodes)
             .edges(bundling_edge);
         var results = fbundling();
-        
+
         for (let i = 0; i < results.length; i++) {
             let tmp_key = results[i][0].id + '-' + results[i][results[i].length - 1].id
             results[i].value = clusterLinks_dict[tmp_key]

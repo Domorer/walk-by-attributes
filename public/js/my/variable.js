@@ -5,11 +5,15 @@ let variable = (function () {
     let node_data;//力引导点的数据
     let all_comb;//所有游走类型的数据集合
     let all_data;//所有参数的集合
+
+
     let svg_tree = d3.select('#svg_tree')
     let svg_scatter = d3.select('#svg_scatter');
     let svg_brush = d3.select('#svg_brush');
     let svg_sankey = d3.select('#svg_sankey');
     let svg_force = d3.select('#svg_force');
+    let viewbox = { top: 0, left: 0, right: 0, bottom: 0 }
+
     let attr_arr = ['0', '1', '2', '3', '4'];
     let time_arr = ['6:00~9:00', '10:00~13:00', '14:00~17:00', '18:00~21:00', '22:00~5:00',];
     let info_dict = {};//节点的信息字典
@@ -48,6 +52,7 @@ let variable = (function () {
         svg_force,
         svg_brush,
         svg_tree,
+        viewbox,
         attr_arr,
         info_dict,
         ChoseCluster,

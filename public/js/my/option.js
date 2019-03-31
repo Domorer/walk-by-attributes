@@ -153,9 +153,51 @@ let option = (function () {
     $('#confirm_cluster').on('click', () => {
         modify_cluster(variable.comb_data, true);
     })
-
+    //力引导图控件
+    let transition = d3.transition().duration(2000),
+    moveStep = 30;
+    $('#ButtonRight').on('click', () => {
+        variable.viewbox.left += moveStep
+        // variable.viewbox.right += moveStep
+        variable.svg_force.transition(transition)
+            .attr('viewBox', `${variable.viewbox.left} ${variable.viewbox.top} ${variable.viewbox.right} ${variable.viewbox.bottom}`)
+    })
+    $('#ButtonLeft').on('click', () => {
+        variable.viewbox.left -= moveStep
+        // variable.viewbox.right -= moveStep
+        variable.svg_force.transition(transition)
+            .attr('viewBox', `${variable.viewbox.left} ${variable.viewbox.top} ${variable.viewbox.right} ${variable.viewbox.bottom}`)
+    })
+    $('#ButtonUp').on('click', () => {
+        variable.viewbox.top -= moveStep
+        // variable.viewbox.bottom -= moveStep
+        variable.svg_force.transition(transition)
+            .attr('viewBox', `${variable.viewbox.left} ${variable.viewbox.top} ${variable.viewbox.right} ${variable.viewbox.bottom}`)
+    })
+    $('#ButtonDown').on('click', () => {
+        variable.viewbox.top += moveStep
+        // variable.viewbox.bottom += moveStep
+        variable.svg_force.transition(transition)
+            .attr('viewBox', `${variable.viewbox.left} ${variable.viewbox.top} ${variable.viewbox.right} ${variable.viewbox.bottom}`)
+    })
+    $('#zoomIn').on('click', () => {
+        let zoom = d3.zoom().scaleExtent([0.1, 10])
+        variable.viewbox.top += moveStep
+        variable.viewbox.bottom += moveStep
+        variable.svg_force.transition(transition)
+            .attr('viewBox', `${variable.viewbox.left} ${variable.viewbox.top} ${variable.viewbox.right} ${variable.viewbox.bottom}`)
+    })
+    $('#zoomOut').on('click', () => {
+        variable.viewbox.top += moveStep
+        variable.viewbox.bottom += moveStep
+        variable.svg_force.transition(transition)
+            .attr('viewBox', `${variable.viewbox.left} ${variable.viewbox.top} ${variable.viewbox.right} ${variable.viewbox.bottom}`)
+    })
     //每次类变化后页面进行的操作
     function modify_cluster(data, tree_confirm) {
+        //地图视图清空
+        d3.select('#map').selectAll('path').remove();
+
         //桑基图的列数加一
         variable.sankey_count += 1;
         console.log('data: ', data);
@@ -163,7 +205,7 @@ let option = (function () {
         //通过用户选定的层级中的类   或者选中的断层的类   来生成类字典
         let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
         variable.level = max_level - 6;
-        
+
         //通过判断当前的类是用户选择的还是自定层级的， 来确定参数
         if (tree_confirm == false)
             clusterFun.cluster(variable.comb_data, max_level - 6, null)
@@ -182,7 +224,7 @@ let option = (function () {
         console.log(variable.param)
         if (variable.sankey_count >= 2) {
             for (let key in variable.cluster_ids_dict)
-                variable.sankeyNode_data.push({ 'id': 'option' + variable.sankey_count.toString() + '-' + key ,stations:clusterFun.deepCopy(variable.cluster_ids_dict[key])})
+                variable.sankeyNode_data.push({ 'id': 'option' + variable.sankey_count.toString() + '-' + key, stations: clusterFun.deepCopy(variable.cluster_ids_dict[key]) })
             //计算类变化连线的权重
             let link_weight_dict = {};
 
