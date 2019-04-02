@@ -64,6 +64,7 @@ let scatter = (function () {
         let length_arr = [];
         for (let key in key_list) {
             let tmp_points = cluster_point_dict[key_list[key]];
+            //获取边界点
             let areaPoints = hull(tmp_points, 10);
             points_arr.push(areaPoints);
             length_arr.push(areaPoints.length)

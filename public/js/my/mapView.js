@@ -58,8 +58,53 @@ let mapView = (function () {
         }
     }
 
+    function drawSk(id_arr) {
+        d3.select('#map').selectAll('path').remove();
+        //获取所有点的坐标用于获取边界点
+        let color = 'gray'
+        for (let i = 0; i < id_arr.length; i++) {
+            let tmp_points = []
+            if (i == id_arr.length - 1)
+                color = 'red'
+            for (let j = 0; j < id_arr[i].length; j++) {
+                id_arr[i][j]['loc'] = variable.loc_dict[id_arr[i][j].id];
+                L.circle(id_arr[i][j]['loc'], {
+                    color: color,
+                    radius: 5,
+                    fill: 'red'
+                }).addTo(mapView.map)
+                tmp_points.push([id_arr[i][j]['loc'].lat, id_arr[i][j]['loc'].lng])
+            }
+            id_arr[i].area = hull(tmp_points, 10)
+        }
+        // color = d3.scaleOrdinal(d3.schemeCategory20);
+
+        //根据type来划分,下标为一的代表当前选中的类，其余为后续类
+        mapView.map.setView([id_arr[0][0]['loc'].lat, id_arr[0][0]['loc'].lng], 11)
+        color = 'blue'
+        let opacity = 0.5
+        for (let i = 0; i < id_arr.length; i++) {
+            // console.log(i)
+            if (i == id_arr.length - 1){
+                color = 'red'
+                opacity = 1
+            }
+            console.log(color)
+            // console.log('id_arr[i]: ', id_arr[i]['area']);
+            L.polygon(id_arr[i]['area'], {
+                color: color,
+                weight: 2,
+                fill:false,
+                opacity:opacity
+            }).addTo(mapView.map)
+
+        }
+       
+    }
+
     return {
         drawPL,
-        map
+        map,
+        drawSk
     }
 })()

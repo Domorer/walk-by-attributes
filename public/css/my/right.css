@@ -50,6 +50,12 @@ div#moveButtons button{
     padding: 2
 }
 
+#refresh{
+    position: absolute;
+    top:6%;
+    right:0.5%;
+    padding:2;
+}
 /* button#zoomOut{
     margin-top: 2;
     padding:2

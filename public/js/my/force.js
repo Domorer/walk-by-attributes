@@ -308,11 +308,24 @@ let forceChart = (function () {
             }).call(drag(simulation))
 
         //画园内的pattern
-
+        //加权随机
+        function randomW(wArr) {
+            let sum = 0;
+            for (let i = 0; i < wArr.length; i++)
+                sum += wArr[i]
+            let randomNum = Math.random() * sum;
+            let tmp = 0
+            for (let i = 0; i < wArr.length; i++) {
+                tmp += wArr[i]
+                if (tmp >= randomNum)
+                    return i;
+            }
+        }
         let pattern_g = [], pieArr = [];
+        let wtPattern = [0, 2, 7, 2, 1]
         for (let i = 0; i < cluster_nodes.length; i++) {
             let pie_g = drawPie(cluster_nodes[i].id, rScale(cluster_nodes[i].value));
-            let tmp_g = drawTopo(Math.floor(Math.random() * 5), rScale(cluster_nodes[i].value));
+            let tmp_g = drawTopo(randomW(wtPattern), rScale(cluster_nodes[i].value));
             pattern_g.push({ node: tmp_g[0], link: tmp_g[1], value: cluster_nodes[i].value });
             pieArr.push(pie_g);
         }

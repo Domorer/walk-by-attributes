@@ -109,6 +109,7 @@ let option = (function () {
         //***********获取当前各参数的选择情况***********
         comb_len = 0; //记录当前选择的属性数量，用于后面key的格式定义
         variable.attr = 'random';
+        tree_view.modifyCount = 1
         //循环判断每个checkbox的状态来获取当前的属性选择
         variable.attr_arr.forEach(Element => {
             let tmp_checked = $('#' + Element)[0].checked;
@@ -153,29 +154,35 @@ let option = (function () {
     $('#confirm_cluster').on('click', () => {
         modify_cluster(variable.comb_data, true);
     })
+    //桑基图刷新按钮
+    $('#refresh').on('click',()=>{
+        console.log('yes')
+        variable.svg_sankey.selectAll('.sankeyLink').attr('stroke','#d9d9d9').attr('opacity', 1);
+        variable.svg_sankey.selectAll('rect').attr('opacity', 1.0);
+    })
     //力引导图控件
     let transition = d3.transition().duration(2000),
     moveStep = 30;
     $('#ButtonRight').on('click', () => {
-        variable.viewbox.left += moveStep
+        variable.viewbox.left -= moveStep
         // variable.viewbox.right += moveStep
         variable.svg_force.transition(transition)
             .attr('viewBox', `${variable.viewbox.left} ${variable.viewbox.top} ${variable.viewbox.right} ${variable.viewbox.bottom}`)
     })
     $('#ButtonLeft').on('click', () => {
-        variable.viewbox.left -= moveStep
+        variable.viewbox.left += moveStep
         // variable.viewbox.right -= moveStep
         variable.svg_force.transition(transition)
             .attr('viewBox', `${variable.viewbox.left} ${variable.viewbox.top} ${variable.viewbox.right} ${variable.viewbox.bottom}`)
     })
     $('#ButtonUp').on('click', () => {
-        variable.viewbox.top -= moveStep
+        variable.viewbox.top += moveStep
         // variable.viewbox.bottom -= moveStep
         variable.svg_force.transition(transition)
             .attr('viewBox', `${variable.viewbox.left} ${variable.viewbox.top} ${variable.viewbox.right} ${variable.viewbox.bottom}`)
     })
     $('#ButtonDown').on('click', () => {
-        variable.viewbox.top += moveStep
+        variable.viewbox.top -= moveStep
         // variable.viewbox.bottom += moveStep
         variable.svg_force.transition(transition)
             .attr('viewBox', `${variable.viewbox.left} ${variable.viewbox.top} ${variable.viewbox.right} ${variable.viewbox.bottom}`)

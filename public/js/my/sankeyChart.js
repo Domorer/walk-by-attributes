@@ -1,5 +1,6 @@
 let sankeyChart = (function () {
-    // drawSankey();
+    // drawSankey();   
+    let firstChildren = true;
 
     function drawSankey(nodes_data, links_data) {
         console.log('links_data: ', links_data);
@@ -19,14 +20,18 @@ let sankeyChart = (function () {
         }
         const color = d3.scaleOrdinal(d3.schemeCategory20);
 
-        function DIguiS(node, stations_arr) {
+        //递归寻找source
+        function DIguiS(node, stations_arr, sourceId) {
             $('#' + node.id).attr('opacity', 1);
             if (node.sourceLinks.length > 0) {
                 let tmp_sourceLinks = node.sourceLinks;
                 for (let l = 0; l < tmp_sourceLinks.length; l++) {
                     for (let s = 0; s < stations_arr.length; s++) {
                         if (tmp_sourceLinks[l].stations.indexOf(stations_arr[s]) != -1) {
-                            $('#' + tmp_sourceLinks[l].id).attr('opacity', 1);
+                            if (tmp_sourceLinks[l].source.id == sourceId)
+                                $('#' + tmp_sourceLinks[l].id).attr('stroke', 'black').attr('opacity',1);
+                            else
+                                $('#' + tmp_sourceLinks[l].id).attr('opacity', 1);
                             DIguiS(tmp_sourceLinks[l].target, stations_arr);
                             break;
                         }
@@ -40,6 +45,7 @@ let sankeyChart = (function () {
                 return;
             }
         }
+        //递归寻找Target
         function DIguiT(node, stations_arr) {
             $('#' + node.id).attr('opacity', 1);
             if (node.targetLinks.length > 0) {
@@ -76,15 +82,39 @@ let sankeyChart = (function () {
             .attr("fill", '#329ccb')
             .attr('id', d => d.id)
             .on("mouseover", function (d) {
-                let sourceLinks = d.sourceLinks, targetLinks = d.targetLinks;
-                variable.svg_sankey.selectAll('.sankeyLink').attr('opacity', 0.1);
+
+                // variable.svg_sankey.selectAll('.sankeyLink').attr('opacity', 0.1);
+                // variable.svg_sankey.selectAll('rect').attr('opacity', 0.1);
+
+                // DIguiS(d, d.stations);
+                // DIguiT(d, d.stations);
+            }).on('mouseout', function () {
+                // variable.svg_sankey.selectAll('path').attr('opacity', 1);
+                // variable.svg_sankey.selectAll('rect').attr('opacity', 1)
+            }).on('click', (d, i) => {
+
+                variable.svg_sankey.selectAll('.sankeyLink').attr('stroke','#8F8A8F').attr('opacity', 0.1);
                 variable.svg_sankey.selectAll('rect').attr('opacity', 0.1);
 
-                DIguiS(d, d.stations);
+                DIguiS(d, d.stations, d.id);
                 DIguiT(d, d.stations);
-            }).on('mouseout', function () {
-                variable.svg_sankey.selectAll('path').attr('opacity', 1);
-                variable.svg_sankey.selectAll('rect').attr('opacity', 1)
+                let id_arr = []; //保存所有需要滑到地图上的点的id和标记
+                let tmp_arr = [];
+                //保存所有target内的所有点, sourceLinks 代表以自己为起始点的连线
+                for (let n = 0; n < d.sourceLinks.length; n++) {
+                    tmp_arr = []
+                    for (let t = 0; t < d.sourceLinks[n].target.stations.length; t++) {
+                        tmp_arr.push({ id: d.sourceLinks[n].target.stations[t], type: false })
+                    }
+                    id_arr.push(tmp_arr);
+                }
+                //保存当前块内的所有点
+                tmp_arr = []
+                for (let n = 0; n < d.stations.length; n++)
+                    tmp_arr.push({ id: d.stations[n], selected: true })
+                id_arr.push(tmp_arr)
+                console.log('id_arr: ', id_arr);
+                mapView.drawSk(id_arr);
             });
 
 
@@ -184,7 +214,7 @@ let sankeyChart = (function () {
                 .attr('stroke', 'gray')
                 .attr('stroke-width', 2)
                 .attr('fill', 'none')
-                .attr('marker-end', slArrow ? 'url(#marker)': 'none')
+                .attr('marker-end', slArrow ? 'url(#marker)' : 'none')
                 .attr('transform', 'translate(10,0)')
             let tmp_tf = option_status[op].rl == 'True' ? [True] : [False]
             variable.svg_sankey.append('g').selectAll('path').data(tmp_tf).enter()
@@ -201,6 +231,7 @@ let sankeyChart = (function () {
 
 
     return {
-        drawSankey
+        drawSankey,
+        firstChildren
     }
 })()
