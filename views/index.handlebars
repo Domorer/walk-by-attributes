@@ -14,10 +14,12 @@
 <script src="/js/FileSaver.js"></script>
 <script src="/js/d3/d3-ForceEdgeBundling.js"></script>
 <script src="/js/leaflet/leaflet.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
+    integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
     crossorigin="" />
 <!-- Make sure you put this AFTER Leaflet's CSS -->
-<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
+    integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
     crossorigin=""></script>
 
 
@@ -27,9 +29,39 @@
 <div id='left'>
     <div id='dataset'>
         <div id="headLine">
-            <a id='headline_a'>Dataset</a>
+            <a id='headline_a'>Data Infomation</a>
         </div>
-        <div id='radioDiv'>
+        <label style='color:rgb(124, 124, 124);margin:10px;display:inline-block;margin-left:5%;'>Dataset：
+        </label>
+        <div class="dropdown show" style="display:inline-block;">
+            <a class="btn btn-sm dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="true" style='margin-top:-5px;'>
+                Patent
+            </a>
+
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                <a class="dropdown-item" href="#">Chicago</a>
+                <a class="dropdown-item" href="#">Simulation data</a>
+            </div>
+        </div>
+        <div style='display:block'>
+            <label style='color:rgb(124, 124, 124);display:inline-block;margin-left:5%; '>Nodes
+            </label>
+            <label style='color:rgb(124, 124, 124);display:inline-block;margin-left:15%;'>Tsne Count
+            </label>
+            <label style='color:rgb(124, 124, 124);margin-left:15%;'>Edges
+            </label>
+        </div>
+
+        <div style='disply:block;'>
+            <a class='data_info' style='margin-left:5%;width:50px;'>0</a>
+            <a class='data_info' style='margin-left:15%;width:70px;'>0</a>
+            <a class='data_info' style='margin-left:15%;width:50px;'>0</a>
+        </div>
+
+
+
+        {{!-- <div id='radioDiv'>
             <div class="custom-control custom-radio " style='margin-left:13%;margin-top:5%;color:gray'>
                 <input type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input"
                     checked=True>
@@ -43,7 +75,7 @@
                 <input type="radio" id="customRadioInline3" name="customRadioInline1" class="custom-control-input">
                 <label class="custom-control-label" for="customRadioInline3">Shenzhen Taxi</label>
             </div>
-        </div>
+        </div> --}}
     </div>
 
     <div id='control_pannel'>
@@ -51,25 +83,29 @@
             <a id='headline_a'>Control Pannel</a>
         </div>
         <div id='controlInner'>
+            <div id='headline'><a id='headline_b'>Model Parameter</a></div>
+
+
             <div class='slider_out'>
-                <span class='slider_span'>Walk Times:
+                <span class='slider_span'>WT:
                 </span>
                 <input type="text" id="times_text" class='slider_input' value=5>
                 <div id='walk_times' class='slider'></div>
             </div>
             <div class='slider_out'>
-                <span class='slider_span'>Walk Length:
+                <span class='slider_span'>WL:
                 </span>
                 <input type="text" id="length_text" class='slider_input' value=5>
                 <div id='walk_length' class='slider'></div>
             </div>
             <div id='radio_out'>
-                <span class='slider_span'>Return:</span>
-                <div class="custom-control custom-radio custom-control-inline" style='margin-left:5%;margin-top:5%;color:gray'>
+                <span class='slider_span'>RT:</span>
+                <div class="custom-control custom-radio custom-control-inline" style='margin:5% 1% 0 5%;color:gray'>
                     <input type="radio" id="ret_True" name="customRadioInline_return" class="custom-control-input">
                     <label class="custom-control-label" for="ret_True">True</label>
                 </div>
-                <div class="custom-control custom-radio custom-control-inline" style='margin-left:0%;margin-top:3%;color:gray'>
+                <div class="custom-control custom-radio custom-control-inline"
+                    style='margin-left:0%;margin-top:3%;color:gray'>
                     <input type="radio" id="ret_False" name="customRadioInline_return" class="custom-control-input"
                         checked=True>
                     <label class="custom-control-label" for="ret_False">False</label>
@@ -81,6 +117,48 @@
             </div>
         </div>
 
+
+        <div id='attributes'>
+            <div id='headline'><a id='headline_b'>Attributions Selected</a></div>
+
+            <div class="custom-control custom-checkbox" style='margin:3% 5% 0 5%;'>
+                <input type="checkbox" class="custom-control-input" id="0" checked='true'>
+                <label class="custom-control-label" for="0" id="citedLabel" style='color:gray'>6:00 ~ 9:00</label>
+                <div class='tuli' style='background-color:#A597FF'></div>
+            </div>
+
+            <div class="custom-control custom-checkbox" style='margin:3% 5% 0 5%;'>
+                <input type="checkbox" class="custom-control-input" id="1">
+                <label class="custom-control-label" for="1" id="abtLabel" style='color:gray'>10:00 ~ 13:00</label>
+                <div class='tuli' style='background-color:#A597FF'></div>
+            </div>
+
+            <div class="custom-control custom-checkbox" style='margin:3% 5% 0 5%;'>
+                <input type="checkbox" class="custom-control-input" id="2">
+                <label class="custom-control-label" for="2" id="confLabel" style='color:gray'>14:00 ~ 17:00</label>
+                <div class='tuli' style='background-color:#FFAB7C'></div>
+
+            </div>
+
+            <div class="custom-control custom-checkbox" style='margin:3% 5% 0 5%;'>
+                <input type="checkbox" class="custom-control-input" id="3">
+                <label class="custom-control-label" for="3" id="yearLabel" style='color:gray'>18:00 ~ 21:00</label>
+                <div class='tuli' style='background-color:#EE89FF'></div>
+
+            </div>
+
+            <div class="custom-control custom-checkbox" style='margin:3% 5% 0 5%;'>
+                <input type="checkbox" class="custom-control-input" id="4">
+                <label class="custom-control-label" for="4" id="affLabel" style='color:gray'>22:00 ~ 6:00</label>
+                <div class='tuli' style='background-color:#00D8FF'></div>
+
+            </div>
+            <div class='btn_out'>
+                <button id="confirm" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Confirm</button>
+            </div>
+
+
+        </div>
     </div>
 
     <div id='OriTopo'>
@@ -101,61 +179,33 @@
         <button id="cluster_layout" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Cluster Layout</button>
         <button id="edge_bundling" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Edge Bundling</button>
         <div id='moveButtons'>
-            <button type="button" class="btn btn-outline-secondary my-2 my-sm-1 Movebutton" aria-label="Left Align" id='zoomIn'>
+            <button type="button" class="btn btn-outline-secondary my-2 my-sm-1 Movebutton" aria-label="Left Align"
+                id='zoomIn'>
                 <img src="/img/zoom in.png" width='20' height="20">
             </button>
-            <button type="button" class="btn btn-outline-secondary my-2 my-sm-1 Movebutton" aria-label="Left Align" id='zoomOut'>
+            <button type="button" class="btn btn-outline-secondary my-2 my-sm-1 Movebutton" aria-label="Left Align"
+                id='zoomOut'>
                 <img src="/img/zoom out.png" width='20' height="20">
             </button>
-            <button type="button" class="btn btn-outline-secondary my-2 my-sm-1 Movebutton" aria-label="Left Align" id='ButtonLeft'>
+            <button type="button" class="btn btn-outline-secondary my-2 my-sm-1 Movebutton" aria-label="Left Align"
+                id='ButtonLeft'>
                 <img src="/img/arrowleft.png" width='20' height="20">
             </button>
-            <button type="button" class="btn btn-outline-secondary my-2 my-sm-1 Movebutton" aria-label="Left Align" id='ButtonRight'>
+            <button type="button" class="btn btn-outline-secondary my-2 my-sm-1 Movebutton" aria-label="Left Align"
+                id='ButtonRight'>
                 <img src="/img/arrowright.png" width='20' height="20">
             </button>
-            <button type="button" class="btn btn-outline-secondary my-2 my-sm-1 Movebutton" aria-label="Left Align" id='ButtonUp'>
+            <button type="button" class="btn btn-outline-secondary my-2 my-sm-1 Movebutton" aria-label="Left Align"
+                id='ButtonUp'>
                 <img src="/img/arrowup.png" width='20' height="20">
             </button>
-            <button type="button" class="btn btn-outline-secondary my-2 my-sm-1 Movebutton" aria-label="Left Align" id='ButtonDown'>
+            <button type="button" class="btn btn-outline-secondary my-2 my-sm-1 Movebutton" aria-label="Left Align"
+                id='ButtonDown'>
                 <img src="/img/arrowdown.png" width='20' height="20">
             </button>
         </div>
 
-        <div id='attributes'>
-            <div id='attrInner'>
-                <div class="custom-control custom-checkbox custom-control-inline" style='margin-top:7%;margin-left:13%;'>
-                    <input type="checkbox" class="custom-control-input" id="0" checked='true'>
-                    <label class="custom-control-label" for="0" id="citedLabel" style='color:gray'>6:00 ~ 9:00</label>
-                </div>
-                <div class='tuli' style='background-color:#50ab4c'></div>
 
-                <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
-                    <input type="checkbox" class="custom-control-input" id="1">
-                    <label class="custom-control-label" for="1" id="abtLabel" style='color:gray'>10:00 ~ 13:00</label>
-                </div>
-                <div class='tuli' style='background-color:#A597FF'></div>
-
-                <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
-                    <input type="checkbox" class="custom-control-input" id="2">
-                    <label class="custom-control-label" for="2" id="confLabel" style='color:gray'>14:00 ~ 17:00</label>
-                </div>
-                <div class='tuli' style='background-color:#FFAB7C'></div>
-
-                <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
-                    <input type="checkbox" class="custom-control-input" id="3">
-                    <label class="custom-control-label" for="3" id="yearLabel" style='color:gray'>18:00 ~ 21:00</label>
-                </div>
-                <div class='tuli' style='background-color:#EE89FF'></div>
-
-                <div class="custom-control custom-checkbox" style='margin-top:7%;margin-left:13%;'>
-                    <input type="checkbox" class="custom-control-input" id="4">
-                    <label class="custom-control-label" for="4" id="affLabel" style='color:gray'>22:00 ~ 6:00</label>
-                </div>
-                <div class='tuli' style='background-color:#00D8FF'></div>
-
-            </div>
-
-        </div>
     </div>
 
     <div id='parallelDiv'>
@@ -188,8 +238,9 @@
         <button id="cluster" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Cluster</button>
 
         <div class="dropdown" id='dropdown'>
-            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
-                aria-haspopup="true" aria-expanded="false" style='font-size:0.8em;padding:.0rem .5rem;'>
+            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                style='font-size:0.8em;padding:.0rem .5rem;'>
                 walk combination
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id='options' style='min-width:9rem;'>
