@@ -1,7 +1,6 @@
 let tree_view = (function () {
     let modifyCount = 1, levelLine_g, cluLoc_dict = {};
 
-
     function draw_tree(data, level) {
         let colorSelected = { fill: '#ff957c', stroke: '#ff4416' }, colorOri = { fill: '#B6E9FF', stroke: '#329CCB' }
         let svg_tree = d3.select('#svg_tree');
@@ -75,9 +74,9 @@ let tree_view = (function () {
         console.log('nodes: ', nodes);
         let links = treeData.links();
         //设置线宽、透明度、圆半径的比例尺
-        let LWScale = d3.scaleLinear().domain([0, treeData.height]).range([0.05, 3])
-        let OPScale = d3.scaleLinear().domain([0, treeData.height]).range([0.001, 1])
-        let RScale = d3.scaleLinear().domain([0, treeData.height]).range([0.3, 5])
+        let LWScale = d3.scaleLinear().domain([0, treeData.height]).range([2, 3])
+        let OPScale = d3.scaleLinear().domain([0, treeData.height]).range([0.5, 1])
+        let RScale = d3.scaleLinear().domain([0, treeData.height]).range([0.5, 5])
 
         let g = svg_tree.append('g').attr('transform', `translate(10,${0.37 * svg_height})`)
         g.selectAll('.link').data(links).enter()
@@ -114,17 +113,19 @@ let tree_view = (function () {
 
                 let parent = [], children = [], separate;
                 parent = judgeParent(d);
-                // console.log('parent: ', parent);
+                console.log('parent: ', parent);
                 children = judgeChildren(children_dict[d.data.name]);
                 children.splice(0, 1)
-                // console.log('children: ', children);
+                console.log('children: ', children);
                 //如果选中切层中的子节点,则删除该节点，并将该节点的子节点 都 加入切层类数组
                 let tmp_parentId;
+                //先判断该节点网上走过程中是不是又一个父节点处于当前的cluster中，若是，则进行分割操作，不是则进行合并
                 for (let p = 0; p < parent.length; p++) {
                     if (variable.cluster_arr.indexOf(parent[p]) != -1) {
                         //当前操作代表切割
                         separate = true;
                         console.log('separate: ', separate);
+                        //删除类数组中的父节点
                         variable.cluster_arr.splice(variable.cluster_arr.indexOf(parent[p]), 1);
                         d3.select('#tree_' + parent[p])
                             .transition()
@@ -138,7 +139,10 @@ let tree_view = (function () {
                     //将当前节点的父节点的所有下一层子节点加入类数组
                     let parent_childrens = judgeChildren(children_dict[tmp_parentId])
                     console.log('parent_childrens: ', parent_childrens);
-                    let levelIds = level_dict[d.height + 1];
+                    //d.height代表的是层次树的可见高度是第几层，并不是实际上的层次level，所以在获取指定层的点时，需要加上层次树开始可见的level
+                    let levelIds = level_dict[d.height +  level];
+                    console.log("functiondraw_tree -> levelIds", levelIds)
+                    console.log("functiondraw_tree -> d.height", d.height)
                     console.log('levelIds: ', levelIds);
                     for (let i = 0; i < levelIds.length; i++) {
                         if (parent_childrens.indexOf(levelIds[i]) != -1) {

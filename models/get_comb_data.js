@@ -2,15 +2,15 @@ var mongoose = require("mongoose")
 const Schema = mongoose.Schema;
 
 const getSchema = new Schema({
-    wt: String,
-    sl: String,
-    rl: String,
+    wt: Number,
+    sl: Number,
+    rl: Boolean,
     comb:String
 }, {
-    collection: 'Chicago_hierarchical'
+    collection: 'paper'
 });
 
-var CBModel = mongoose.model('Chicago_hierarchical', getSchema);
+var CBModel = mongoose.model('paper', getSchema);
 CBModel.createIndexes({"wt":1, 'sl':1, 'rl':1});
 
 module.exports = CBModel;

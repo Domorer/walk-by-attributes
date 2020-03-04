@@ -54,17 +54,20 @@ let riverView = (function () {
                     t_cluster = id_cluster_dict[tmp_link['target']].cluster;
                 let tmp_cluLink_key = s_cluster + '-' + t_cluster;  //当前簇之间的连线
                 let tmp_StLink_key = tmp_link['source'] + '_' + tmp_link['target'];//当前轨迹
-                let tmp_value = variable.period_dict[tmp_StLink_key]
+                // let tmp_value = variable.period_dict[tmp_StLink_key]
+                let tmp_value = 1;
                 //如果当前簇连线已经存在
                 if (cluBtLink_wt_dict[tmp_cluLink_key] != null) {
                     //当前时间段流量相加
                     for (let a = 0; a < tmp_attrs.length; a++)
-                        cluBtLink_wt_dict[tmp_cluLink_key] += tmp_value[a];
+                        // cluBtLink_wt_dict[tmp_cluLink_key] += tmp_value[a];
+                        cluBtLink_wt_dict[tmp_cluLink_key] += 1
                 }
                 else {
                     cluBtLink_wt_dict[tmp_cluLink_key] = 0;
                     for (let a = 0; a < tmp_attrs.length; a++)
-                        cluBtLink_wt_dict[tmp_cluLink_key] += tmp_value[a];
+                        // cluBtLink_wt_dict[tmp_cluLink_key] += tmp_value[a];
+                        cluBtLink_wt_dict[tmp_cluLink_key] += 1
                 }
             }
         }
@@ -377,10 +380,10 @@ let riverView = (function () {
         riverView.symbol_g = variable.svg_tree.append('g')
         riverView.directLine_g = variable.svg_tree.append('g')
         //添加图例
-        let text_x = 0.85 * svg_width,
+        let text_x = 0.8 * svg_width,
             y_space = 0.05 * svg_height,
-            text_sy = 0.15 * svg_height,
-            rect_sy = 0.125 * svg_height;
+            text_sy = 0.1 * svg_height,
+            rect_sy = 0.070 * svg_height;
         let labels = ['Label Cost', 'Data Cost', 'Smooth Cost']
         variable.svg_tree.append('g').selectAll('text').data(labels).enter()
             .append('text')

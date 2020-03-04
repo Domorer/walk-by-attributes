@@ -1,32 +1,36 @@
-button#confirm {
-    margin-left: 35%;
-    padding-left: 5;
-    padding-right: 5;
-    padding-top: 0;
-    padding-bottom: 0;
-    font-size: 1em;
+/*********************************/
+
+
+#scatter {
+    position: absolute;
+    width: 100%;
+    height: 50%;
 }
 
-button#cluster_layout {
-    position: absolute;
-    top: 3%;
-    right: 1%;
-    padding-left: 5;
-    padding-right: 5;
-    padding-top: 0;
-    padding-bottom: 0;
-    font-size: 0.8em;
+#svg_scatter {
+    width: 100%;
+    height: 100%;
+}
+#scatter_draw {
+    width: 100%;
+    height: 95.5%;
+    border-radius: 4px;
+    border: 1.5px solid #ecebeb;
 }
 
-button#edge_bundling {
+div#parallelDiv {
     position: absolute;
-    top: 3%;
-    right: 12%;
-    padding-left: 5;
-    padding-right: 5;
-    padding-top: 0;
-    padding-bottom: 0;
-    font-size: 0.8em;
+    top: 50%;
+    margin-top: 0.1%;
+    width: 100%;
+    height: 50%;
+}
+
+#svg_parallel {
+    width: 100%;
+    height: 94.5%;
+    border-radius: 4px;
+    border: 1.5px solid #ecebeb;
 }
 
 button#confirm_cluster {
@@ -40,59 +44,24 @@ button#confirm_cluster {
     font-size: 0.8em;
 }
 
-div#moveButtons{
-    position: absolute;
-    top:7%;
-    right:2%;
-    width:20px;
-}
-div#moveButtons button{
-    padding: 2
-}
-
 #refresh{
     position: absolute;
     top:6%;
     right:0.5%;
     padding:2;
 }
-/* button#zoomOut{
-    margin-top: 2;
-    padding:2
-}
-button#zoomIn{
-        margin-top: 2;
 
-    padding:2
-}
-button#ButtonLeft{
-    padding:2
-}
-button#ButtonRight{
-    padding:2
-}
-button#ButtonUp{
-    padding:2
-}
-button#ButtonDown{
-    padding:2
-} */
-button#brush {
+div#toHeatmap {
     position: absolute;
     top: 6%;
-    right: 28%;
-    padding-left: 5;
-    padding-right: 5;
-    padding-top: 0;
-    padding-bottom: 0;
-    font-size: 0.8em;
-
+    left:2%;
+    font-size: 0.85em;
 }
 
-button#cluster {
+button#toHeatmap {
     position: absolute;
     top: 6%;
-    right: 23%;
+    right: 32%;
     padding-left: 5;
     padding-right: 5;
     padding-top: 0;

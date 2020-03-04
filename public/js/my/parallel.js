@@ -24,6 +24,8 @@ let parallel = (function () {
         for (let i = 0; i < 5; i++) {
             attrs_line.push(
                 [[(i + 0.5) * svg_width / 5,
+
+                    
                 0.1 * svg_height],
                 [(i + 0.5) * svg_width / 5,
                 0.9 * svg_height]]

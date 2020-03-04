@@ -7,7 +7,6 @@ let clusterFun = (function () {
         console.log('cluster_arr: ', cluster_arr);
         variable.cluster_arr = deepCopy(cluster_arr);
         let cluster_ids_dict = {}
-
         let dfs = function (root) {
             var arr = [], res = [];
             if (root != null) {
@@ -25,7 +24,7 @@ let clusterFun = (function () {
                     arr.push(children_dict[temp.left]);
                 }
             }
-            return res;
+            return res; 
         }
         //计算每个类内所有站点的集合
         for (let i = 0; i < cluster_arr.length; i++) {
@@ -70,7 +69,7 @@ let clusterFun = (function () {
         variable.clusterLink_weight_dict = {};
         variable.clusterLink_weight_dict = deepCopy(clusterLink_dict);  
         // console.log('clusterLink_dict: ', clusterLink_dict);
-        //计算每个簇内的所有连线的字典
+    //***计算每个簇内的所有连线的字典*****
         let clu_tpg = {};
         console.time('XX')
         //使用字典对比法
@@ -81,7 +80,8 @@ let clusterFun = (function () {
                     let tmp_targets = variable.oriLink_dict[cluster_ids_dict[key][i]];
                     for (let j = 0; j < tmp_targets.length; j++) {
                         if (cluster_ids_dict[key].indexOf(tmp_targets[j]) != -1) {
-                            let tmp_value = variable.period_dict[cluster_ids_dict[key][i] + '_' + tmp_targets[j]]
+                            // let tmp_value = variable.period_dict[cluster_ids_dict[key][i] + '_' + tmp_targets[j]]
+                            let tmp_value = 1
                             clu_tpg[key].push({ 'source': cluster_ids_dict[key][i], 'target': tmp_targets[j], value: tmp_value })
                         }
                     }

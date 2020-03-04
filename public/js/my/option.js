@@ -1,9 +1,14 @@
 let option = (function () {
 
-    let cs_dict = { 'O-P': 'P', 'O-R': 'R', 'O': 'O', 'O-P-R': 'PR' }
+    let cs_dict = {
+        'O-P': 'P',
+        'O-R': 'R',
+        'O': 'O',
+        'O-P-R': 'PR'
+    }
     let comb_len = 0;
-    let optIndex = 0;//记录操作的index
-    let comb_record = [];//记录操作的具体参数元素格式为[当前属性选择，当前游走方式选择]
+    let optIndex = 0; //记录操作的index
+    let comb_record = []; //记录操作的具体参数元素格式为[当前属性选择，当前游走方式选择]
     let tmp_param = ["cited", '次', 'cited_chart'];
 
     //*************修改图例颜色**************
@@ -12,35 +17,36 @@ let option = (function () {
     comb_record.push(clusterFun.deepCopy(variable.param));
 
     //*************初始化******************
+    console.log("option -> variable.param", variable.param)
+
     getCombData(variable.param).then(function (data) {
-        d3.csv('data/Chicago/undir_link_weight.csv', function (error, data_link) {
-            d3.json('data/Chicago/period_value_dict.json', function (error, data_period) {
-                variable.period_dict = data_period;
-                // console.log('data_link: ', data_link);
+        d3.csv('data/paper/weighted_link.csv', function (error, data_link) {
+            d3.json('data/paper/nodeInfo.json', function (error, nodeInfo) {
+                variable.nodeInfo = nodeInfo;
+                console.log('data_link: ', data_link);
                 //获取原始link的字典
                 for (let i = 0; i < data_link.length; i++) {
                     if (variable.oriLink_dict[data_link[i].source] != null) {
                         variable.oriLink_dict[data_link[i].source].push(data_link[i].target)
                         variable.station_links_dict[data_link[i].source].push(data_link[i].target)
-                    }
-                    else {
+                    } else {
                         variable.oriLink_dict[data_link[i].source] = [data_link[i].target];
                         variable.station_links_dict[data_link[i].source] = [data_link[i].target]
                     }
                     if (variable.station_links_dict[data_link[i].target] != null) {
                         variable.station_links_dict[data_link[i].target].push(data_link[i].source)
-                    }
-                    else {
+                    } else {
                         variable.station_links_dict[data_link[i].target] = [data_link[i].source]
                     }
                 }
                 variable.oriLinks = data_link;
                 variable.comb_data = data[0];
+                console.log("option -> comb_data", variable.comb_data)
 
                 //通过用户选定的层级来生成类字典
                 let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
                 //当前选中的层级
-                variable.level = max_level - 6;
+                variable.level = 9;
                 clusterFun.cluster(variable.comb_data, variable.level, null)
                 console.log('variable.comb_data: ', variable.comb_data);
                 //绘制降维散点图
@@ -48,12 +54,14 @@ let option = (function () {
                 //绘制力引导图
                 forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
                 //树图
-                tree_view.draw_tree(data[0], 1);
-                radarChart.draw();
+                tree_view.draw_tree(data[0], variable.level);
 
                 //初始化桑基图
                 for (let key in variable.cluster_ids_dict) {
-                    variable.sankeyNode_data.push({ 'id': 'option' + variable.sankey_count.toString() + '-' + key, stations: clusterFun.deepCopy(variable.cluster_ids_dict[key]) })
+                    variable.sankeyNode_data.push({
+                        'id': 'option' + variable.sankey_count.toString() + '-' + key,
+                        stations: clusterFun.deepCopy(variable.cluster_ids_dict[key])
+                    })
                 }
             })
 
@@ -72,7 +80,19 @@ let option = (function () {
     })
     //*****************力引导图的簇展示***************
     $('#cluster_layout').on('click', function () {
-        forceChart.Clustering(variable.comb_data['clu_ids'], variable.comb_data['cluster_link'], variable.cluster_dict);
+        // forceChart.Clustering(variable.comb_data['clu_ids'], variable.comb_data['cluster_link'], variable.cluster_dict);
+        forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
+
+    });
+    $('#origin').on('click', function () {
+        let oriNodes = []
+        for (let key in variable.nodeInfo) {
+            let tmp_node = variable.nodeInfo[key];
+            tmp_node['id'] = key
+            oriNodes.push(tmp_node);
+        }
+        forceChart.drawOriForce(oriNodes, variable.oriLinks,variable.cluster_dict);
+
     });
 
     //*******************滑块******************
@@ -83,9 +103,9 @@ let option = (function () {
         value: 5,
         slide: function (event, ui) {
             if (ui.value <= 5)
-                variable.param.wt = 'wt_5';
+                variable.param.wt = 5;
             else
-                variable.param.wt = 'wt_10';
+                variable.param.wt = 10;
 
             $("#times_text").val(ui.value);
         }
@@ -97,9 +117,9 @@ let option = (function () {
         value: 5,
         slide: function (event, ui) {
             if (ui.value <= 5)
-                variable.param.sl = 'sl_10';
+                variable.param.sl = 10;
             else
-                variable.param.sl = 'sl_15';
+                variable.param.sl = 20;
             $("#length_text").val(ui.value);
         }
     })
@@ -108,22 +128,24 @@ let option = (function () {
     $('#confirm').on('click', function () {
         //***********获取当前各参数的选择情况***********
         comb_len = 0; //记录当前选择的属性数量，用于后面key的格式定义
+        variable.type_count = 0;
         variable.attr = 'random';
         tree_view.modifyCount = 1
-        //循环判断每个checkbox的状态来获取当前的属性选择
+        //循环判断每个checkbox的状态来获取当前的属性选择,如果一个也没选择就代表随机游走
         variable.attr_arr.forEach(Element => {
             let tmp_checked = $('#' + Element)[0].checked;
             if (tmp_checked) {
                 comb_len += 1;
+                variable.type_count += 1;
                 if (comb_len > 1) {
-                    variable.attr += '_' + $('#' + Element)[0].id;
+                    variable.attr += $('#' + Element)[0].id;
                 } else {
-                    variable.attr = 'period_' + $('#' + Element)[0].id;
+                    variable.attr = $('#' + Element)[0].id;
                 }
             }
         })
         console.log('variable.attr: ', variable.attr);
-        let rl = $('#ret_True')[0].checked ? 'rl_True' : 'rl_False';
+        let rl = $('#ret_True')[0].checked ? true : false;
         variable.param['rl'] = rl;
         variable.param['comb'] = variable.attr;
         //*************修改参数后修改各界面的view****************
@@ -155,14 +177,14 @@ let option = (function () {
         modify_cluster(variable.comb_data, true);
     })
     //桑基图刷新按钮
-    $('#refresh').on('click',()=>{
+    $('#refresh').on('click', () => {
         console.log('yes')
-        variable.svg_sankey.selectAll('.sankeyLink').attr('stroke','#d9d9d9').attr('opacity', 1);
+        variable.svg_sankey.selectAll('.sankeyLink').attr('stroke', '#d9d9d9').attr('opacity', 1);
         variable.svg_sankey.selectAll('rect').attr('opacity', 1.0);
     })
     //力引导图控件
     let transition = d3.transition().duration(2000),
-    moveStep = 30;
+        moveStep = 30;
     $('#ButtonRight').on('click', () => {
         variable.viewbox.left -= moveStep
         // variable.viewbox.right += moveStep
@@ -189,21 +211,34 @@ let option = (function () {
     })
     $('#zoomIn').on('click', () => {
         let zoom = d3.zoom().scaleExtent([0.1, 10])
-        variable.viewbox.top += moveStep
+        variable.viewbox.top -= moveStep
         variable.viewbox.bottom += moveStep
         variable.svg_force.transition(transition)
             .attr('viewBox', `${variable.viewbox.left} ${variable.viewbox.top} ${variable.viewbox.right} ${variable.viewbox.bottom}`)
     })
     $('#zoomOut').on('click', () => {
-        variable.viewbox.top += moveStep
-        variable.viewbox.bottom += moveStep
+        variable.viewbox.top -= moveStep
+        variable.viewbox.bottom += moveStep * 2
         variable.svg_force.transition(transition)
             .attr('viewBox', `${variable.viewbox.left} ${variable.viewbox.top} ${variable.viewbox.right} ${variable.viewbox.bottom}`)
     })
+
+    $('#toHeatmap').on('click', function () {
+        console.log('checked: ', $('#inputHeat')[0].checked);
+        // if ($('#inputHeat')[0].checked == true){
+
+        //     scatter.drawHeat(variable.comb_data);
+        // }
+        // else{
+        //     console.log('false')
+        //     // d3.select('#scatter_canvas').select('canvas').remove();
+        // }
+    });
+
     //每次类变化后页面进行的操作
     function modify_cluster(data, tree_confirm) {
         //地图视图清空
-        d3.select('#map').selectAll('path').remove();
+        // d3.select('#map').selectAll('path').remove();
 
         //桑基图的列数加一
         variable.sankey_count += 1;
@@ -211,7 +246,7 @@ let option = (function () {
         variable.comb_data = data;
         //通过用户选定的层级中的类   或者选中的断层的类   来生成类字典
         let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
-        variable.level = max_level - 6;
+        variable.level = 9;
 
         //通过判断当前的类是用户选择的还是自定层级的， 来确定参数
         if (tree_confirm == false)
@@ -224,28 +259,33 @@ let option = (function () {
         forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
         //如果不是通过修改断层来修改类数组则需要重绘树图
         if (tree_confirm == false)
-            tree_view.draw_tree(data, 1);
-        radarChart.draw();
+            tree_view.draw_tree(data, variable.level);
 
         //桑基图
         console.log(variable.param)
         if (variable.sankey_count >= 2) {
             for (let key in variable.cluster_ids_dict)
-                variable.sankeyNode_data.push({ 'id': 'option' + variable.sankey_count.toString() + '-' + key, stations: clusterFun.deepCopy(variable.cluster_ids_dict[key]) })
+                variable.sankeyNode_data.push({
+                    'id': 'option' + variable.sankey_count.toString() + '-' + key,
+                    stations: clusterFun.deepCopy(variable.cluster_ids_dict[key])
+                })
             //计算类变化连线的权重
             let link_weight_dict = {};
 
             for (let key in variable.last_cluster_dict) {
-                let s_clu = variable.last_cluster_dict[key].cluster, t_clu;
+                let s_clu = variable.last_cluster_dict[key].cluster,
+                    t_clu;
                 if (variable.cluster_dict[key] != null) {
                     t_clu = variable.cluster_dict[key].cluster;
                     let tmp_key = s_clu + '-' + t_clu
                     if (link_weight_dict[tmp_key] != null) {
                         link_weight_dict[tmp_key]['value'] += 1
                         link_weight_dict[tmp_key]['stations'].push(key)
-                    }
-                    else {
-                        link_weight_dict[tmp_key] = { value: 1, stations: [key] }
+                    } else {
+                        link_weight_dict[tmp_key] = {
+                            value: 1,
+                            stations: [key]
+                        }
                     }
 
                 }
@@ -262,7 +302,7 @@ let option = (function () {
                     'stations': link_weight_dict[key]['stations']
                 })
             }
-            sankeyChart.drawSankey(variable.sankeyNode_data, variable.sankeyLink_data);
+            // sankeyChart.drawSankey(variable.sankeyNode_data, variable.sankeyLink_data);
         }
 
     }

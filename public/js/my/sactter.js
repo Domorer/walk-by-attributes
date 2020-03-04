@@ -1,7 +1,7 @@
 let scatter = (function () {
 
     function drawScatter(comb_data) {
-        // console.log('comb_data: ', comb_data);
+        console.log('comb_data: ', comb_data);
         variable.svg_scatter.selectAll('*').remove();
         let svg_width = $("#svg_scatter")[0].scrollWidth;
         let svg_height = $("#svg_scatter")[0].scrollHeight;
@@ -96,7 +96,6 @@ let scatter = (function () {
                 //雷达图
                 radarChart.addRadar(d.id);
 
-                mapView.drawPL(variable.clu_tpg[d.id], variable.cluster_ids_dict[d.id]);
 
                 // parallel.drawParallel(d.id);
             });
@@ -156,8 +155,46 @@ let scatter = (function () {
 
     }
 
+    function drawHeat(data) {
+        //删除上次绘图canvas
+        // d3.select('#scatter_canvas').select('canvas').remove();
+     //坐标进行比例换算，将坐标为负的按比例放缩到正值
+        let svg_width = $("#svg_scatter")[0].scrollWidth;
+        let svg_height = $("#svg_scatter")[0].scrollHeight;
+        let min_x = d3.min(data.info, function (d) { return d.x });
+        let min_y = d3.min(data.info, function (d) { return d.y });
+        let max_x = d3.max(data.info, function (d) { return d.x });
+        let max_y = d3.max(data.info, function (d) { return d.y });
+        let xScale = d3.scaleLinear().domain([min_x, max_x]).range([0, svg_width - 20]);
+        let yScale = d3.scaleLinear().domain([min_y, max_y]).range([svg_height - 20, 0]);
+
+
+        let points = [], max_val = 1;
+        for (let i = 0; i < data.info.length; i++) {
+            let point = {
+                x:xScale(data.info[i].x),
+                y:yScale(data.info[i].y),
+                value:1,
+                radius:15
+            }
+            points.push(point);
+        }
+
+        let heat_data = {
+            data: points
+        }
+        console.log('points: ', points);
+
+        let container = document.querySelector('#scatter_canvas');
+        let heatmap = h337.create({
+            container: container
+        })
+        heatmap.setData(heat_data);
+    }
+
 
     return {
-        drawScatter
+        drawScatter,
+        drawHeat
     }
 })()

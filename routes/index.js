@@ -3,7 +3,7 @@ var router = express.Router();
 var CBModel = require("../models/get_comb_data");
 
 
-// var InsertModel = require("../models/test_co");
+// var InsertModel = require("../models/test_co");                  
 /* GET home page. */
 router.get("/", function (req, res, next) {
     res.render("index", {

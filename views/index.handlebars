@@ -21,6 +21,7 @@
 <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
     integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
     crossorigin=""></script>
+<script src="/js/heatmap.js"></script>
 
 
 {{!-- <nav id="nav" class="navbar navbar-dark sticky-top  flex-md-nowrap p-0" style="border-bottom:3px solid rgb(216, 216, 216);">
@@ -38,7 +39,6 @@
                 aria-haspopup="true" aria-expanded="true" style='margin-top:-5px;'>
                 Patent
             </a>
-
             <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                 <a class="dropdown-item" href="#">Chicago</a>
                 <a class="dropdown-item" href="#">Simulation data</a>
@@ -59,23 +59,6 @@
             <a class='data_info' style='margin-left:15%;width:50px;'>0</a>
         </div>
 
-
-
-        {{!-- <div id='radioDiv'>
-            <div class="custom-control custom-radio " style='margin-left:13%;margin-top:5%;color:gray'>
-                <input type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input"
-                    checked=True>
-                <label class="custom-control-label" for="customRadioInline1">Citation Network</label>
-            </div>
-            <div class="custom-control custom-radio " style='margin-left:13%;margin-top:3%;color:gray'>
-                <input type="radio" id="customRadioInline2" name="customRadioInline1" class="custom-control-input">
-                <label class="custom-control-label" for="customRadioInline2">Chicago Bicycle</label>
-            </div>
-            <div class="custom-control custom-radio " style='margin-left:13%;margin-top:3%;color:gray'>
-                <input type="radio" id="customRadioInline3" name="customRadioInline1" class="custom-control-input">
-                <label class="custom-control-label" for="customRadioInline3">Shenzhen Taxi</label>
-            </div>
-        </div> --}}
     </div>
 
     <div id='control_pannel'>
@@ -122,50 +105,49 @@
             <div id='headline'><a id='headline_b'>Attributions Selected</a></div>
 
             <div class="custom-control custom-checkbox" style='margin:3% 5% 0 5%;'>
-                <input type="checkbox" class="custom-control-input" id="0" checked='true'>
-                <label class="custom-control-label" for="0" id="citedLabel" style='color:gray'>6:00 ~ 9:00</label>
-                <div class='tuli' style='background-color:#A597FF'></div>
-            </div>
-
-            <div class="custom-control custom-checkbox" style='margin:3% 5% 0 5%;'>
-                <input type="checkbox" class="custom-control-input" id="1">
-                <label class="custom-control-label" for="1" id="abtLabel" style='color:gray'>10:00 ~ 13:00</label>
+                <input type="checkbox" class="custom-control-input" id="1" checked='true'>
+                <label class="custom-control-label" for="1" id="citedLabel" style='color:gray'>Conference</label>
                 <div class='tuli' style='background-color:#A597FF'></div>
             </div>
 
             <div class="custom-control custom-checkbox" style='margin:3% 5% 0 5%;'>
                 <input type="checkbox" class="custom-control-input" id="2">
-                <label class="custom-control-label" for="2" id="confLabel" style='color:gray'>14:00 ~ 17:00</label>
-                <div class='tuli' style='background-color:#FFAB7C'></div>
-
+                <label class="custom-control-label" for="2" id="abtLabel" style='color:gray'>Year</label>
+                <div class='tuli' style='background-color:#A597FF'></div>
             </div>
 
             <div class="custom-control custom-checkbox" style='margin:3% 5% 0 5%;'>
                 <input type="checkbox" class="custom-control-input" id="3">
-                <label class="custom-control-label" for="3" id="yearLabel" style='color:gray'>18:00 ~ 21:00</label>
-                <div class='tuli' style='background-color:#EE89FF'></div>
+                <label class="custom-control-label" for="3" id="confLabel" style='color:gray'>Paper Type</label>
+                <div class='tuli' style='background-color:#FFAB7C'></div>
 
             </div>
 
-            <div class="custom-control custom-checkbox" style='margin:3% 5% 0 5%;'>
+            {{!-- <div class="custom-control custom-checkbox" style='margin:3% 5% 0 5%;'>
+                <input type="checkbox" class="custom-control-input" id="3">
+                <label class="custom-control-label" for="3" id="yearLabel" style='color:gray'>18:00 ~ 21:00</label>
+                <div class='tuli' style='background-color:#EE89FF'></div>
+
+            </div> --}}
+
+            {{!-- <div class="custom-control custom-checkbox" style='margin:3% 5% 0 5%;'>
                 <input type="checkbox" class="custom-control-input" id="4">
                 <label class="custom-control-label" for="4" id="affLabel" style='color:gray'>22:00 ~ 6:00</label>
                 <div class='tuli' style='background-color:#00D8FF'></div>
 
-            </div>
+            </div> --}}
             <div class='btn_out'>
                 <button id="confirm" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Confirm</button>
             </div>
 
-
         </div>
     </div>
 
-    <div id='OriTopo'>
+    <div id='treeDiv'>
         <div id="headLine">
-            <a id='headline_a'>Original Topology</a>
+            <a id='headline_a'>Tree View</a>
         </div>
-        <div id='map'></div>
+        <svg id='svg_tree'></svg>
     </div>
 </div>
 
@@ -176,6 +158,11 @@
             <a id='headline_a'>Abstraction View</a>
         </div>
         <svg id='svg_force'></svg>
+        <div id='innerTopo'  class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="topo">
+            <label class="custom-control-label" for="topo" id="citedLabel" style='color:gray'>Inner Topology</label>
+        </div>
+        <button id="origin" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Original topology</button>
         <button id="cluster_layout" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Cluster Layout</button>
         <button id="edge_bundling" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Edge Bundling</button>
         <div id='moveButtons'>
@@ -204,38 +191,25 @@
                 <img src="/img/arrowdown.png" width='20' height="20">
             </button>
         </div>
-
-
     </div>
 
-    <div id='parallelDiv'>
-        <div id='sankeyDiv'>
-            <div id="headLine">
-                <a id='headline_a'>Sankey View</a>
-            </div>
-            <svg id='svg_sankey'></svg>
-            {{!-- <button type="button" class="btn btn-outline-secondary my-2 my-sm-1 Movebutton" aria-label="Left Align" id='refresh'>
-                <img src="/img/sync.png" width='15' height="15">
-            </button> --}}
-        </div>
-        <div id='radarDiv'>
-            <div id="headLine">
-                <a id='headline_a'>Radar View</a>
-            </div>
-            <svg id='svg_radar'></svg>
-        </div>
-    </div>
-</div>>
+
+</div>
 <div id='right'>
-
     <div id='scatter'>
         <div id="headLine">
             <a id='headline_a'>Projection View</a>
         </div>
+        <div id='toHeatmap' class="custom-control custom-checkbox" style='margin:0 0 0 0;'>
+            <input type="checkbox" class="custom-control-input" id="inputHeat">
+            <label class="custom-control-label" for="inputHeat" id="labelHeat" style='color:gray'>HeatMap</label>
+        </div>
         {{!-- <button id="point" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Point</button> --}}
+        <div id='scatter_canvas'>
+            <svg id='svg_scatter'></svg>
+        </div>
 
-        <svg id='svg_scatter'></svg>
-        <button id="cluster" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Cluster</button>
+        {{!-- <button id="toHeatmap" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">HeatMap</button> --}}
 
         <div class="dropdown" id='dropdown'>
             <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
@@ -248,13 +222,12 @@
         </div>
     </div>
 
-    <div id='paramDiv'>
+    <div id='ParallelDiv'>
         <div id="headLine">
-            <a id='headline_a'>Tree View</a>
+            <a id='headline_a'>Parallel View</a>
         </div>
         <button id="confirm_cluster" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">confirm</button>
-        <svg id='svg_tree'></svg>
-
+        <svg id='svg_parallel'></svg>
     </div>
 
 </div>
