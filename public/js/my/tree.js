@@ -4,7 +4,7 @@ let tree_view = (function () {
     let svg_width = $("#svg_tree")[0].scrollWidth;
     let svg_height = $("#svg_tree")[0].scrollHeight;
     console.log('svg_height: ', svg_height);
-    function draw_tree(data) {
+    function draw_tree(data, show_level) {
 
         console.log('data: ', data);
         
@@ -12,7 +12,7 @@ let tree_view = (function () {
         let children_dict = data['children_dict'];
         let max_level = d3.max(Object.keys(level_dict), d => parseInt(d));
         console.log('max_level: ', max_level);
-        let show_level = max_level, start_level = max_level - show_level + 1;
+        let start_level = max_level - show_level + 1;
         for (let key in level_dict) {
             if (key >= start_level) {
                 let leaf = svg_tree.append('g').selectAll('circle').data(level_dict[key]).enter()

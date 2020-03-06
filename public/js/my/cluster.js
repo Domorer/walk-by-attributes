@@ -33,14 +33,15 @@ let clusterFun = (function () {
         }
         console.log('cluster_ids_dict: ', cluster_ids_dict);
         //计算站点的所在类字典
-        let id_cluster_dict = {}, index = 0;
+        let id_cluster_dict = {}, index = 0, count = 0;
         for (let key in cluster_ids_dict) {
             for (let i = 0; i < cluster_ids_dict[key].length; i++) {
                 id_cluster_dict[cluster_ids_dict[key][i]] = { cluster: key, index: index }
             }
+            count += cluster_ids_dict[key].length;
             index += 1;
         }
-        
+
         if (variable.sankey_count == 1)
             variable.last_cluster_dict = deepCopy(id_cluster_dict);
         else {

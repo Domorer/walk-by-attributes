@@ -33,16 +33,7 @@ div#parallelDiv {
     border: 1.5px solid #ecebeb;
 }
 
-button#confirm_cluster {
-    position: absolute;
-    top: 6%;
-    right: 2%;
-    padding-left: 5;
-    padding-right: 5;
-    padding-top: 0;
-    padding-bottom: 0;
-    font-size: 0.8em;
-}
+
 
 #refresh{
     position: absolute;

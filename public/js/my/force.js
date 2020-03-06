@@ -179,13 +179,13 @@ let forceChart = (function () {
                 // if (d.cluster != -1 && d.cluster != undefined)
                 //     return color(d.cluster)
                 // else
-                let tmp_index = variable.valueCount_dict[variable.attr].indexOf(d[parseInt(variable.attr)])
+                let tmp_index = variable.attrValue_dict[variable.attr].indexOf(d[parseInt(variable.attr)])
                 return variable.color_arr[tmp_index]
             }).attr('fill', function (d) {
                 // if (d.cluster != -1 && d.cluster != undefined)
                 //     return color(d.cluster)
                 // else
-                let tmp_index = variable.valueCount_dict[variable.attr].indexOf(d[parseInt(variable.attr)])
+                let tmp_index = variable.attrValue_dict[variable.attr].indexOf(d[parseInt(variable.attr)])
                 return variable.color_arr[tmp_index]
             }).attr('class', function (d) {
                 return d.id;
@@ -272,11 +272,11 @@ let forceChart = (function () {
         let node_cluster = variable.svg_force.append('g').selectAll('circle').data(nodes).enter()
             .append('circle')
             .attr('r', 2)
-            .attr('stroke', function(d){
-                return variable.color_arr[variable.valueCount_dict[variable.attr].indexOf(variable.nodeInfo[d.id][parseInt(variable.attr)])]
+            .attr('stroke', function (d) {
+                return variable.color_arr[variable.attrValue_dict[variable.attr].indexOf(variable.nodeInfo[d.id][parseInt(variable.attr)])]
             })
-            .attr('fill', function(d){
-                let tmp_idnex = variable.valueCount_dict[variable.attr].indexOf(variable.nodeInfo[d.id][parseInt(variable.attr)])
+            .attr('fill', function (d) {
+                let tmp_idnex = variable.attrValue_dict[variable.attr].indexOf(variable.nodeInfo[d.id][parseInt(variable.attr)])
                 return variable.color_arr[tmp_idnex]
             })
             .attr('class', 'innerTopoNodes_' + cluster)
@@ -306,7 +306,6 @@ let forceChart = (function () {
             cluster_nodes.push(tmp_dict);
         }
 
-        console.log("Clustering -> variable.clu_tpg", variable.clu_tpg)
         let index_dict = {};
         for (let i = 0; i < cluster_nodes.length; i++) {
             index_dict[cluster_nodes[i].id] = i;
@@ -318,7 +317,6 @@ let forceChart = (function () {
         d_extent = d3.extent(cluster_nodes, function (d) {
             return d.density;
         })
-        console.log("Clustering -> d_extent", d_extent)
         let dScale = d3.scaleLinear().domain(d_extent).range([0, 1])
         let colorDensity = d3.interpolateRgb('#f1f4ff', '#2e5eff')
         let rScale = d3.scaleLinear().domain(r_extent).range([5, 20]);
@@ -423,22 +421,27 @@ let forceChart = (function () {
                 return 'cluster_node';
             }).attr('id', d => 'cluster_' + d.id)
             .on('click', function (d, i) {
-                console.log(d.density)
-                console.log(dScale(d.density));
-                console.log(colorDensity(dScale(d.density)));
                 const a = i;
-
+                parallel.changeWidth(d.id)
                 if (variable.last_cluster != undefined) {
+                    d3.select('#svg_parallel').selectAll('path')
+                        .style('opacity', .05   )
+                        .style('stroke-width', 1)
+                        .style('stroke', '#e3e3e3')
                     d3.select('#area_' + variable.last_cluster).attr('fill', '#D5E2FF');
-                    d3.select('#cluster_' + variable.last_cluster).attr('fill', '#004358');
+                    d3.select('#cluster_' + variable.last_cluster)
+                        .attr('fill', d => colorDensity(dScale(d.density)));
                 }
+                d3.selectAll('.parallelClass_' + d.id)
+                    .style('opacity', 1)
+                    .style('stroke-width', 2)
+                    .style('stroke', '#8a8a8a')
                 d3.select('#area_' + d.id).attr('fill', '#E83A00');
                 d3.select('#cluster_' + d.id).attr('fill', '#E83A00');
                 /*如果innertopo为选中状态，则点击当前节点就会改变该节点和节点外圈扇形的透明度
-                  
+                
                 */
                 if ($('#topo')[0].checked) {
-
                     if ($(this)[0].style.opacity == '0') {
                         d3.selectAll('.pie_' + d.id).style('opacity', 1);
                         d3.select(this).style('opacity', 1);
@@ -448,7 +451,9 @@ let forceChart = (function () {
                         drawClusterForce(d.id, rScale(d.value), d.x, d.y);
                     }
                 }
+
                 variable.last_cluster = d.id;
+
                 //雷达图
                 // radarChart.addRadar(d.id);
 
@@ -486,7 +491,6 @@ let forceChart = (function () {
         }
         //画圆外的属性方差值
         // for()
-        // console.log('pattern_g: ', pattern_g);
 
         // let radian_dict = {
         //     'left_top': 162 * (2 * Math.PI / 360),
@@ -605,8 +609,8 @@ let forceChart = (function () {
         if (variable.type_count == 1) {
             //单属性时，variable.attr 就是属性名称，不是多个属性名称的集合
             let value_dict = {};
-            for (let i = 0; i < variable.valueCount_dict[variable.attr].length; i++) {
-                value_dict[variable.valueCount_dict[variable.attr][i]] = 0
+            for (let i = 0; i < variable.attrValue_dict[variable.attr].length; i++) {
+                value_dict[variable.attrValue_dict[variable.attr][i]] = 0
             }
             //遍历当前类内的点，并统计各个属性值都包含几个点
             let tmp_ids = variable.cluster_ids_dict[cluster];
@@ -676,7 +680,6 @@ let forceChart = (function () {
             .on('click', function (d, i) {
                 console.log(i)
             })
-        // console.log('pie_data: ', pie_data);
         return pie_g;
     }
 

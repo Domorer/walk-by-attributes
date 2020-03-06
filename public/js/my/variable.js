@@ -8,11 +8,14 @@ let variable = (function () {
     let type_count = 1; //选择了几个属性
     let attr = '1';
     let color_arr = ['#FF57D9', '#EB590C', '#FFD105', '#42F005', '#23FFE8']
-    let valueCount_dict = {
-        '1': ['VAST', 'InfoVis', 'SciVis'],
-        '2': ['1', '2', '3', '4', '5'],
-        '3': ['C', 'M', 'T']
+    let attrValue_dict = {}
+    let valueIds_dict = {}; //每个属性值对应点数组的字典
+    let oriAttrName_dict = {
+        '1': 'Conference',
+        '2': 'Year',
+        '3': 'Paper type'
     }
+
     let nodeInfo; //点的属性值字典
     let svg_tree = d3.select('#svg_tree')
     let svg_scatter = d3.select('#svg_scatter');
@@ -25,9 +28,15 @@ let variable = (function () {
         right: 0,
         bottom: 0
     }
+    let yearPhase_dict = {
+        '1': '90-94',
+        '2': '95-99',
+        '3': '00-04',
+        '4': '05-09',
+        '5': '10-14'
+    };
 
     let attr_arr = ['1', '2', '3'];
-    let time_arr = ['6:00~9:00', '10:00~13:00', '14:00~17:00', '18:00~21:00', '22:00~5:00', ];
     let info_dict = {}; //节点的信息字典
 
     let ChoseCluster = false; //判断当前选择点的方式
@@ -49,7 +58,7 @@ let variable = (function () {
     let oriLink_dict = {};
     let station_links_dict = {};
     let period_dict;
-    let level;
+    let level = 9;
     let param = {
         wt: 10,
         sl: 20,
@@ -60,7 +69,6 @@ let variable = (function () {
 
     let loc_dict; //坐标字典
     return {
-        time_arr,
         all_comb,
         comb_data,
         link_data,
@@ -96,9 +104,12 @@ let variable = (function () {
         attr_color,
         loc_dict,
         cluster_arr,
-        valueCount_dict,
+        attrValue_dict,
         attr,
         nodeInfo,
-        color_arr
+        color_arr,
+        valueIds_dict,
+        oriAttrName_dict,
+        yearPhase_dict
     }
 })()

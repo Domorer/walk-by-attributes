@@ -32,7 +32,7 @@
         <div id="headLine">
             <a id='headline_a'>Data Infomation</a>
         </div>
-        <label style='color:rgb(124, 124, 124);margin:10px;display:inline-block;margin-left:5%;'>Dataset：
+        <label style='color:rgb(124, 124, 124);margin:10px;display:inline-block;margin:2% 5% 1% 5%'>Dataset：
         </label>
         <div class="dropdown show" style="display:inline-block;">
             <a class="btn btn-sm dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
@@ -45,18 +45,18 @@
             </div>
         </div>
         <div style='display:block'>
-            <label style='color:rgb(124, 124, 124);display:inline-block;margin-left:5%; '>Nodes
+            <label style='color:rgb(124, 124, 124);display:inline-block;margin:0 0 1% 5%; '>Nodes
             </label>
-            <label style='color:rgb(124, 124, 124);display:inline-block;margin-left:15%;'>Tsne Count
+            <label style='color:rgb(124, 124, 124);display:inline-block;margin:0 0 1% 20%;'>Edges
             </label>
-            <label style='color:rgb(124, 124, 124);margin-left:15%;'>Edges
+            <label style='color:rgb(124, 124, 124);margin:0 0 1% 16%;'>Attributes
             </label>
         </div>
 
-        <div style='disply:block;'>
-            <a class='data_info' style='margin-left:5%;width:50px;'>0</a>
-            <a class='data_info' style='margin-left:15%;width:70px;'>0</a>
-            <a class='data_info' style='margin-left:15%;width:50px;'>0</a>
+        <div style='disply:block;color:rgb(124, 124, 124)'>
+            <a class='data_info' id='node_quantity'  style='margin-left:5%;width:50px;'>0</a>
+            <a class='data_info' id='edge_quantity'  style='margin-left:15%;width:70px;'>0</a>
+            <a class='data_info' id='attr_quantity'  style='margin-left:15%;width:50px;'>0</a>
         </div>
 
     </div>
@@ -68,20 +68,22 @@
         <div id='controlInner'>
             <div id='headline'><a id='headline_b'>Model Parameter</a></div>
 
-
             <div class='slider_out'>
                 <span class='slider_span'>WT:
                 </span>
                 <input type="text" id="times_text" class='slider_input' value=5>
                 <div id='walk_times' class='slider'></div>
+                <span class='rangeLeft'>35</span>
             </div>
+            
             <div class='slider_out'>
                 <span class='slider_span'>WL:
                 </span>
                 <input type="text" id="length_text" class='slider_input' value=5>
                 <div id='walk_length' class='slider'></div>
+                <span class='rangeLeft'>35</span>
             </div>
-            <div id='radio_out'>
+            {{!-- <div id='radio_out'>
                 <span class='slider_span'>RT:</span>
                 <div class="custom-control custom-radio custom-control-inline" style='margin:5% 1% 0 5%;color:gray'>
                     <input type="radio" id="ret_True" name="customRadioInline_return" class="custom-control-input">
@@ -93,11 +95,12 @@
                         checked=True>
                     <label class="custom-control-label" for="ret_False">False</label>
                 </div>
-            </div>
+            </div> --}}
 
             <div class='btn_out'>
                 <button id="confirm" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Confirm</button>
             </div>
+
         </div>
 
 
@@ -136,10 +139,7 @@
                 <div class='tuli' style='background-color:#00D8FF'></div>
 
             </div> --}}
-            <div class='btn_out'>
-                <button id="confirm" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Confirm</button>
-            </div>
-
+            <button id="confirm" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Confirm</button>
         </div>
     </div>
 
@@ -147,6 +147,7 @@
         <div id="headLine">
             <a id='headline_a'>Tree View</a>
         </div>
+        <button id="confirm_cluster" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">confirm</button>
         <svg id='svg_tree'></svg>
     </div>
 </div>
@@ -158,7 +159,7 @@
             <a id='headline_a'>Abstraction View</a>
         </div>
         <svg id='svg_force'></svg>
-        <div id='innerTopo'  class="custom-control custom-checkbox">
+        <div id='innerTopo' class="custom-control custom-checkbox">
             <input type="checkbox" class="custom-control-input" id="topo">
             <label class="custom-control-label" for="topo" id="citedLabel" style='color:gray'>Inner Topology</label>
         </div>
@@ -226,7 +227,6 @@
         <div id="headLine">
             <a id='headline_a'>Parallel View</a>
         </div>
-        <button id="confirm_cluster" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">confirm</button>
         <svg id='svg_parallel'></svg>
     </div>
 
