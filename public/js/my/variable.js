@@ -7,6 +7,9 @@ let variable = (function () {
     let all_data; //所有参数的集合
     let type_count = 1; //选择了几个属性
     let attr = '1';
+    let w1 = 1,
+        w2 = 5,
+        w3 = 0.1;
     let color_arr = ['#FF57D9', '#EB590C', '#FFD105', '#42F005', '#23FFE8']
     let attrValue_dict = {}
     let valueIds_dict = {}; //每个属性值对应点数组的字典
@@ -110,6 +113,9 @@ let variable = (function () {
         color_arr,
         valueIds_dict,
         oriAttrName_dict,
-        yearPhase_dict
+        yearPhase_dict,
+        w1,
+        w2,
+        w3
     }
 })()

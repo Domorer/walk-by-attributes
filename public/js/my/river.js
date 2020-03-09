@@ -1,17 +1,22 @@
 let riverView = (function () {
-    let value_arr = [], river_g, clusterArr_record = [];
+    let value_arr = [],
+        river_g, clusterArr_record = [];
     let symbol_g, directLine_g;
+
     function Cal(data, cluster_arr, symbol, node) {
-        //当前选中的时间段数组
-        let tmp_attrs = variable.param.comb.split('_');
-        tmp_attrs.shift()
-        let children_dict = data['children_dict'], level_dict = data['level_dict'] //每个层拥有的所有id集合的字典;
+
+        let children_dict = data['children_dict']
         console.log('cluster_arr: ', cluster_arr);
         //各个类间连线的流量总和、各个类的选中属性的 类内流量占比 之和, 统计数值数组
-        let cluBtLink_wt_dict = {}, cluRatio_dict = {}, value_dict = { inner: 0, interval: 0, clusterCounts: 0 };
+        let value_dict = {
+                'sc': 0,
+                'ah': 0,
+                'ts': 0
+            };
         //遍历树，获取当前节点所连的所有末端节点的集合
         let dfs = function (root) {
-            var arr = [], res = [];
+            var arr = [],
+                res = [];
             if (root != null) {
                 arr.push(root);
             }
@@ -35,96 +40,90 @@ let riverView = (function () {
             let tmp_topNode = cluster_arr[i];
             cluster_ids_dict[tmp_topNode] = dfs(children_dict[tmp_topNode]);
         }
-        // console.log('cluster_ids_dict: ', cluster_ids_dict);
-        //计算站点的所在类字典
-        let id_cluster_dict = {}, index = 0;
+
+        //***计算每个簇内的所有连线的字典*****
+        let clu_tpg = {};
+        console.time('XX')
+        //使用字典对比法
         for (let key in cluster_ids_dict) {
+            clu_tpg[key] = [];
             for (let i = 0; i < cluster_ids_dict[key].length; i++) {
-                id_cluster_dict[cluster_ids_dict[key][i]] = { cluster: key, index: index }
-            }
-            index += 1;
-        }
-
-        //*************计算各个簇之间的选中时间段的流量的权重字典*************
-        for (let i = 0; i < variable.oriLinks.length; i++) {
-            let tmp_link = variable.oriLinks[i];
-            //判断当前连线是否存在于本次游走的数据集内
-            if (id_cluster_dict[tmp_link['source']] != null && id_cluster_dict[tmp_link['target']] != null) {
-                let s_cluster = id_cluster_dict[tmp_link['source']].cluster,
-                    t_cluster = id_cluster_dict[tmp_link['target']].cluster;
-                let tmp_cluLink_key = s_cluster + '-' + t_cluster;  //当前簇之间的连线
-                let tmp_StLink_key = tmp_link['source'] + '_' + tmp_link['target'];//当前轨迹
-                // let tmp_value = variable.period_dict[tmp_StLink_key]
-                let tmp_value = 1;
-                //如果当前簇连线已经存在
-                if (cluBtLink_wt_dict[tmp_cluLink_key] != null) {
-                    //当前时间段流量相加
-                    for (let a = 0; a < tmp_attrs.length; a++)
-                        // cluBtLink_wt_dict[tmp_cluLink_key] += tmp_value[a];
-                        cluBtLink_wt_dict[tmp_cluLink_key] += 1
-                }
-                else {
-                    cluBtLink_wt_dict[tmp_cluLink_key] = 0;
-                    for (let a = 0; a < tmp_attrs.length; a++)
-                        // cluBtLink_wt_dict[tmp_cluLink_key] += tmp_value[a];
-                        cluBtLink_wt_dict[tmp_cluLink_key] += 1
+                if (variable.oriLink_dict[cluster_ids_dict[key][i]] != null) {
+                    let tmp_targets = variable.oriLink_dict[cluster_ids_dict[key][i]];
+                    for (let j = 0; j < tmp_targets.length; j++) {
+                        if (cluster_ids_dict[key].indexOf(tmp_targets[j]) != -1) {
+                            // let tmp_value = variable.period_dict[cluster_ids_dict[key][i] + '_' + tmp_targets[j]]
+                            let tmp_value = 1
+                            clu_tpg[key].push({
+                                'source': cluster_ids_dict[key][i],
+                                'target': tmp_targets[j],
+                                value: tmp_value
+                            })
+                        }
+                    }
                 }
             }
         }
-        //通过判断连线键值的始末cluster相同来区分类内和类间流量
-        let tmp_key;
-        for (let key in cluBtLink_wt_dict) {
-            tmp_key = key.split('-')
-            if (tmp_key[0] == tmp_key[1]) {
-                value_dict['inner'] += cluBtLink_wt_dict[key];
-            } else {
-                value_dict['interval'] += cluBtLink_wt_dict[key]
-            }
+
+        //计算一下
+        let innerLinks_count = 0
+        //计算所有类内连边的数量
+        for (let key in clu_tpg) {
+            innerLinks_count += clu_tpg[key].length
         }
+        //计算每个聚类当前属性的信息熵
 
-        //循环每个类内，计算类内的所有点的 与类内连线的流量除于总流量的比值 的均值
-        // console.log('cluster_ids_dict: ', cluster_ids_dict);
-        // for (let clu = 0; clu < cluster_arr.length; clu++) {
-        //     let attrs_value = new Array(5).fill(0);
-        //     let tmp_ids = cluster_ids_dict[cluster_arr[clu]]
+        let nodeCounts = 0;
+        for (let clu in cluster_ids_dict)
+            nodeCounts += cluster_ids_dict[clu].length
+        let entropy = 0;
+        for (let clu in cluster_ids_dict) {
+            let tmp_entropy = 0,
+                valueProb_dict = {}
+            for (let i = 0; i < cluster_ids_dict[clu].length; i++) {
+                let tmp_id = cluster_ids_dict[clu][i],
+                    tmp_attrValue = variable.nodeInfo[tmp_id][variable.attr]
+                if ((tmp_attrValue in valueProb_dict) == false)
+                    valueProb_dict[tmp_attrValue] = 1
+                else
+                    valueProb_dict[tmp_attrValue] += 1
+            }
+            for (let attr in valueProb_dict) {
+                let tmp_Prob = valueProb_dict[attr] / cluster_ids_dict[clu].length
+                tmp_entropy += tmp_Prob * Math.log2(tmp_Prob)
+            }
+            /*计算出该类的信息熵后，乘以该类点数占比
+             */
+            entropy += tmp_entropy * (cluster_ids_dict[clu].length / nodeCounts)
+        }
+        console.log("functionmodify_cluster -> entropy", -entropy * variable.w2)
 
-        //     for (let i = 0; i < tmp_ids.length; i++) {
-        //         let tmp_targets = variable.station_links_dict[tmp_ids[i]];
-        //         let inner_value = new Array(5).fill(0), outer_value = new Array(5).fill(0);
-        //         for (let j = 0; j < tmp_targets.length; j++) {
-        //             let tmp_link_key = Math.min(parseInt(tmp_ids[i]), parseInt(tmp_targets[j])) + '_' + Math.max(parseInt(tmp_ids[i]), parseInt(tmp_targets[j]));
-        //             if (tmp_ids.indexOf(tmp_targets[j]) != -1)
-        //                 for (let a = 0; a < 5; a++)
-        //                     inner_value[a] += variable.period_dict[tmp_link_key][a]
-        //             if (tmp_ids.indexOf(tmp_targets[j]) == -1)
-        //                 for (let a = 0; a < 5; a++)
-        //                     outer_value[a] += variable.period_dict[tmp_link_key][a]
-        //         }
-        //         let ratio_arr = new Array(5);
-        //         for (let a = 0; a < tmp_attrs.length; a++) {
-        //             if (inner_value[a] == 0 && outer_value[a] == 0)
-        //                 ratio_arr[a] = 0;
-        //             else
-        //                 ratio_arr[a] = inner_value[a] / (inner_value[a] + outer_value[a])
-        //         }
 
-        //         for (let a = 0; a < ratio_arr.length; a++) {
-        //             attrs_value[a] += ratio_arr[a] / tmp_ids.length;
-        //         }
-        //     }
-        //     for (let a = 0; a < tmp_attrs.length; a++) {
-        //         value_dict['ratioSum'] += attrs_value[parseInt(tmp_attrs[a])] / cluster_arr.length
-        //     }
-        // }
-        value_dict['inner'] = 1 / value_dict['inner']  //类内流量取倒数
-        value_dict['clusterCounts'] = 1 / cluster_arr.length; // 当前类的数量的倒数
-        value_dict['symbol'] = symbol;  //保存本次操作的标志
-        value_dict['node'] = node;  //保存操作的节点ID
+        let densityValue = variable.w1 * (1 - innerLinks_count / variable.oriLinks.length)
+        console.log("functionmodify_cluster -> densityValue", densityValue)
+        let finalValue = densityValue - variable.w2 * entropy
+        console.log("functionmodify_cluster -> finalValue", finalValue)
+
+
+
+        value_dict['sc'] = densityValue  //w1
+        value_dict['ah'] = -entropy * variable.w2 // w2
+        value_dict['ts'] = variable.w3 * cluster_arr.length  // w3
+        value_dict['symbol'] = symbol; //保存本次操作的标志
+        value_dict['node'] = node; //保存操作的节点ID
         value_dict['cluster_arr'] = clusterFun.deepCopy(cluster_arr); //保存本次操作结果的cluster_arr
         riverView.value_arr.push(value_dict)
     }
+
     function modifyRiver(data, cluster_arr, separate, node) {
-        let colorSelected = { fill: '#ff957c', stroke: '#ff4416' }, colorOri = { fill: '#B6E9FF', stroke: '#329CCB' }
+        let colorSelected = {
+                fill: '#ff957c',
+                stroke: '#ff4416'
+            },
+            colorOri = {
+                fill: '#B6E9FF',
+                stroke: '#329CCB'
+            }
         console.log('cluster_arr: ', cluster_arr);
         //将当前的类数组存入record
         riverView.clusterArr_record.push(cluster_arr);
@@ -136,16 +135,16 @@ let riverView = (function () {
         let svg_width = $("#svg_tree")[0].scrollWidth;
         let svg_height = $("#svg_tree")[0].scrollHeight;
         //计算当前的最值，用于设置比例尺
-        let max_inner = d3.max(riverView.value_arr, d => d['inner']),
-            max_interval = d3.max(riverView.value_arr, d => d['interval']),
-            max_counts = d3.max(riverView.value_arr, d => d['clusterCounts'])
+        let max_inner = d3.max(riverView.value_arr, d => d['sc']),
+            max_interval = d3.max(riverView.value_arr, d => d['ah']),
+            max_counts = d3.max(riverView.value_arr, d => d['ts'])
 
         let innerScale = d3.scaleLinear()
             .domain([0, max_inner])
-            .range([0, 0.1 * svg_height])
+            .range([0, 0.05 * svg_height])
         let intervalScale = d3.scaleLinear()
             .domain([0, max_interval])
-            .range([0, 0.1 * svg_height])
+            .range([0, 0.05 * svg_height])
         let countScale = d3.scaleLinear()
             .domain([0, max_counts])
             .range([0, 0.05 * svg_height])
@@ -155,28 +154,34 @@ let riverView = (function () {
             .y1(d => d.y)
             .y0(d => d.y0)
             .curve(d3.curveCatmullRom)
-        let area_arr = [[], [], []];
-        //计算坐标，类内流量位于上方，类间流量位于下方
+        let area_arr = [
+            [],
+            [],
+            []
+        ];
+        //计算坐标，从下到上 w3  w2  w1
         for (let i = 0; i < riverView.value_arr.length; i++) {
             let tmp_inner = {
-                'type': 'inner',
-                value: riverView.value_arr[i]['inner'],
-                x: i * (svg_width * 0.7) / (tree_view.modifyCount - 1) + 10,
-                y: 0.3 * svg_height - innerScale(riverView.value_arr[i]['inner']),
-                y0: 0.3 * svg_height
-            }, tmp_interval = {
-                'type': 'interval',
-                value: riverView.value_arr[i]['interval'],
-                x: i * (svg_width * 0.7) / (tree_view.modifyCount - 1) + 10,
-                y: tmp_inner.y - intervalScale(riverView.value_arr[i]['interval']),
-                y0: tmp_inner.y
-            }, tmp_counts = {
-                'type': 'clusterCounts',
-                value: riverView.value_arr[i]['clusterCounts'],
-                x: i * (svg_width * 0.7) / (tree_view.modifyCount - 1) + 10,
-                y: tmp_interval.y - countScale(riverView.value_arr[i]['clusterCounts']),
-                y0: tmp_interval.y
-            }
+                    'type': 'sc',
+                    value: riverView.value_arr[i]['sc'],
+                    x: i * (svg_width * 0.8) / (tree_view.modifyCount - 1) + 10,
+                    y: 0.3 * svg_height - countScale(riverView.value_arr[i]['ts']),
+                    y0: 0.3 * svg_height
+                },
+                tmp_interval = {
+                    'type': 'ah',
+                    value: riverView.value_arr[i]['ah'],
+                    x: i * (svg_width * 0.8) / (tree_view.modifyCount - 1) + 10,
+                    y: tmp_inner.y - intervalScale(riverView.value_arr[i]['ah']),
+                    y0: tmp_inner.y
+                },
+                tmp_counts = {
+                    'type': 'ts',
+                    value: riverView.value_arr[i]['ts'],
+                    x: i * (svg_width * 0.8) / (tree_view.modifyCount - 1) + 10,
+                    y: tmp_interval.y - innerScale(riverView.value_arr[i]['sc']),
+                    y0: tmp_interval.y
+                }
             area_arr[0].push(tmp_inner)
             area_arr[1].push(tmp_interval)
             area_arr[2].push(tmp_counts)
@@ -196,7 +201,7 @@ let riverView = (function () {
                 symbol: riverView.value_arr[i].symbol,
                 node: riverView.value_arr[i].node,
                 x: i * (svg_width * 0.7) / (tree_view.modifyCount - 1) + 10,
-                y: 0.02 * svg_height,
+                y: 0.12 * svg_height,
                 cluster_arr: riverView.value_arr[i].cluster_arr
             };
             symbol.push(tmp_dict)
@@ -206,8 +211,7 @@ let riverView = (function () {
         //新添加标志
         riverView.symbol_g.append('path')
             .attr('d', d3.symbol().type(symbol[symbol.length - 1].symbol).size(50))
-            .attr('transform', `translate(${symbol[symbol.length - 1].x},${symbol[symbol.length - 1].y})`
-            )
+            .attr('transform', `translate(${symbol[symbol.length - 1].x},${symbol[symbol.length - 1].y})`)
             .attr('fill', 'blue')
 
         //修改就标志的位置
@@ -226,14 +230,14 @@ let riverView = (function () {
                 variable.svg_tree.selectAll('.node')
                     .transition()
                     .duration(1000)
-                    .attr('fill', colorOri.fill)
-                    .attr('stroke', colorOri.stroke)
+                    .attr('fill', colorOri.stroke)
+                    // .attr('stroke', colorOri.stroke)
                 for (let n = 0; n < variable.cluster_arr.length; n++) {
                     d3.select('#tree_' + variable.cluster_arr[n])
                         .transition()
                         .duration(1000)
-                        .attr('fill', colorSelected.fill)
-                        .attr('stroke', colorSelected.stroke)
+                        .attr('fill', colorSelected.stroke)
+                        // .attr('stroke', colorSelected.stroke)
                 }
 
                 //修改断层线
@@ -320,9 +324,9 @@ let riverView = (function () {
         Cal(data, cluster_arr, null, null);
         riverView.clusterArr_record.push([]);
         //计算当前的最值，用于设置比例尺
-        let max_inner = d3.max(riverView.value_arr, d => d['inner']),
-            max_interval = d3.max(riverView.value_arr, d => d['interval']),
-            max_counts = d3.max(riverView.value_arr, d => d['clusterCounts'])
+        let max_inner = d3.max(riverView.value_arr, d => d['sc']),
+            max_interval = d3.max(riverView.value_arr, d => d['sh']),
+            max_counts = d3.max(riverView.value_arr, d => d['ts'])
 
 
         let innerScale = d3.scaleLinear()
@@ -339,7 +343,11 @@ let riverView = (function () {
             .x(0)
             .y1(0)
             .y0(0.2 * svg_height)
-        let area_arr = [[], [], []];
+        let area_arr = [
+            [],
+            [],
+            []
+        ];
         // for (let i = 0; i < riverView.value_arr.length; i++) {
         //     area_arr[0].push({ 'type': 'inner', value: riverView.value_arr[i]['inner'] })
         //     area_arr[1].push({ 'type': 'interval', value: riverView.value_arr[i]['interval'] })
@@ -356,8 +364,14 @@ let riverView = (function () {
 
 
         //绘制比例尺
-        let yAxis = [[10, 0.3 * svg_height], [10, 0.08 * svg_height]],
-            xAxis = [[10, 0.3 * svg_height], [svg_width * 0.7 + 10, 0.3 * svg_height]]
+        let yAxis = [
+                [10, 0.3 * svg_height],
+                [10, 0.14 * svg_height]
+            ],
+            xAxis = [
+                [10, 0.3 * svg_height],
+                [svg_width * 0.8 + 10, 0.3 * svg_height]
+            ]
         let axisLine = d3.line()
             .x(d => d[0])
             .y(d => d[1])
@@ -372,7 +386,7 @@ let riverView = (function () {
 
         variable.svg_tree.append('text')
             .attr('x', 10)
-            .attr('y', 0.05 * svg_height)
+            .attr('y', 0.13 * svg_height)
             .attr('color', 'gray')
             .attr('font-size', '0.7em')
             .style('text-anchor', 'start')
@@ -380,26 +394,26 @@ let riverView = (function () {
         riverView.symbol_g = variable.svg_tree.append('g')
         riverView.directLine_g = variable.svg_tree.append('g')
         //添加图例
-        let text_x = 0.8 * svg_width,
+        let text_x = 0.93 * svg_width,
             y_space = 0.05 * svg_height,
-            text_sy = 0.1 * svg_height,
-            rect_sy = 0.070 * svg_height;
-        let labels = ['Label Cost', 'Data Cost', 'Smooth Cost']
+            text_sy = 0.10 * svg_height,
+            rect_sy = 0.10 * svg_height;
+        let labels = ['SC', 'AH', 'TS']
         variable.svg_tree.append('g').selectAll('text').data(labels).enter()
             .append('text')
             .attr('x', text_x)
-            .attr('y', (d, i) => text_sy + i * y_space)
+            .attr('y', (d, i) => text_sy + i * y_space + 10)
             .text(d => d)
             .attr('font-weight', 500)
-            .attr('fill','#999')
-            .attr('font-size', '0.9em')
+            .attr('fill', '#999')
+            .attr('font-size', '0.8em')
 
         variable.svg_tree.append('g').selectAll('rect').data(labels).enter()
             .append('rect')
             .attr('x', text_x - 20)
             .attr('y', (d, i) => rect_sy + i * y_space)
-            .attr('height', 15)
-            .attr('width', 15)
+            .attr('height', 12)
+            .attr('width', 12)
             .attr('rx', 5)
             .attr('ry', 5)
             .attr('fill', (d, i) => river_color[i])

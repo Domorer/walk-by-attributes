@@ -59,7 +59,7 @@ let tree_view = (function () {
         let iter_data = getChildren(top_node)
         let hierarchyData = d3.hierarchy(iter_data).sum(d => d.value ? 1 : 0);
         let tree = d3.tree()
-            .size([svg_width - 20, 0.6 * svg_height]);
+            .size([svg_width - 20, 0.45 * svg_height]);
 
         //获取数据结构字典数据，最高层为最外层数据
         let treeData = tree(hierarchyData);
@@ -76,8 +76,7 @@ let tree_view = (function () {
         //设置线宽、透明度、圆半径的比例尺
         let LWScale = d3.scaleLinear().domain([0, treeData.height]).range([2, 3])
         let OPScale = d3.scaleLinear().domain([0, treeData.height]).range([0.5, 1])
-        let RScale = d3.scaleLinear().domain([0, treeData.height]).range([0.5, 5])
-
+        let RScale = d3.scaleLinear().domain([0, treeData.height]).range([2.5, 5])
         let g = svg_tree.append('g').attr('transform', `translate(10,${0.37 * svg_height})`)
         g.selectAll('.link').data(links).enter()
             .append('path')
@@ -97,15 +96,15 @@ let tree_view = (function () {
             .attr('r', d => RScale(d.height))
             .attr('fill', d => {
                 if (level_dict[variable.level].indexOf(d.data.name) != -1)
-                    return colorSelected.fill
-                return colorOri.fill
-            })
-            .attr('stroke', d => {
-                if (level_dict[variable.level].indexOf(d.data.name) != -1)
                     return colorSelected.stroke
                 return colorOri.stroke
             })
-            .attr('stroke-width', d => LWScale(d.height))
+            // .attr('stroke', d => {
+            //     if (level_dict[variable.level].indexOf(d.data.name) != -1)
+            //         return colorSelected.stroke
+            //     return colorOri.stroke
+            // })
+            // .attr('stroke-width', d => LWScale(d.height))
             .attr('id', d => 'tree_' + d.data.name)
             .on('click', function (d) {
                 // console.log('d: ', d);
@@ -130,8 +129,8 @@ let tree_view = (function () {
                         d3.select('#tree_' + parent[p])
                             .transition()
                             .duration(1000)
-                            .attr('fill', colorOri.fill)
-                            .attr('stroke', colorOri.stroke)
+                            .attr('fill', colorOri.stroke)
+                            // .attr('stroke', colorOri.stroke)
                         tmp_parentId = parent[p];
                     }
                 }
@@ -149,8 +148,8 @@ let tree_view = (function () {
                             d3.select('#tree_' + levelIds[i])
                                 .transition()
                                 .duration(1000)
-                                .attr('fill', colorSelected.fill)
-                                .attr('stroke', colorSelected.stroke)
+                                .attr('fill', colorSelected.stroke)
+                                // .attr('stroke', colorSelected.stroke)
                             variable.cluster_arr.push(levelIds[i]);
                         }
                     }
@@ -166,8 +165,8 @@ let tree_view = (function () {
                         d3.select('#tree_' + children[c])
                             .transition()
                             .duration(1000)
-                            .attr('fill', colorOri.fill)
-                            .attr('stroke', colorOri.stroke)
+                            .attr('fill', colorOri.stroke)
+                            // .attr('stroke', colorOri.stroke)
                     }
                 }
                 //如果当前操作属于合并，则将当前节点加入类数组
@@ -175,8 +174,8 @@ let tree_view = (function () {
                     d3.select('#tree_' + d.data.name)
                         .transition()
                         .duration(1000)
-                        .attr('fill', colorSelected.fill)
-                        .attr('stroke', colorSelected.stroke)
+                        .attr('fill', colorSelected.stroke)
+                        // .attr('stroke', colorSelected.stroke)
                     variable.cluster_arr.push(d.data.name);
 
                 }
@@ -184,7 +183,8 @@ let tree_view = (function () {
                 console.log('separate: ', separate);
                 let tmp_info = { name: d.data.name, x: d.x + 10, y: d.y + 0.37 * svg_height };
                 riverView.modifyRiver(data, variable.cluster_arr, separate, tmp_info)
-
+                
+                
 
             })
 
@@ -210,10 +210,11 @@ let tree_view = (function () {
         tree_view.levelLine_g = svg_tree.append('g')
         tree_view.levelLine_g.append('path')
             .attr('d', line(level_line))
-            .attr('stroke', 'gray')
-            .attr('fill','none')
-            .attr('stroke-width', 2)
-            .attr('stroke-dasharray', '4 4')
+            .style('stroke', 'gray')
+            .style('fill','none')
+            .style('stroke-opacity', .5)
+            .style('stroke-width', 2)
+            .style('stroke-dasharray', '4 4')
             .attr('transform', `translate(10,${0.37 * svg_height})`)
     }
 

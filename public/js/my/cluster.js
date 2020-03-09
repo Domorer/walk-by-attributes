@@ -3,6 +3,7 @@ let clusterFun = (function () {
         console.log('cluster_ids: ', cluster_ids);
         console.log('level: ', level);
         let children_dict = data['children_dict'], level_dict = data['level_dict'];
+        //判断是否为null,来确定使用的cluster集合
         let cluster_arr = cluster_ids ? cluster_ids : level_dict[level];
         console.log('cluster_arr: ', cluster_arr);
         variable.cluster_arr = deepCopy(cluster_arr);
@@ -100,6 +101,7 @@ let clusterFun = (function () {
         //     }
         // }
         variable.clu_tpg = clu_tpg;
+        console.log("cluster -> variable.clu_tpg", variable.clu_tpg)
         console.timeEnd('XX');
     }
 

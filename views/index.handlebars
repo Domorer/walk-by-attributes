@@ -54,9 +54,9 @@
         </div>
 
         <div style='disply:block;color:rgb(124, 124, 124)'>
-            <a class='data_info' id='node_quantity'  style='margin-left:5%;width:50px;'>0</a>
-            <a class='data_info' id='edge_quantity'  style='margin-left:15%;width:70px;'>0</a>
-            <a class='data_info' id='attr_quantity'  style='margin-left:15%;width:50px;'>0</a>
+            <a class='data_info' id='node_quantity' style='margin-left:5%;width:50px;'>0</a>
+            <a class='data_info' id='edge_quantity' style='margin-left:15%;width:70px;'>0</a>
+            <a class='data_info' id='attr_quantity' style='margin-left:15%;width:50px;'>0</a>
         </div>
 
     </div>
@@ -67,21 +67,22 @@
         </div>
         <div id='controlInner'>
             <div id='headline'><a id='headline_b'>Model Parameter</a></div>
+            <span id='rangeLeft1'>10</span>
+            <span id='rangeRight1'>30</span>
 
             <div class='slider_out'>
                 <span class='slider_span'>WT:
                 </span>
-                <input type="text" id="times_text" class='slider_input' value=5>
+                <input type="text" id="times_text" class='slider_input' value=10>
                 <div id='walk_times' class='slider'></div>
-                <span class='rangeLeft'>35</span>
             </div>
-            
+            <span id='rangeLeft2'>15</span>
+            <span id='rangeRight2'>40</span>
             <div class='slider_out'>
                 <span class='slider_span'>WL:
                 </span>
-                <input type="text" id="length_text" class='slider_input' value=5>
+                <input type="text" id="length_text" class='slider_input' value=20>
                 <div id='walk_length' class='slider'></div>
-                <span class='rangeLeft'>35</span>
             </div>
             {{!-- <div id='radio_out'>
                 <span class='slider_span'>RT:</span>
@@ -147,7 +148,51 @@
         <div id="headLine">
             <a id='headline_a'>Tree View</a>
         </div>
-        <button id="confirm_cluster" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">confirm</button>
+        <div id='buttonList'>
+            <div class="dropdown dropdownList" id='dropdown'>
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="button_w1"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                    style='font-size:0.8em;padding:.0rem .5rem;'>
+                    w1: 1
+                </button>
+                <div class="dropdown-menu downList" aria-labelledby="dropdownMenuButton" id='w1'>
+                    <a class="dropdown-item" href="#" value=1>1</a>
+                    <a class="dropdown-item" href="#" value=2>2</a>
+                    <a class="dropdown-item" href="#" value=3>3</a>
+                </div>
+            </div>
+            <div class="dropdown dropdownList" id='dropdown'>
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="button_w2"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                    style='font-size:0.8em;padding:.0rem .5rem;'>
+                    w2: 5
+                </button>
+                <div class="dropdown-menu downList" aria-labelledby="dropdownMenuButton" id='w2'>
+                     <a class="dropdown-item" href="#" value=5>5</a>
+                    <a class="dropdown-item" href="#" value=6>6</a>
+                    <a class="dropdown-item" href="#" value=7>7</a>
+                </div>
+            </div>
+            <div class="dropdown dropdownList" id='dropdown'>
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="button_w3"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                    style='font-size:0.8em;padding:.0rem .5rem;'>
+                    w3: 0.1
+                </button>
+                <div class="dropdown-menu downList" aria-labelledby="dropdownMenuButton" id='w3'>
+                     <a class="dropdown-item" href="#" value=0.1>0.1</a>
+                    <a class="dropdown-item" href="#" value=0.2>0.2</a>
+                    <a class="dropdown-item" href="#" value=0.3>0.3</a>
+                </div>
+            </div>
+            <button id="em" class="btn btn-outline-secondary my-2 my-sm-0 tree_button" type="submit">em</button>
+            <button id="confirm_cluster" class="btn btn-outline-secondary my-2 my-sm-0 tree_button"
+                type="submit">confirm</button>
+
+        </div>
+
+
+
         <svg id='svg_tree'></svg>
     </div>
 </div>
@@ -212,15 +257,7 @@
 
         {{!-- <button id="toHeatmap" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">HeatMap</button> --}}
 
-        <div class="dropdown" id='dropdown'>
-            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                style='font-size:0.8em;padding:.0rem .5rem;'>
-                walk combination
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id='options' style='min-width:9rem;'>
-            </div>
-        </div>
+
     </div>
 
     <div id='ParallelDiv'>

@@ -296,7 +296,10 @@ let forceChart = (function () {
             lineW_extent = [];
         let color = d3.scaleOrdinal(d3.schemeCategory20);
 
-        //*********统计每个簇内的点数量, 赋值给value**********
+        /*********统计每个簇内的点数量, 赋值给value    
+                半径映射点的数量
+                颜色深浅映射密度
+        */
         for (let key in clusterids_dict) {
             let tmp_dict = {};
             tmp_dict['id'] = key;
@@ -318,7 +321,7 @@ let forceChart = (function () {
             return d.density;
         })
         let dScale = d3.scaleLinear().domain(d_extent).range([0, 1])
-        let colorDensity = d3.interpolateRgb('#f1f4ff', '#2e5eff')
+        let colorDensity = d3.interpolateRgb('#a4b9ff', '#0740ff')
         let rScale = d3.scaleLinear().domain(r_extent).range([5, 20]);
         //***********统计每条连线的权重************
 
@@ -358,7 +361,7 @@ let forceChart = (function () {
 
         //设置力的作用
         let simulation = d3.forceSimulation(cluster_nodes)
-            .force("charge", d3.forceManyBody().strength(-3500).distanceMax(300))
+            .force("charge", d3.forceManyBody().strength(-3500).distanceMax(100))
             .force("link", d3.forceLink(cluster_links).id(d => d.id))
             .force("center", d3.forceCenter(forceWidth / 2, forceHeight / 2))
 
@@ -404,14 +407,47 @@ let forceChart = (function () {
             .attr('id', function (d) {
                 return d.source + '_' + d.target;
             })
+        //最外层大圆环
 
+        let nodeOut = variable.svg_force.append('g').attr('class', 'node')
+            .selectAll('circle')
+            .data(cluster_nodes)
+            .enter()
+            .append('circle')
+            .attr('r', function (d) {
+                return rScale(d.value) * 2.5;
+            })
+            .style('fill', 'white')
+            .style('fill-opacity', 0)
+            .style('stroke', 'red')
+            .style('stroke-opacity', 0)
+            .style('stroke-width', 2)
+            .attr('class', function (d) {
+                return 'clusterOut_node';
+            }).attr('id', d => 'clusterOut_' + d.id)
 
+        //背景白圆
 
-        //画点
-        let node = variable.svg_force.append('g').attr('class', 'node').selectAll('circle').data(cluster_nodes).enter()
+        let nodeBack = variable.svg_force.append('g').attr('class', 'node')
+            .selectAll('circle')
+            .data(cluster_nodes)
+            .enter()
             .append('circle')
             .attr('r', function (d) {
                 return rScale(d.value);
+            })
+            .style('fill', 'white')
+            .style('stroke', 'black')
+            .style('stroke-width', 1)
+            .attr('class', function (d) {
+                return 'clusterBack_node';
+            }).attr('id', d => 'clusterBack_' + d.id)
+
+        //实心点
+        let node = variable.svg_force.append('g').attr('class', 'node').selectAll('circle').data(cluster_nodes).enter()
+            .append('circle')
+            .attr('r', function (d) {
+                return rScale(d.value) * 3 / 5;
             })
             .attr('stroke', function (d) {
                 return colorDensity(dScale(d.density));
@@ -425,19 +461,20 @@ let forceChart = (function () {
                 parallel.changeWidth(d.id)
                 if (variable.last_cluster != undefined) {
                     d3.select('#svg_parallel').selectAll('path')
-                        .style('opacity', .05   )
+                        .style('opacity', .05)
                         .style('stroke-width', 1)
                         .style('stroke', '#e3e3e3')
                     d3.select('#area_' + variable.last_cluster).attr('fill', '#D5E2FF');
-                    d3.select('#cluster_' + variable.last_cluster)
-                        .attr('fill', d => colorDensity(dScale(d.density)));
+                    d3.select('#clusterOut_' + variable.last_cluster)
+                        .style('stroke-opacity', 0)
                 }
                 d3.selectAll('.parallelClass_' + d.id)
                     .style('opacity', 1)
                     .style('stroke-width', 2)
                     .style('stroke', '#8a8a8a')
                 d3.select('#area_' + d.id).attr('fill', '#E83A00');
-                d3.select('#cluster_' + d.id).attr('fill', '#E83A00');
+                d3.select('#clusterOut_' + d.id)
+                    .style('stroke-opacity', 1)
                 /*如果innertopo为选中状态，则点击当前节点就会改变该节点和节点外圈扇形的透明度
                 
                 */
@@ -461,6 +498,9 @@ let forceChart = (function () {
                 // parallel.drawParallel(d.id);
                 // forceChart.drawPie(d.id);
             }).call(drag(simulation))
+
+
+
 
         //画园内的pattern
         //加权随机
@@ -509,7 +549,12 @@ let forceChart = (function () {
             node
                 .attr("cx", d => d.x)
                 .attr("cy", d => d.y);
-
+            nodeOut
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y);
+            nodeBack
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y);
             for (let i = 0; i < pieArr.length; i++) {
                 // pattern_g[i].node.attr('transform', "translate(" + cluster_nodes[i].x + ',' + cluster_nodes[i].y + ')');
                 // pattern_g[i].link.attr('transform', "translate(" + cluster_nodes[i].x + ',' + cluster_nodes[i].y + ')');
@@ -653,7 +698,7 @@ let forceChart = (function () {
             .innerRadius(radius)
             .outerRadius(d => rScale(d.data))
             .cornerRadius(d => (d.outerRadius - d.innerRadius) / 5)
-            .padAngle(.02)
+            .padAngle(.3)
 
         let pie_g = variable.svg_force.append('g').selectAll('path').data(pie_data).enter()
             .append('path')
@@ -680,6 +725,17 @@ let forceChart = (function () {
             .on('click', function (d, i) {
                 console.log(i)
             })
+        //*********** 绘制外面的大圆轮廓***********
+        // let outPie_data = d3.pie()([1])
+        // outPie_data[i].startAngle = 0;
+        // outPie_data[i].endAngle = Math.PI * 2;
+        // outPie_data[i].innerRadius = radius * 2.3;
+        // outPie_data[i].outerRadius = radius * 2.4;
+        // outPie_data[i].class = 'pie_' + cluster;
+
+        // let pie_g = variable.svg_force.append('g').selectAll('path').data(outPie_data).enter()
+        //     .append('path')
+        //     .attr('fill', 'red')
         return pie_g;
     }
 

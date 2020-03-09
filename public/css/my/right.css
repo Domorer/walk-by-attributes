@@ -61,19 +61,7 @@ button#toHeatmap {
 }
 
 
-#dropdownMenuButton {
-    background-color: white;
-    color: gray;
-    border: 0.5px gray solid;
-}
 
-#dropdown {
-    position: absolute;
-    top: 6%;
-    right: 2%;
-    border: none;
-    color: white;
-}
 
 
 
