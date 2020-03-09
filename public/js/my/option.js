@@ -168,7 +168,7 @@ let option = (function () {
         //***********获取当前各参数的选择情况***********
         comb_len = 0; //记录当前选择的属性数量，用于后面key的格式定义
         variable.type_count = 0;
-        variable.attr = 'random';
+        variable.attr = '';
         tree_view.modifyCount = 1
         //循环判断每个checkbox的状态来获取当前的属性选择,如果一个也没选择就代表随机游走
         variable.attr_arr.forEach(Element => {
@@ -183,6 +183,7 @@ let option = (function () {
                 }
             }
         })
+
         console.log('variable.attr: ', variable.attr);
         variable.param['rl'] = false;
         variable.param['comb'] = variable.attr;
@@ -224,6 +225,10 @@ let option = (function () {
         let tmp_value = e.target.getAttribute('value')
         $('#button_w3').text('w3: ' + tmp_value)
         variable.w3 = tmp_value
+    })
+
+    $('#em').on('click', function () {
+        console.log('em')
     })
     //用户自定义的类数组确定按钮
     $('#confirm_cluster').on('click', () => {
@@ -309,48 +314,11 @@ let option = (function () {
         scatter.drawScatter(data['info']);
         forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
 
-        //计算一下
-        let innerLinks_count = 0
-        //计算所有类内连边的数量
-        for (let key in variable.clu_tpg) {
-            innerLinks_count += variable.clu_tpg[key].length
-        }
-        //计算每个聚类当前属性的信息熵
-        let nodeCounts = 0;
-        for (let clu in variable.cluster_ids_dict)
-            nodeCounts += variable.cluster_ids_dict[clu].length
-        let entropy = 0;
-        for (let clu in variable.cluster_ids_dict) {
-            let tmp_entropy = 0,
-                valueProb_dict = {}
-            for (let i = 0; i < variable.cluster_ids_dict[clu].length; i++) {
-                let tmp_id = variable.cluster_ids_dict[clu][i],
-                    tmp_attrValue = variable.nodeInfo[tmp_id][variable.attr]
-                if ((tmp_attrValue in valueProb_dict) == false)
-                    valueProb_dict[tmp_attrValue] = 1
-                else
-                    valueProb_dict[tmp_attrValue] += 1
-            }
-            for (let attr in valueProb_dict) {
-                let tmp_Prob = valueProb_dict[attr] / variable.cluster_ids_dict[clu].length7
-                tmp_entropy += tmp_Prob * Math.log2(tmp_Prob)
-            }
-            /*计算出该类的信息熵后，乘以该类点数占比
-             */
-            entropy += tmp_entropy * (variable.cluster_ids_dict[clu].length / nodeCounts)
-        }
-        console.log("functionmodify_cluster -> entropy", -entropy * variable.w2)
 
-
-        let densityValue = variable.w1 * (1 - innerLinks_count / variable.oriLinks.length)
-        console.log("functionmodify_cluster -> densityValue", densityValue)
-        let finalValue = densityValue - variable.w2 * entropy
-        console.log("functionmodify_cluster -> finalValue", finalValue)
-        //如果不是通过修改断层来修改类数组则需要重绘树图
         if (tree_confirm == false)
             tree_view.draw_tree(data, variable.level);
 
-
+        parallel.drawParallel();
     }
 
     function getCombData(param) {

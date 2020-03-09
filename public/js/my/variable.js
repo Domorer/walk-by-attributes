@@ -7,8 +7,8 @@ let variable = (function () {
     let all_data; //所有参数的集合
     let type_count = 1; //选择了几个属性
     let attr = '1';
-    let w1 = 1,
-        w2 = 5,
+    let w1 = 0.1,
+        w2 = 6,
         w3 = 0.1;
     let color_arr = ['#FF57D9', '#EB590C', '#FFD105', '#42F005', '#23FFE8']
     let attrValue_dict = {}

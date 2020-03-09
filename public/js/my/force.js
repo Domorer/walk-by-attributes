@@ -191,6 +191,9 @@ let forceChart = (function () {
                 return d.id;
             }).call(drag(simulation));
     }
+
+
+
     //绘制簇内点的原始力引导图
     function drawClusterForce(cluster, radius, center_x, center_y) {
 
@@ -671,6 +674,7 @@ let forceChart = (function () {
 
         } else {
 
+
         }
         //计算方差
         // let attrs_value = calVariance(tmp_tpg);
@@ -739,6 +743,7 @@ let forceChart = (function () {
         return pie_g;
     }
 
+
     function calVariance(link_arr) {
         let varianceArr = new Array(5).fill(0),
             ave_arr = new Array(5).fill(0);
@@ -754,7 +759,7 @@ let forceChart = (function () {
         return varianceArr;
     }
 
-
+    //画节点内部的图案
     function drawTopo(topo_type, radius) {
         let topo_nodes = [],
             topo_links = [];

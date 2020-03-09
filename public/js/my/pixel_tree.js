@@ -1,19 +1,31 @@
 let tree_view = (function () {
-    let modifyCount = 1, levelLine_g, cluLoc_dict = {};
+    let modifyCount = 1,
+        levelLine_g, cluLoc_dict = {};
 
     function draw_tree(data, level) {
-        let colorSelected = { fill: '#ff957c', stroke: '#ff4416' }, colorOri = { fill: '#B6E9FF', stroke: '#329CCB' }
+        let colorSelected = {
+                fill: '#ff957c',
+                stroke: '#ff4416'
+            },
+            colorOri = {
+                fill: '#B6E9FF',
+                stroke: '#329CCB'
+            }
         let svg_tree = d3.select('#svg_tree');
         let svg_width = $("#svg_tree")[0].scrollWidth;
         let svg_height = $("#svg_tree")[0].scrollHeight;
         svg_tree.selectAll('*').remove();
 
-        let level_dict = data['level_dict'], children_dict = data['children_dict'];
+        let level_dict = data['level_dict'],
+            children_dict = data['children_dict'];
         let max_level = d3.max(Object.keys(data['level_dict']), d => parseInt(d))
         console.log('max_level: ', max_level);
         let top_node = level_dict[max_level][0];
+
         function getChildren(node) {
-            let tmp_dict = { name: node };
+            let tmp_dict = {
+                name: node
+            };
             if (parseInt(children_dict[node]['level']) > level) {
                 tmp_dict['children'] = [];
                 tmp_dict['children'].push(getChildren(children_dict[node]['left']))
@@ -24,7 +36,8 @@ let tree_view = (function () {
             return tmp_dict;
         }
         let judgeChildren = function (root) {
-            var arr = [], res = [];
+            var arr = [],
+                res = [];
             if (root != null) {
                 arr.push(root);
             }
@@ -42,7 +55,8 @@ let tree_view = (function () {
             return res;
         }
         let judgeParent = function (root) {
-            var arr = [], res = [];
+            var arr = [],
+                res = [];
             if (root.parent != null) {
                 arr.push(root.parent);
             }
@@ -82,8 +96,12 @@ let tree_view = (function () {
             .append('path')
             .attr('class', 'link')
             .attr('d', d3.linkVertical()
-                .x(function (d) { return d.x; })
-                .y(function (d) { return d.y; }))
+                .x(function (d) {
+                    return d.x;
+                })
+                .y(function (d) {
+                    return d.y;
+                }))
             .attr('stroke', '#b1b1b1')
             .attr('stroke-width', d => LWScale(d.source.height))
             .attr('opacity', d => OPScale(d.source.height))
@@ -110,7 +128,9 @@ let tree_view = (function () {
                 // console.log('d: ', d);
                 tree_view.modifyCount += 1
 
-                let parent = [], children = [], separate;
+                let parent = [],
+                    children = [],
+                    separate;
                 parent = judgeParent(d);
                 console.log('parent: ', parent);
                 children = judgeChildren(children_dict[d.data.name]);
@@ -130,7 +150,7 @@ let tree_view = (function () {
                             .transition()
                             .duration(1000)
                             .attr('fill', colorOri.stroke)
-                            // .attr('stroke', colorOri.stroke)
+                        // .attr('stroke', colorOri.stroke)
                         tmp_parentId = parent[p];
                     }
                 }
@@ -139,7 +159,7 @@ let tree_view = (function () {
                     let parent_childrens = judgeChildren(children_dict[tmp_parentId])
                     console.log('parent_childrens: ', parent_childrens);
                     //d.height代表的是层次树的可见高度是第几层，并不是实际上的层次level，所以在获取指定层的点时，需要加上层次树开始可见的level
-                    let levelIds = level_dict[d.height +  level];
+                    let levelIds = level_dict[d.height + level];
                     console.log("functiondraw_tree -> levelIds", levelIds)
                     console.log("functiondraw_tree -> d.height", d.height)
                     console.log('levelIds: ', levelIds);
@@ -149,7 +169,7 @@ let tree_view = (function () {
                                 .transition()
                                 .duration(1000)
                                 .attr('fill', colorSelected.stroke)
-                                // .attr('stroke', colorSelected.stroke)
+                            // .attr('stroke', colorSelected.stroke)
                             variable.cluster_arr.push(levelIds[i]);
                         }
                     }
@@ -166,7 +186,7 @@ let tree_view = (function () {
                             .transition()
                             .duration(1000)
                             .attr('fill', colorOri.stroke)
-                            // .attr('stroke', colorOri.stroke)
+                        // .attr('stroke', colorOri.stroke)
                     }
                 }
                 //如果当前操作属于合并，则将当前节点加入类数组
@@ -175,16 +195,20 @@ let tree_view = (function () {
                         .transition()
                         .duration(1000)
                         .attr('fill', colorSelected.stroke)
-                        // .attr('stroke', colorSelected.stroke)
+                    // .attr('stroke', colorSelected.stroke)
                     variable.cluster_arr.push(d.data.name);
 
                 }
                 console.log('variable.cluster_arr: ', variable.cluster_arr);
                 console.log('separate: ', separate);
-                let tmp_info = { name: d.data.name, x: d.x + 10, y: d.y + 0.37 * svg_height };
+                let tmp_info = {
+                    name: d.data.name,
+                    x: d.x + 10,
+                    y: d.y + 0.37 * svg_height
+                };
                 riverView.modifyRiver(data, variable.cluster_arr, separate, tmp_info)
-                
-                
+
+
 
             })
 
@@ -211,19 +235,90 @@ let tree_view = (function () {
         tree_view.levelLine_g.append('path')
             .attr('d', line(level_line))
             .style('stroke', 'gray')
-            .style('fill','none')
+            .style('fill', 'none')
             .style('stroke-opacity', .5)
             .style('stroke-width', 2)
             .style('stroke-dasharray', '4 4')
             .attr('transform', `translate(10,${0.37 * svg_height})`)
+
+
+        //**********画最底层的矩形*****************
+        let groundFloorClusterNumbers = data['level_dict'][level].length,
+            rects = [],
+            key_arr = ['sc', 'ah', 'ts'],
+            max_Value = -Infinity //点数最多的情况，以此来限制矩形高度
+
+        //判断是否为多属性，若是，则需要修改值计算方式
+        if (true) {
+            for (let i = nodes.length - groundFloorClusterNumbers; i < nodes.length; i++) {
+                let tmp_value_arr = calEnergy(nodes[i].data['name'])
+                for (let j = 0; j < key_arr.length; j++) {
+                    let tmp_rect = {
+                        'x': nodes[i].x,
+                        'y': nodes[i].y + 0.13 * svg_height,
+                        'id': nodes[i].data['name'],
+                        'key': key_arr[j],
+                        'value_arr': tmp_value_arr,
+                        'valueIndex': j
+                    }
+                    if (tmp_value_arr[j] > max_Value)
+                        max_Value = tmp_value_arr[j]
+                    rects.push(tmp_rect)
+                }
+            }
+        } else {
+
+        }
+        //属性值举行的最大高度不超过 0.12*svg_height 的三分之一
+        let heightScale = d3.scaleLinear().domain([0, max_Value]).range([0, 0.04 * svg_height])
+
+        svg_tree.append('g').selectAll('rect').data(rects).enter()
+            .append('rect')
+            .attr('x', d => d.x - 2)
+            .attr('y', d => {
+                //计算之前属性值矩形的总高度
+                let tmpHeight = 0
+                for (let i_ = 0; i_ <= d.valueIndex; i_++) {
+                    tmpHeight += heightScale(d.value_arr[i_])
+                }
+                return d.y - tmpHeight
+            })
+            .attr('height', d => heightScale(d.value_arr[d.valueIndex]))
+            .attr('width', 4)
+            .attr('fill', d => variable.color_arr[d.valueIndex])
+            .attr('transform', `translate(10,${0.37 * svg_height})`)
+        console.log("functiondraw_tree -> rects", rects)
+
     }
 
-    //通过判断节点的children来确定当前选中的类
-    // variable.cluster_arr = [];
-    // for (let i = 0; i < nodes.length; i++) {
-    //     if (nodes[i].children == null)
-    //         variable.cluster_arr.push(nodes[i].data.name);
-    // }
+
+    function calEnergy(cluster) {
+        //判断是单属性还是多属性
+        let attrs_value = new Array()
+
+        if (variable.type_count == 1) {
+            //单属性时，variable.attr 就是属性名称，不是多个属性名称的集合
+            let value_dict = {};
+            for (let i = 0; i < variable.attrValue_dict[variable.attr].length; i++) {
+                value_dict[variable.attrValue_dict[variable.attr][i]] = 0
+            }
+            //遍历当前类内的点，并统计各个属性值都包含几个点
+            let tmp_ids = variable.cluster_ids_dict[cluster];
+
+            for (let i = 0; i < tmp_ids.length; i++) {
+                let tmp_value = variable.nodeInfo[tmp_ids[i]][variable.attr];
+                value_dict[tmp_value] += 1;
+            }
+            for (let key in value_dict) {
+                // console.log(key)
+                attrs_value.push(value_dict[key]);
+            }
+
+        } else {
+
+        }
+        return attrs_value
+    }
 
 
 

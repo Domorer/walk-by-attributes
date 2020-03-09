@@ -9,10 +9,10 @@ let riverView = (function () {
         console.log('cluster_arr: ', cluster_arr);
         //各个类间连线的流量总和、各个类的选中属性的 类内流量占比 之和, 统计数值数组
         let value_dict = {
-                'sc': 0,
-                'ah': 0,
-                'ts': 0
-            };
+            'sc': 0,
+            'ah': 0,
+            'ts': 0
+        };
         //遍历树，获取当前节点所连的所有末端节点的集合
         let dfs = function (root) {
             var arr = [],
@@ -106,9 +106,9 @@ let riverView = (function () {
 
 
 
-        value_dict['sc'] = densityValue  //w1
+        value_dict['sc'] = densityValue //w1
         value_dict['ah'] = -entropy * variable.w2 // w2
-        value_dict['ts'] = variable.w3 * cluster_arr.length  // w3
+        value_dict['ts'] = variable.w3 * cluster_arr.length // w3
         value_dict['symbol'] = symbol; //保存本次操作的标志
         value_dict['node'] = node; //保存操作的节点ID
         value_dict['cluster_arr'] = clusterFun.deepCopy(cluster_arr); //保存本次操作结果的cluster_arr
@@ -137,7 +137,8 @@ let riverView = (function () {
         //计算当前的最值，用于设置比例尺
         let max_inner = d3.max(riverView.value_arr, d => d['sc']),
             max_interval = d3.max(riverView.value_arr, d => d['ah']),
-            max_counts = d3.max(riverView.value_arr, d => d['ts'])
+            max_counts = d3.max(riverView.value_arr, d => d['ts']),
+            maxValue = d3.max([max_inner, max_interval, max_counts])
 
         let innerScale = d3.scaleLinear()
             .domain([0, max_inner])
@@ -148,6 +149,10 @@ let riverView = (function () {
         let countScale = d3.scaleLinear()
             .domain([0, max_counts])
             .range([0, 0.05 * svg_height])
+
+        let valueScale = d3.scaleLinear()
+            .domain([0, maxValue])
+            .range([0, 0.06 * svg_height])
         //占比高度比例尺
         let areaInitial = d3.area()
             .x(d => d.x)
@@ -165,21 +170,21 @@ let riverView = (function () {
                     'type': 'sc',
                     value: riverView.value_arr[i]['sc'],
                     x: i * (svg_width * 0.8) / (tree_view.modifyCount - 1) + 10,
-                    y: 0.3 * svg_height - countScale(riverView.value_arr[i]['ts']),
+                    y: 0.3 * svg_height - valueScale(riverView.value_arr[i]['sc']),
                     y0: 0.3 * svg_height
                 },
                 tmp_interval = {
                     'type': 'ah',
                     value: riverView.value_arr[i]['ah'],
                     x: i * (svg_width * 0.8) / (tree_view.modifyCount - 1) + 10,
-                    y: tmp_inner.y - intervalScale(riverView.value_arr[i]['ah']),
+                    y: tmp_inner.y - valueScale(riverView.value_arr[i]['ah']),
                     y0: tmp_inner.y
                 },
                 tmp_counts = {
                     'type': 'ts',
                     value: riverView.value_arr[i]['ts'],
                     x: i * (svg_width * 0.8) / (tree_view.modifyCount - 1) + 10,
-                    y: tmp_interval.y - innerScale(riverView.value_arr[i]['sc']),
+                    y: tmp_interval.y - valueScale(riverView.value_arr[i]['ts']),
                     y0: tmp_interval.y
                 }
             area_arr[0].push(tmp_inner)
@@ -200,7 +205,7 @@ let riverView = (function () {
             let tmp_dict = {
                 symbol: riverView.value_arr[i].symbol,
                 node: riverView.value_arr[i].node,
-                x: i * (svg_width * 0.7) / (tree_view.modifyCount - 1) + 10,
+                x: i * (svg_width * 0.8) / (tree_view.modifyCount - 1) + 10,
                 y: 0.12 * svg_height,
                 cluster_arr: riverView.value_arr[i].cluster_arr
             };
@@ -231,13 +236,13 @@ let riverView = (function () {
                     .transition()
                     .duration(1000)
                     .attr('fill', colorOri.stroke)
-                    // .attr('stroke', colorOri.stroke)
+                // .attr('stroke', colorOri.stroke)
                 for (let n = 0; n < variable.cluster_arr.length; n++) {
                     d3.select('#tree_' + variable.cluster_arr[n])
                         .transition()
                         .duration(1000)
                         .attr('fill', colorSelected.stroke)
-                        // .attr('stroke', colorSelected.stroke)
+                    // .attr('stroke', colorSelected.stroke)
                 }
 
                 //修改断层线
@@ -416,7 +421,7 @@ let riverView = (function () {
             .attr('width', 12)
             .attr('rx', 5)
             .attr('ry', 5)
-            .attr('fill', (d, i) => river_color[i])
+            .attr('fill', (d, i) => river_color[2 - i])
     }
     return {
         drawRiver,
