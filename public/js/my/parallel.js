@@ -194,7 +194,10 @@ let parallel = (function () {
                 .attr('height', d => unitHeight * d.count - 5)
                 // .style('stroke', '#dddddd') //i代表属性下标，并不是代表当前值的下标
                 // .style('stroke-width', 2)
-                .style('fill', variable.attr_color[i])
+                .style('fill', (d, vi) =>{
+                    
+                    return variable.valueColor_dict[(i+1).toString()][vi]
+                } )
                 .attr('id', d => 'rect_' + labels[i] + '_' + d.attrValue) //id : rect_属性_属性值
 
 

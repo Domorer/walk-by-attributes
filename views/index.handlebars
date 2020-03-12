@@ -111,19 +111,19 @@
             <div class="custom-control custom-checkbox" style='margin:3% 5% 0 5%;'>
                 <input type="checkbox" class="custom-control-input" id="1" checked='true'>
                 <label class="custom-control-label" for="1" id="citedLabel" style='color:gray'>Conference</label>
-                <div class='tuli' style='background-color:#A597FF'></div>
+                <div class='tuli' style='background-color:#7fc97f'></div>
             </div>
 
             <div class="custom-control custom-checkbox" style='margin:3% 5% 0 5%;'>
                 <input type="checkbox" class="custom-control-input" id="2">
                 <label class="custom-control-label" for="2" id="abtLabel" style='color:gray'>Year</label>
-                <div class='tuli' style='background-color:#A597FF'></div>
+                <div class='tuli' style='background-color:#beaed4'></div>
             </div>
 
             <div class="custom-control custom-checkbox" style='margin:3% 5% 0 5%;'>
                 <input type="checkbox" class="custom-control-input" id="3">
                 <label class="custom-control-label" for="3" id="confLabel" style='color:gray'>Paper Type</label>
-                <div class='tuli' style='background-color:#FFAB7C'></div>
+                <div class='tuli' style='background-color:#fdc086'></div>
 
             </div>
 
@@ -168,6 +168,10 @@
                     w2: 5
                 </button>
                 <div class="dropdown-menu downList" aria-labelledby="dropdownMenuButton" id='w2'>
+                      <a class="dropdown-item" href="#" value=1>1</a>
+                    <a class="dropdown-item" href="#" value=2>2</a>
+                    <a class="dropdown-item" href="#" value=3>3</a>
+                    <a class="dropdown-item" href="#" value=4>4</a>
                      <a class="dropdown-item" href="#" value=5>5</a>
                     <a class="dropdown-item" href="#" value=6>6</a>
                     <a class="dropdown-item" href="#" value=7>7</a>
@@ -201,7 +205,7 @@
 
     <div id='forceDiv'>
         <div id="headLine">
-            <a id='headline_a'>Abstraction View</a>
+            <a id='headline_a'>Aggregation View</a>
         </div>
         <svg id='svg_force'></svg>
         <div id='innerTopo' class="custom-control custom-checkbox">
@@ -246,10 +250,10 @@
         <div id="headLine">
             <a id='headline_a'>Projection View</a>
         </div>
-        <div id='toHeatmap' class="custom-control custom-checkbox" style='margin:0 0 0 0;'>
+        {{!-- <div id='toHeatmap' class="custom-control custom-checkbox" style='margin:0 0 0 0;'>
             <input type="checkbox" class="custom-control-input" id="inputHeat">
             <label class="custom-control-label" for="inputHeat" id="labelHeat" style='color:gray'>HeatMap</label>
-        </div>
+        </div> --}}
         {{!-- <button id="point" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Point</button> --}}
         <div id='scatter_canvas'>
             <svg id='svg_scatter'></svg>
@@ -262,7 +266,7 @@
 
     <div id='ParallelDiv'>
         <div id="headLine">
-            <a id='headline_a'>Parallel View</a>
+            <a id='headline_a'>Attribute View</a>
         </div>
         <svg id='svg_parallel'></svg>
     </div>

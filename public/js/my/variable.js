@@ -10,7 +10,6 @@ let variable = (function () {
     let w1 = 0.1,
         w2 = 6,
         w3 = 0.1;
-    let color_arr = ['#FF57D9', '#EB590C', '#FFD105', '#42F005', '#23FFE8']
     let attrValue_dict = {}
     let valueIds_dict = {}; //每个属性值对应点数组的字典
     let oriAttrName_dict = {
@@ -18,6 +17,12 @@ let variable = (function () {
         '2': 'Year',
         '3': 'Paper type'
     }
+    let attr_color = ['#7fc97f', '#beaed4', '#fdc086', '#ffff99', '#386cb0']
+    let valueColor_dict = {
+        '1':['#c2e699', '#78c679', '#31a354'],
+        '2':['#bfd3e6','#9ebcda','#8c96c6','#8c6bb1','#88419d','#6e016b'],
+        '3':['#fed98e','#fe9929','#d95f0e']
+    };
 
     let nodeInfo; //点的属性值字典
     let svg_tree = d3.select('#svg_tree')
@@ -50,7 +55,7 @@ let variable = (function () {
     let clusterLink_weight_dict;
     let clu_tpg;
 
-    let attr_color = ["#1F8A70", '#BEDB38', '#FFE11A', '#FD7400', '#EE89FF']; //["#50ab4c", '#A597FF', '#FFAB7C', '#EE89FF', '#00D8FF'];
+    ; //["#50ab4c", '#A597FF', '#FFAB7C', '#EE89FF', '#00D8FF'];
     let sankey_count = 1;
     let sankeyNode_data = []; //保存桑基图的节点数据
     let sankeyNodes_dict; //用来判断节点的数据是否已经存在里面
@@ -110,12 +115,12 @@ let variable = (function () {
         attrValue_dict,
         attr,
         nodeInfo,
-        color_arr,
         valueIds_dict,
         oriAttrName_dict,
         yearPhase_dict,
         w1,
         w2,
-        w3
+        w3,
+        valueColor_dict
     }
 })()

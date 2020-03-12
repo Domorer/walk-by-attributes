@@ -44,8 +44,6 @@ let option = (function () {
                             if (variable.attrValue_dict[attr].indexOf(nodeInfo[id][attr]) == -1) {
                                 variable.attrValue_dict[attr].push(nodeInfo[id][attr])
                                 variable.valueIds_dict[attr][nodeInfo[id][attr]] = [id]
-                                console.log("option -> [nodeInfo[id][attr]]", [nodeInfo[id][attr]])
-
                             } else {
                                 //如果该属性值已存在，则将属性值对应的点数组里添加当前id
                                 variable.valueIds_dict[attr][nodeInfo[id][attr]].push(id)
@@ -83,8 +81,7 @@ let option = (function () {
                 variable.comb_data = data[0];
                 console.log("option -> comb_data", variable.comb_data)
 
-                //通过用户选定的层级来生成类字典
-                let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
+
                 //当前选中的层级
                 variable.level = 9;
                 clusterFun.cluster(variable.comb_data, variable.level, null)
@@ -226,10 +223,36 @@ let option = (function () {
         $('#button_w3').text('w3: ' + tmp_value)
         variable.w3 = tmp_value
     })
+    $('#em').on('click', function (e) {
+        let faultages = [],
+            visCluster_arr = []
+        //获取当前树的所有可视节点id, 从level_dict 从后往前遍历
+        let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
+        for (let i = max_level; i > max_level - variable.level; i--) {
+            for (let j = 0; j < variable.comb_data['level_dict'][i].length; j++)
+                visCluster_arr.push(variable.comb_data['level_dict'][i][j])
+        }
+        for (let i = 0; i < 40; i++) {
+            let tmp_visCluster_arr = visCluster_arr.slice(0)
+            faultages.push(tree_view.generateRandomFaultage(tmp_visCluster_arr))
+        }
+        console.log("option -> faultages", faultages)
+        let emFaultage = [],
+            minEnergy = Infinity
+        for (let i = 0; i < faultages.length; i++) {
+            let tmp_dict = riverView.Cal(variable.comb_data, faultages[i]),
+                tmpEnergy = tmp_dict.ah + tmp_dict.sc + tmp_dict.ts
+            if (minEnergy > tmpEnergy) {
+                minEnergy = tmpEnergy
+                emFaultage = faultages[i]
+            }
+        }
+        console.log("option -> emFaultage", emFaultage)
 
-    $('#em').on('click', function () {
-        console.log('em')
+
+
     })
+
     //用户自定义的类数组确定按钮
     $('#confirm_cluster').on('click', () => {
         modify_cluster(variable.comb_data, true);
@@ -269,8 +292,8 @@ let option = (function () {
     })
     $('#zoomIn').on('click', () => {
         let zoom = d3.zoom().scaleExtent([0.1, 10])
-        variable.viewbox.top -= moveStep
-        variable.viewbox.bottom += moveStep
+        variable.viewbox.top += moveStep
+        variable.viewbox.bottom -= moveStep * 2
         variable.svg_force.transition(transition)
             .attr('viewBox', `${variable.viewbox.left} ${variable.viewbox.top} ${variable.viewbox.right} ${variable.viewbox.bottom}`)
     })
@@ -283,14 +306,6 @@ let option = (function () {
 
     $('#toHeatmap').on('click', function () {
         console.log('checked: ', $('#inputHeat')[0].checked);
-        // if ($('#inputHeat')[0].checked == true){
-
-        //     scatter.drawHeat(variable.comb_data);
-        // }
-        // else{
-        //     console.log('false')
-        //     // d3.select('#scatter_canvas').select('canvas').remove();
-        // }
     });
     //每次类变化后页面进行的操作
     function modify_cluster(data, tree_confirm) {
@@ -317,7 +332,6 @@ let option = (function () {
 
         if (tree_confirm == false)
             tree_view.draw_tree(data, variable.level);
-
         parallel.drawParallel();
     }
 
@@ -342,6 +356,9 @@ let option = (function () {
             });
         });
     }
+
+
+
 
     return {
         comb_record,
