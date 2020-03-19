@@ -1,5 +1,5 @@
 let variable = (function () {
-
+    let dataset = 'paper';
     let comb_data; //当前游走类型的数据
     let link_data; //引用连线数据
     let node_data; //力引导点的数据
@@ -13,15 +13,39 @@ let variable = (function () {
     let attrValue_dict = {}
     let valueIds_dict = {}; //每个属性值对应点数组的字典
     let oriAttrName_dict = {
-        '1': 'Conference',
-        '2': 'Year',
-        '3': 'Paper type'
+        'patent': {
+            '1': 'Year',
+            '2': 'Country',
+            '3': 'Class',
+            '4': 'Cat',
+            '5': 'Subcat'
+        },
+        'paper': {
+            '1': 'Conference',
+            '2': 'Year',
+            '3': 'Paper type'
+        }
     }
+    let attr_arr_dict = {
+        'paper': ['1', '2', '3'],
+        'patent': ['1', '2', '3', '4', '5']
+    };
     let attr_color = ['#7fc97f', '#beaed4', '#fdc086', '#ffff99', '#386cb0']
     let valueColor_dict = {
-        '1':['#c2e699', '#78c679', '#31a354'],
-        '2':['#bfd3e6','#9ebcda','#8c96c6','#8c6bb1','#88419d','#6e016b'],
-        '3':['#fed98e','#fe9929','#d95f0e']
+        'paper': {
+            '1': ['#c2e699', '#78c679', '#31a354'],
+            '2': ['#bfd3e6', '#9ebcda', '#8c96c6', '#8c6bb1', '#88419d', '#6e016b'],
+            '3': ['#fed98e', '#fe9929', '#d95f0e'],
+            '4': ['#ffffd4', '#fee391', '#fec44f', '#fe9929', '#ec7014', '#cc4c02', '#8c2d04'],
+            '5': ['#f2f0f7', '#dadaeb', '#bcbddc', '#9e9ac8', '#807dba', '#6a51a3', '#4a1486']
+        },
+        'patent': {
+            '1': ['#f7fcfd','#e5f5f9','#ccece6','#99d8c9','#66c2a4','#41ae76','#238b45','#006d2c','#00441b'],
+            '2': ['#9ebcda', '#8c96c6'],
+            '3': ['#ffffe5','#fff7bc','#fee391','#fec44f','#fe9929','#ec7014','#cc4c02','#993404','#662506'],
+            '4': ['#ffffd4', '#fee391', '#fec44f', '#fe9929', '#ec7014', '#cc4c02', '#8c2d04'],
+            '5': ['#f2f0f7', '#dadaeb', '#bcbddc', '#9e9ac8', '#807dba', '#6a51a3', '#4a1486']
+        }
     };
 
     let nodeInfo; //点的属性值字典
@@ -37,14 +61,26 @@ let variable = (function () {
         bottom: 0
     }
     let yearPhase_dict = {
-        '1': '90-94',
-        '2': '95-99',
-        '3': '00-04',
-        '4': '05-09',
-        '5': '10-14'
+        'paper': {
+            '1': '90-94',
+            '2': '95-99',
+            '3': '00-04',
+            '4': '05-09',
+            '5': '10-14'
+        },
+        'patent': {
+            '1': '63-67',
+            '2': '68-72',
+            '3': '73-77',
+            '4': '78-82',
+            '5': '83-87',
+            '6': '88-92',
+            '7': '93-97',
+            '8': '98-99'
+        }
     };
 
-    let attr_arr = ['1', '2', '3'];
+
     let info_dict = {}; //节点的信息字典
 
     let ChoseCluster = false; //判断当前选择点的方式
@@ -87,7 +123,7 @@ let variable = (function () {
         svg_brush,
         svg_tree,
         viewbox,
-        attr_arr,
+        attr_arr_dict,
         info_dict,
         ChoseCluster,
         cluster_dict,
@@ -121,6 +157,7 @@ let variable = (function () {
         w1,
         w2,
         w3,
-        valueColor_dict
+        valueColor_dict,
+        dataset
     }
 })()

@@ -180,13 +180,13 @@ let forceChart = (function () {
                 //     return color(d.cluster)
                 // else
                 let tmp_index = variable.attrValue_dict[variable.attr].indexOf(d[parseInt(variable.attr)])
-                return variable.valueColor_dict[variable.attr][tmp_index]
+                return variable.valueColor_dict[variable.dataset][variable.attr][tmp_index]
             }).attr('fill', function (d) {
                 // if (d.cluster != -1 && d.cluster != undefined)
                 //     return color(d.cluster)
                 // else
                 let tmp_index = variable.attrValue_dict[variable.attr].indexOf(d[parseInt(variable.attr)])
-                return variable.valueColor_dict[variable.attr][tmp_index]
+                return variable.valueColor_dict[variable.dataset][variable.attr][tmp_index]
             }).attr('class', function (d) {
                 return d.id;
             }).call(drag(simulation));
@@ -277,14 +277,14 @@ let forceChart = (function () {
             .attr('r', 2)
             .attr('stroke', function (d) {
                 if (variable.type_count == 1)
-                    return variable.valueColor_dict[variable.attr][variable.attrValue_dict[variable.attr].indexOf(variable.nodeInfo[d.id][parseInt(variable.attr)])]
+                    return variable.valueColor_dict[variable.dataset][variable.attr][variable.attrValue_dict[variable.attr].indexOf(variable.nodeInfo[d.id][parseInt(variable.attr)])]
                 else
                     return '#53aad5'
             })
             .attr('fill', function (d) {
                 if (variable.type_count == 1) {
                     let tmp_idnex = variable.attrValue_dict[variable.attr].indexOf(variable.nodeInfo[d.id][parseInt(variable.attr)])
-                    return variable.valueColor_dict[variable.attr][tmp_idnex]
+                    return variable.valueColor_dict[variable.dataset][variable.attr][tmp_idnex]
                 } else
                     return '#53aad5'
             })
@@ -468,15 +468,20 @@ let forceChart = (function () {
             .on('click', function (d, i) {
                 const a = i;
                 parallel.changeWidth(d.id)
-                if (variable.last_cluster != undefined) {
-                    d3.select('#svg_parallel').selectAll('path')
-                        .style('opacity', .05)
-                        .style('stroke-width', 1)
-                        .style('stroke', '#e3e3e3')
-                    d3.select('#area_' + variable.last_cluster).attr('fill', '#D5E2FF');
-                    d3.select('#clusterOut_' + variable.last_cluster)
-                        .style('stroke-opacity', 0)
-                }
+
+                d3.select('#svg_parallel').selectAll('path')
+                    .style('opacity', function () {
+                        if (variable.dataset == 'patent')
+                            return 0
+                        else
+                        return .05
+                    })
+                    .style('stroke-width', 1)
+                    .style('stroke', '#e3e3e3')
+                d3.select('#area_' + variable.last_cluster).attr('fill', '#D5E2FF');
+                d3.select('#clusterOut_' + variable.last_cluster)
+                    .style('stroke-opacity', 0)
+
                 d3.selectAll('.parallelClass_' + d.id)
                     .style('opacity', 1)
                     .style('stroke-width', 2)
@@ -624,7 +629,7 @@ let forceChart = (function () {
             tmp_color_arr,
             tmp_attr_arr
         if (variable.type_count == 1) {
-            tmp_color_arr = variable.valueColor_dict[variable.attr]
+            tmp_color_arr = variable.valueColor_dict[variable.dataset][variable.attr]
             //单属性时，variable.attr 就是属性名称，不是多个属性名称的集合
             let value_dict = {};
             for (let i = 0; i < variable.attrValue_dict[variable.attr].length; i++) {
@@ -647,9 +652,12 @@ let forceChart = (function () {
             tmp_color_arr = variable.attr_color
             tmp_attr_arr = variable.attr.split('')
             for (let i = 0; i < variable.type_count; i++) {
-                attrs_value.push(calEntropy(cluster, tmp_attr_arr[i], variable.cluster_ids_dict))
+                let tmpEntropy = calEntropy(cluster, tmp_attr_arr[i], variable.cluster_ids_dict)
+                if (tmpEntropy == 0)
+                    attrs_value.push(10000000)
+                else
+                    attrs_value.push(1 / tmpEntropy)
             }
-
         }
 
         let rScale = d3.scaleLinear()
@@ -661,7 +669,7 @@ let forceChart = (function () {
         let pie_data = d3.pie()(attrs_value)
         for (let i = 0; i < pie_data.length; i++) {
             pie_data[i].startAngle = i * Math.PI * 2 / pie_data.length;
-            pie_data[i].endAngle = (i + 1) * Math.PI * 2 / pie_data.length;
+            pie_data[i].endAngle = (i + .9) * Math.PI * 2 / pie_data.length;
             pie_data[i].innerRadius = radius;
             pie_data[i].outerRadius = rScale(pie_data[i].data);
             pie_data[i].class = 'pie_' + cluster;
@@ -673,19 +681,20 @@ let forceChart = (function () {
             .innerRadius(radius)
             .outerRadius(d => rScale(d.data))
             .cornerRadius(d => (d.outerRadius - d.innerRadius) / 5)
-            .padAngle(.3)
 
         let pie_g = variable.svg_force.append('g').selectAll('path').data(pie_data).enter()
             .append('path')
             .attr('d', d => arc(d))
             .attr('fill', function (d, i) {
-                if (variable.type_count != 1)
-                    return tmp_color_arr[parseInt(tmp_attr_arr[i])]
+                if (variable.type_count != 1) {
+                    return tmp_color_arr[parseInt(tmp_attr_arr[i]) - 1]
+                }
+
                 return tmp_color_arr[i];
             })
             .attr('stroke', function (d, i) {
                 if (variable.type_count != 1)
-                    return tmp_color_arr[parseInt(tmp_attr_arr[i])]
+                    return tmp_color_arr[parseInt(tmp_attr_arr[i]) - 1]
                 return tmp_color_arr[i];
             })
             .attr('stroke-width', 0.1)

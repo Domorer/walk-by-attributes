@@ -1,108 +1,19 @@
 let option = (function () {
 
-    let cs_dict = {
-        'O-P': 'P',
-        'O-R': 'R',
-        'O': 'O',
-        'O-P-R': 'PR'
-    }
     let comb_len = 0;
     let optIndex = 0; //记录操作的index
     let comb_record = []; //记录操作的具体参数元素格式为[当前属性选择，当前游走方式选择]
 
     //*************修改图例颜色**************
-    $('.tuli').css('background-color', (i) => variable.attr_color[i])
+    $('.tuli').css('background-color', (d, i) => variable.attr_color[i])
+
     $('.leaflet-control-attribution, .leaflet-control').remove();
     comb_record.push(clusterFun.deepCopy(variable.param));
-
     //*************初始化******************
+    resetByDataset();
     console.log("option -> variable.param", variable.param)
 
-    getCombData(variable.param).then(function (data) {
-        d3.csv('data/paper/weighted_link.csv', function (error, data_link) {
-            d3.json('data/paper/nodeInfo.json', function (error, nodeInfo) {
-                variable.nodeInfo = nodeInfo;
-                /* 遍历节点信息字典数据：
-                    1. 获取valueCount_dict 各属性值拥有的点的数量
-                    2. attrValue_dict  ,,属性字典，各属性所拥有的属性值字典
-                */
-                let node_quantity = 0
-                for (let id in nodeInfo) {
-                    node_quantity += 1
-                    for (let attr in nodeInfo[id]) {
-                        /*如果该属性不存在，则1.添加该属性，并将当前属性值添加
-                                            2.将该属性值对应的点数组初始为包含当前id的数组
-                        */
-                        if ((attr in variable.attrValue_dict) == false) {
-                            variable.attrValue_dict[attr] = [nodeInfo[id][attr]]
-                            variable.valueIds_dict[attr] = {}
-                            variable.valueIds_dict[attr][nodeInfo[id][attr]] = [id]
-                        } else {
-                            /*如果该属性已有，则判断该属性值是否已经存在，若不存在，则添加
-                                        将该属性值对应的点的数量初始为包含当前id的数组
-                            */
-                            if (variable.attrValue_dict[attr].indexOf(nodeInfo[id][attr]) == -1) {
-                                variable.attrValue_dict[attr].push(nodeInfo[id][attr])
-                                variable.valueIds_dict[attr][nodeInfo[id][attr]] = [id]
-                            } else {
-                                //如果该属性值已存在，则将属性值对应的点数组里添加当前id
-                                variable.valueIds_dict[attr][nodeInfo[id][attr]].push(id)
-                            }
-                        }
-                    }
-                }
-                console.log("option -> variable.valueIds_dict", variable.valueIds_dict)
-                console.log("option -> variable.attrValue_dict", variable.attrValue_dict)
 
-                console.log('data_link: ', data_link)
-                //修改属性信息展示窗口的数据
-                let attr_count = 0;
-                for (let key in variable.attrValue_dict)
-                    attr_count += 1
-                $('#node_quantity').text(node_quantity)
-                $('#edge_quantity').text(data_link.length)
-                $('#attr_quantity').text(attr_count)
-                //获取原始link的字典
-                for (let i = 0; i < data_link.length; i++) {
-                    if (variable.oriLink_dict[data_link[i].source] != null) {
-                        variable.oriLink_dict[data_link[i].source].push(data_link[i].target)
-                        variable.station_links_dict[data_link[i].source].push(data_link[i].target)
-                    } else {
-                        variable.oriLink_dict[data_link[i].source] = [data_link[i].target];
-                        variable.station_links_dict[data_link[i].source] = [data_link[i].target]
-                    }
-                    if (variable.station_links_dict[data_link[i].target] != null) {
-                        variable.station_links_dict[data_link[i].target].push(data_link[i].source)
-                    } else {
-                        variable.station_links_dict[data_link[i].target] = [data_link[i].source]
-                    }
-                }
-                variable.oriLinks = data_link;
-                variable.comb_data = data[0];
-                console.log("option -> comb_data", variable.comb_data)
-
-
-                //当前选中的层级
-                variable.level = 9;
-                clusterFun.cluster(variable.comb_data, variable.level, null)
-                console.log('variable.comb_data: ', variable.comb_data);
-                //绘制降维散点图
-                scatter.drawScatter(variable.comb_data['info']);
-                //绘制力引导图
-                forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
-                //树图
-                tree_view.draw_tree(data[0], variable.level);
-                //平行坐标轴
-
-
-                parallel.drawParallel();
-
-            })
-
-        })
-    }).catch(function (error) {
-        console.log('error: ', error);
-    })
 
     //获取站点坐标数据
     d3.json('data/Chicago/loc.json', function (error, data) {
@@ -160,59 +71,37 @@ let option = (function () {
         }
     })
 
-    //********************确认按钮的参数确定********************
-    $('#confirm').on('click', function () {
-        //***********获取当前各参数的选择情况***********
-        comb_len = 0; //记录当前选择的属性数量，用于后面key的格式定义
-        variable.type_count = 0;
-        variable.attr = '';
-        tree_view.modifyCount = 1
-        //循环判断每个checkbox的状态来获取当前的属性选择,如果一个也没选择就代表随机游走
-        variable.attr_arr.forEach(Element => {
-            let tmp_checked = $('#' + Element)[0].checked;
-            if (tmp_checked) {
-                comb_len += 1;
-                variable.type_count += 1;
-                if (comb_len > 1) {
-                    variable.attr += $('#' + Element)[0].id;
-                } else {
-                    variable.attr = $('#' + Element)[0].id;
-                }
-            }
-        })
 
-        console.log('variable.attr: ', variable.attr);
-        variable.param['rl'] = false;
-        variable.param['comb'] = variable.attr;
-        //*************修改参数后修改各界面的view****************
-        getCombData(variable.param).then(function (data) {
-            modify_cluster(data[0], false);
-        })
-        /*****************************************************/
-
-        //将操作数据记录并添加到dropdown，格式为选择的属性 + 游走的方式
-        option.comb_record.push(clusterFun.deepCopy(variable.param));
-        // let tmp_text = variable.attr;
-        // let tmp_option = $('<a></a>').text(tmp_text).attr("id", option.optIndex).attr('class', 'dropdown-item').on('click', function () {
-        //     getCombData(option.comb_record[this.id]).then(function (data) {
-        //         variable.comb_data = data[0];
-        //         //通过用户选定的层级来生成类字典
-        //         let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
-        //         clusterFun.cluster(variable.comb_data, variable.level, null)
-        //         scatter.drawScatter(data[0]['info']);
-        //         tree_view.draw_tree(data[0], variable.level);
-        //         forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
-        //     })
-        // });
-        // $("#options").append(tmp_option);
-        // option.optIndex += 1;
+    $('#confirm_param, #confirm_attr').on('click', function () {
+        reset()
     })
     //treeView 按钮设置
+    $('#datasetDropdown').on('click', function (e) {
+        let tmp_text = e.target.innerText,
+            tmp_dataset = e.target.getAttribute('value')
+        $('#button_dataset').text(tmp_text)
+        variable.dataset = tmp_dataset
+        d3.select('#attributes').selectAll('.custom-checkbox').remove();
+        for (let j = 0; j < variable.attr_arr_dict[variable.dataset].length; j++) {
+            let checked = null
+            if (j == 0)
+                checked = 'checked'
+            let tmp_attrName = variable.oriAttrName_dict[variable.dataset][j + 1]
+            let tmpInnerHtml = `<div class='custom-control custom-checkbox' style='margin:3% 5% 0 5%;'>` +
+                `<input type='checkbox' class='custom-control-input' id='${j + 1}' ${checked}>` +
+                `<label class='custom-control-label' for='${j + 1}' id='citedLabe${j}' style='color:gray'>${tmp_attrName}</label>` +
+                `<div class='tuli' style='background-color:${variable.attr_color[j]}'></div></div>`
+            $('#attributes').append(tmpInnerHtml)
+        }
+        resetByDataset()
+
+    })
     $('#w1').on('click', function (e) {
         let tmp_value = e.target.getAttribute('value')
         $('#button_w1').text('w1: ' + tmp_value)
         variable.w1 = tmp_value
     })
+
     $('#w2').on('click', function (e) {
         let tmp_value = e.target.getAttribute('value')
         $('#button_w2').text('w2: ' + tmp_value)
@@ -223,16 +112,19 @@ let option = (function () {
         $('#button_w3').text('w3: ' + tmp_value)
         variable.w3 = tmp_value
     })
-    $('#em').on('click', function (e) {
+    $('#em').on('click', function (d) {
+        console.log("generateRandomFaultage -> tree_view.tree_nodes_dict[tmp_cluster]", tree_view.tree_nodes_dict)
+
+        tree_view.modifyCount += 1
         let faultages = [],
             visCluster_arr = []
         //获取当前树的所有可视节点id, 从level_dict 从后往前遍历
         let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
-        for (let i = max_level; i > max_level - variable.level; i--) {
+        for (let i = max_level; i > variable.level; i--) {
             for (let j = 0; j < variable.comb_data['level_dict'][i].length; j++)
                 visCluster_arr.push(variable.comb_data['level_dict'][i][j])
         }
-        for (let i = 0; i < 40; i++) {
+        for (let i = 0; i < 100; i++) {
             let tmp_visCluster_arr = visCluster_arr.slice(0)
             faultages.push(tree_view.generateRandomFaultage(tmp_visCluster_arr))
         }
@@ -247,10 +139,33 @@ let option = (function () {
                 emFaultage = faultages[i]
             }
         }
+        /*层次树节点的颜色
+            1.恢复之前已经选中的节点的颜色为默认颜色    
+            2.修改最有切层节点的颜色为选中颜色
+        */
+        let colorSelected = '#ff4416',
+            colorOri = '#329CCB'
+        for (let j = 0; j < variable.cluster_arr.length; j++) {
+            d3.select('#tree_' + variable.cluster_arr[j])
+                .attr('fill', colorOri)
+        }
+        //更新当前的cluster_arr
+        variable.cluster_arr = emFaultage
+        for (let j = 0; j < variable.cluster_arr.length; j++) {
+            d3.select('#tree_' + variable.cluster_arr[j])
+                .transition()
+                .duration(1000)
+                .attr('fill', colorSelected)
+        }
+        let top_nodeId = variable.comb_data['level_dict'][max_level][0],
+            topNode = tree_view.tree_nodes_dict[top_nodeId]
+        let tmp_node = {
+            'name': topNode.data.name,
+            'x': topNode.x + 10,
+            'y': topNode.y + tree_view.transformHeight
+        };
+        riverView.modifyRiver(variable.comb_data, emFaultage, false, tmp_node, false)
         console.log("option -> emFaultage", emFaultage)
-
-
-
     })
 
     //用户自定义的类数组确定按钮
@@ -318,7 +233,7 @@ let option = (function () {
         variable.comb_data = data;
         //通过用户选定的层级中的类   或者选中的断层的类   来生成类字典
         let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
-        variable.level = 9;
+        variable.level = max_level - 9;
 
         //通过判断当前的类是用户选择的还是自定层级的， 来确定参数
         if (tree_confirm == false)
@@ -335,11 +250,156 @@ let option = (function () {
         parallel.drawParallel();
     }
 
-    function getCombData(param) {
+
+    //********************确认按钮的参数确定********************
+    function reset() {
+        //***********获取当前各参数的选择情况***********
+        comb_len = 0; //记录当前选择的属性数量，用于后面key的格式定义
+        variable.type_count = 0;
+        variable.attr = '';
+        tree_view.modifyCount = 1
+        //循环判断每个checkbox的状态来获取当前的属性选择,如果一个也没选择就代表随机游走
+        variable.attr_arr_dict[variable.dataset].forEach(Element => {
+            let tmp_checked = $('#' + Element)[0].checked;
+            if (tmp_checked) {
+                comb_len += 1;
+                variable.type_count += 1;
+                if (comb_len > 1) {
+                    variable.attr += $('#' + Element)[0].id;
+                } else {
+                    variable.attr = $('#' + Element)[0].id;
+                }
+            }
+        })
+
+        console.log('variable.attr: ', variable.attr);
+        variable.param['rl'] = false;
+        variable.param['comb'] = variable.attr;
+        //*************修改参数后修改各界面的view****************
+        getCombData(variable.param, variable.dataset).then(function (data) {
+            modify_cluster(data[0], false);
+        })
+        /*****************************************************/
+
+        //将操作数据记录并添加到dropdown，格式为选择的属性 + 游走的方式
+        option.comb_record.push(clusterFun.deepCopy(variable.param));
+
+    }
+
+    function resetByDataset() {
+        if (variable.dataset == 'paper') {
+            variable.param = {
+                wt: 10,
+                sl: 20,
+                rl: false,
+                comb: '1'
+            };
+            variable.attr = '1'
+            variable.type_count = 1
+        } else {
+            variable.type_count = 1
+            variable.param = {
+                wt: 10,
+                sl: 20,
+                rl: false,
+                comb: '1'
+            };
+            variable.attr = '1'
+        }
+        getCombData(variable.param, variable.dataset).then(function (data) {
+            d3.csv(`data/${variable.dataset}/weighted_link.csv`, function (error, data_link) {
+                d3.json(`data/${variable.dataset}/nodeInfo.json`, function (error, nodeInfo) {
+                    variable.nodeInfo = nodeInfo;
+                    /* 遍历节点信息字典数据：
+                        1. 获取valueCount_dict 各属性值拥有的点的数量
+                        2. attrValue_dict  ,,属性字典，各属性所拥有的属性值字典
+                    */
+                    let node_quantity = 0
+                    variable.attrValue_dict = {}
+                    for (let id in nodeInfo) {
+                        node_quantity += 1
+                        for (let attr in nodeInfo[id]) {
+                            /*如果该属性不存在，则1.添加该属性，并将当前属性值添加
+                                                2.将该属性值对应的点数组初始为包含当前id的数组
+                            */
+                            if ((attr in variable.attrValue_dict) == false) {
+                                variable.attrValue_dict[attr] = [nodeInfo[id][attr]]
+                                variable.valueIds_dict[attr] = {}
+                                variable.valueIds_dict[attr][nodeInfo[id][attr]] = [id]
+                            } else {
+                                /*如果该属性已有，则判断该属性值是否已经存在，若不存在，则添加
+                                            将该属性值对应的点的数量初始为包含当前id的数组
+                                */
+                                if (variable.attrValue_dict[attr].indexOf(nodeInfo[id][attr]) == -1) {
+                                    variable.attrValue_dict[attr].push(nodeInfo[id][attr])
+                                    variable.valueIds_dict[attr][nodeInfo[id][attr]] = [id]
+                                } else {
+                                    //如果该属性值已存在，则将属性值对应的点数组里添加当前id
+                                    variable.valueIds_dict[attr][nodeInfo[id][attr]].push(id)
+                                }
+                            }
+                        }
+                    }
+                    console.log("option -> variable.valueIds_dict", variable.valueIds_dict)
+                    console.log("option -> variable.attrValue_dict", variable.attrValue_dict)
+
+                    console.log('data_link: ', data_link)
+                    //修改属性信息展示窗口的数据
+                    let attr_count = 0;
+                    for (let key in variable.attrValue_dict)
+                        attr_count += 1
+                    $('#node_quantity').text(node_quantity)
+                    $('#edge_quantity').text(data_link.length)
+                    $('#attr_quantity').text(attr_count)
+                    //获取原始link的字典
+                    for (let i = 0; i < data_link.length; i++) {
+                        if (variable.oriLink_dict[data_link[i].source] != null) {
+                            variable.oriLink_dict[data_link[i].source].push(data_link[i].target)
+                            variable.station_links_dict[data_link[i].source].push(data_link[i].target)
+                        } else {
+                            variable.oriLink_dict[data_link[i].source] = [data_link[i].target];
+                            variable.station_links_dict[data_link[i].source] = [data_link[i].target]
+                        }
+                        if (variable.station_links_dict[data_link[i].target] != null) {
+                            variable.station_links_dict[data_link[i].target].push(data_link[i].source)
+                        } else {
+                            variable.station_links_dict[data_link[i].target] = [data_link[i].source]
+                        }
+                    }
+                    variable.oriLinks = data_link;
+                    variable.comb_data = data[0];
+                    console.log("option -> comb_data", variable.comb_data)
+
+
+                    //当前选中的层级
+                    let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
+                    variable.level = max_level - 9;
+                    clusterFun.cluster(variable.comb_data, variable.level, null)
+                    console.log('variable.comb_data: ', variable.comb_data);
+                    //绘制降维散点图
+                    scatter.drawScatter(variable.comb_data['info']);
+                    //绘制力引导图
+                    forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
+                    //树图
+                    tree_view.draw_tree(data[0], variable.level);
+                    //平行坐标轴
+
+
+                    parallel.drawParallel();
+
+                })
+
+            })
+        }).catch(function (error) {
+            console.log('error: ', error);
+        })
+    }
+
+    function getCombData(param, dataset) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: "get",
-                url: "/comb_data",
+                url: "/" + dataset,
                 async: false,
                 data: {
                     'wt': param.wt,

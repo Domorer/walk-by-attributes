@@ -103,7 +103,7 @@ let riverView = (function () {
         return value_dict
     }
 
-    function modifyRiver(data, cluster_arr, separate, node) {
+    function modifyRiver(data, cluster_arr, separate, node, treeClick) {
         let colorSelected = {
                 fill: '#ff957c',
                 stroke: '#ff4416'
@@ -114,11 +114,20 @@ let riverView = (function () {
             }
         console.log('cluster_arr: ', cluster_arr);
         //将当前的类数组存入record
+        /* 判断当前修改河流图是由点击层次树引起的还是点击em按钮引起的
+            1.点击层次树引起的： 需要在河流图上增加
+            2. em按钮默认连接到顶点
+         */
+
         riverView.clusterArr_record.push(cluster_arr);
-        if (!separate)
+        if (!separate && treeClick)
             riverView.value_arr.push(Cal(data, cluster_arr, d3.symbolCross, node))
-        else
+        else if (separate && treeClick)
             riverView.value_arr.push(Cal(data, cluster_arr, d3.symbolDiamond, node))
+        else
+            riverView.value_arr.push(Cal(data, cluster_arr, d3.symbolStar, node))
+
+
 
         let svg_width = $("#svg_tree")[0].scrollWidth;
         let svg_height = $("#svg_tree")[0].scrollHeight;

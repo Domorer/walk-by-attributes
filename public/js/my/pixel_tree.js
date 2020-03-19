@@ -1,21 +1,16 @@
 let tree_view = (function () {
     let modifyCount = 1,
         levelLine_g, cluLoc_dict = {},
-        tree_nodes_dict = {}
+        tree_nodes_dict = {},
+        transformHeight
 
     function draw_tree(data, level) {
-        let colorSelected = {
-                fill: '#ff957c',
-                stroke: '#ff4416'
-            },
-            colorOri = {
-                fill: '#B6E9FF',
-                stroke: '#329CCB'
-            }
+        let colorSelected = '#ff4416',
+            colorOri = '#329CCB'
         let svg_tree = d3.select('#svg_tree');
         let svg_width = $("#svg_tree")[0].scrollWidth;
         let svg_height = $("#svg_tree")[0].scrollHeight;
-        let transformHeight = 0.32 * svg_height
+        tree_view.transformHeight = 0.32 * svg_height
         svg_tree.selectAll('*').remove();
 
         let level_dict = data['level_dict'],
@@ -49,7 +44,7 @@ let tree_view = (function () {
         let LWScale = d3.scaleLinear().domain([0, treeData.height]).range([2, 3])
         let OPScale = d3.scaleLinear().domain([0, treeData.height]).range([0.5, 1])
         let RScale = d3.scaleLinear().domain([0, treeData.height]).range([2.5, 5])
-        let g = svg_tree.append('g').attr('transform', `translate(10,${transformHeight})`)
+        let g = svg_tree.append('g').attr('transform', `translate(10,${tree_view.transformHeight})`)
         g.selectAll('.link').data(links).enter()
             .append('path')
             .attr('class', 'link')
@@ -72,8 +67,8 @@ let tree_view = (function () {
             .attr('r', d => RScale(d.height))
             .attr('fill', d => {
                 if (level_dict[variable.level].indexOf(d.data.name) != -1)
-                    return colorSelected.stroke
-                return colorOri.stroke
+                    return colorSelected
+                return colorOri
             })
             // .attr('stroke', d => {
             //     if (level_dict[variable.level].indexOf(d.data.name) != -1)
@@ -108,7 +103,7 @@ let tree_view = (function () {
                         d3.select('#tree_' + parent[p])
                             .transition()
                             .duration(1000)
-                            .attr('fill', colorOri.stroke)
+                            .attr('fill', colorOri)
                         // .attr('stroke', colorOri.stroke)
                         tmp_parentId = parent[p];
                     }
@@ -133,7 +128,7 @@ let tree_view = (function () {
                             d3.select('#tree_' + levelIds[i])
                                 .transition()
                                 .duration(1000)
-                                .attr('fill', colorSelected.stroke)
+                                .attr('fill', colorSelected)
                             // .attr('stroke', colorSelected.stroke)
                             variable.cluster_arr.push(levelIds[i]);
                         }
@@ -150,7 +145,7 @@ let tree_view = (function () {
                             d3.select('#tree_' + children[c])
                                 .transition()
                                 .duration(1000)
-                                .attr('fill', colorOri.stroke)
+                                .attr('fill', colorOri)
                             // .attr('stroke', colorOri.stroke)
                         }
                     }
@@ -158,7 +153,7 @@ let tree_view = (function () {
                     d3.select('#tree_' + d.data.name)
                         .transition()
                         .duration(1000)
-                        .attr('fill', colorSelected.stroke)
+                        .attr('fill', colorSelected)
                     // .attr('stroke', colorSelected.stroke)
                     variable.cluster_arr.push(d.data.name);
                 }
@@ -168,9 +163,9 @@ let tree_view = (function () {
                 let tmp_info = {
                     name: d.data.name,
                     x: d.x + 10,
-                    y: d.y + transformHeight
+                    y: d.y + tree_view.transformHeight
                 };
-                riverView.modifyRiver(data, variable.cluster_arr, separate, tmp_info)
+                riverView.modifyRiver(data, variable.cluster_arr, separate, tmp_info, true)
             })
 
         //*******初始化河流图************
@@ -200,7 +195,7 @@ let tree_view = (function () {
             .style('stroke-opacity', .5)
             .style('stroke-width', 2)
             .style('stroke-dasharray', '4 4')
-            .attr('transform', `translate(10,${transformHeight})`)
+            .attr('transform', `translate(10,${tree_view.transformHeight})`)
 
 
         //**********画最底层的矩形*****************
@@ -213,7 +208,7 @@ let tree_view = (function () {
             xIndex = 0, //在此处记录连线的起点，即树底层节点的坐标
             tmp_color_arr;
         if (variable.type_count == 1) {
-            tmp_color_arr = variable.valueColor_dict[variable.attr]
+            tmp_color_arr = variable.valueColor_dict[variable.dataset][variable.attr]
             for (let i = nodes.length - groundFloorClusterNumbers; i < nodes.length; i++) {
                 let tmp_line = [
                     [nodes[i].x, nodes[i].y]
@@ -271,7 +266,12 @@ let tree_view = (function () {
         console.log("functiondraw_tree -> line_arr", line_arr)
 
         //属性值举行的最大高度不超过 0.12*svg_height 的三分之一
-        let heightScale = d3.scaleLinear().domain([0, max_Value]).range([0, 0.06 * svg_height])
+        let maxHeight;
+        if (variable.type_count == 5)
+            maxHeight = 0.04 * svg_height
+        else
+            maxHeight = 0.06 * svg_height
+        let heightScale = d3.scaleLinear().domain([0, max_Value]).range([0, maxHeight])
         console.log("functiondraw_tree -> rects", rects)
 
         svg_tree.append('g').selectAll('rect').data(rects).enter()
@@ -294,7 +294,7 @@ let tree_view = (function () {
             .style('fill', (d, i) => {
                 return tmp_color_arr[d.cIndex]
             })
-            .attr('transform', `translate(10,${transformHeight})`)
+            .attr('transform', `translate(10,${tree_view.transformHeight})`)
             .attr('id', d => 'rect_' + d.id + '_' + d.key)
         console.log("functiondraw_tree -> rects", rects)
         /*画底层节点与底层矩形的连线 */
@@ -307,7 +307,7 @@ let tree_view = (function () {
             .style('stroke', '#b1b1b1')
             .style('stroke-width', 2)
             .style('stroke-opacity', .5)
-            .attr('transform', `translate(10,${transformHeight})`)
+            .attr('transform', `translate(10,${tree_view.transformHeight})`)
     }
 
 
@@ -391,15 +391,18 @@ let tree_view = (function () {
         while (cluster_arr.length > 0) {
             let tmp_cluster = cluster_arr[parseInt(Math.random() * cluster_arr.length)]
             let tmp_parents = getParents(tree_view.tree_nodes_dict[tmp_cluster]),
-                tmp_children = getChildren(tree_view.tree_nodes_dict[tmp_cluster])
+                tmp_children = getChildren(variable.comb_data['children_dict'][tmp_cluster])
+            tmp_parents.push(tmp_cluster)
             //随机获取一个点之后，删除该点的所有父亲节点和子节点
             for (let i = 0; i < tmp_parents.length; i++) {
-                let tmp_index = cluster_arr.findIndex(Element => Element == tmp_children[i])
-                cluster_arr.splice(tmp_index, 1)
+                let tmp_index = cluster_arr.findIndex(Element => Element == tmp_parents[i])
+                if (tmp_index >= 0)
+                    cluster_arr.splice(tmp_index, 1)
             }
             for (let i = 0; i < tmp_children.length; i++) {
                 let tmp_index = cluster_arr.findIndex(Element => Element == tmp_children[i])
-                cluster_arr.splice(tmp_index, 1)
+                if (tmp_index >= 0)
+                    cluster_arr.splice(tmp_index, 1)
             }
             level_cluster_arr.push(tmp_cluster)
         }

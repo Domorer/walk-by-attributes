@@ -10,10 +10,18 @@ let scatter = (function () {
             Element['x'] = parseFloat(Element['x']);
             Element['y'] = parseFloat(Element['y']);
         })
-        let min_x = d3.min(comb_data, function (d) { return d.x });
-        let min_y = d3.min(comb_data, function (d) { return d.y });
-        let max_x = d3.max(comb_data, function (d) { return d.x });
-        let max_y = d3.max(comb_data, function (d) { return d.y });
+        let min_x = d3.min(comb_data, function (d) {
+            return d.x
+        });
+        let min_y = d3.min(comb_data, function (d) {
+            return d.y
+        });
+        let max_x = d3.max(comb_data, function (d) {
+            return d.x
+        });
+        let max_y = d3.max(comb_data, function (d) {
+            return d.y
+        });
         let xScale = d3.scaleLinear().domain([min_x, max_x]).range([0, svg_width - 20]);
         let yScale = d3.scaleLinear().domain([min_y, max_y]).range([svg_height - 20, 0]);
 
@@ -25,7 +33,12 @@ let scatter = (function () {
                 return xScale(parseFloat(d.x)) + 10;
             }).attr('cy', function (d) {
                 return yScale(parseFloat(d.y));
-            }).attr('r', 2)
+            }).attr('r', function () {
+                if (variable.dataset == 'patent')
+                    return 1.5
+                else
+                    return 2
+            })
             .attr('fill', function (d, i) {
                 d.cluster = variable.cluster_dict[d.id].cluster;
                 // return color(variable.cluster_dict[d.id].index)
@@ -38,27 +51,34 @@ let scatter = (function () {
                 return d.id;
             })
         //绘制簇边界  
-        let cluster_point_dict = {};//保存每个簇的边界点坐标
-        let cluster_ids_dict = {};//保存每个簇内点的id
+        let cluster_point_dict = {}; //保存每个簇的边界点坐标
+        let cluster_ids_dict = {}; //保存每个簇内点的id
         for (let i = 0; i < comb_data.length; i++) {
             if (comb_data[i].cluster != -1) {
                 let tmp_cluster = 'cluster-' + comb_data[i]['cluster'];
                 if (cluster_point_dict[tmp_cluster]) {
                     cluster_ids_dict[tmp_cluster].push(comb_data[i]['id']);
                     cluster_point_dict[tmp_cluster].push([comb_data[i].x, comb_data[i].y])
-                }
-                else {
+                } else {
                     cluster_ids_dict[tmp_cluster] = [comb_data[i]['id']];
-                    cluster_point_dict[tmp_cluster] = [[comb_data[i].x, comb_data[i].y]]
+                    cluster_point_dict[tmp_cluster] = [
+                        [comb_data[i].x, comb_data[i].y]
+                    ]
                 }
             }
 
         }
-        let key_list = Object.keys(cluster_point_dict).sort(function (a, b) { return cluster_point_dict[b].length - cluster_point_dict[a].length })
+        let key_list = Object.keys(cluster_point_dict).sort(function (a, b) {
+            return cluster_point_dict[b].length - cluster_point_dict[a].length
+        })
         //定义线生成器
         let line = d3.line()
-            .x(function (d) { return xScale(parseFloat(d[0])) + 10; })
-            .y(function (d) { return yScale(parseFloat(d[1])); })
+            .x(function (d) {
+                return xScale(parseFloat(d[0])) + 10;
+            })
+            .y(function (d) {
+                return yScale(parseFloat(d[1]));
+            })
             .curve(d3.curveCatmullRom)
         let points_arr = [];
         let length_arr = [];
@@ -102,6 +122,7 @@ let scatter = (function () {
         //设置刷子
         var brush = d3.brush()
             .on("end", brushed);
+
         function brushed() {
             // let selection = d3.event.selection;
             // let inner_paper = [];
@@ -117,12 +138,12 @@ let scatter = (function () {
             variable.svg_scatter.append("a")
                 .attr("class", "brush")
                 .call(brush)
-            variable.svg_scatter.selectAll('circle').on('click', function () { })
+            variable.svg_scatter.selectAll('circle').on('click', function () {})
             variable.svg_scatter.selectAll('path')
                 .attr('opacity', 0)
-                .on('mouseover', function () { })
-                .on('mouseout', function () { })
-                .on('click', function () { })
+                .on('mouseover', function () {})
+                .on('mouseout', function () {})
+                .on('click', function () {})
         })
 
         //设置选簇操作
@@ -158,24 +179,33 @@ let scatter = (function () {
     function drawHeat(data) {
         //删除上次绘图canvas
         // d3.select('#scatter_canvas').select('canvas').remove();
-     //坐标进行比例换算，将坐标为负的按比例放缩到正值
+        //坐标进行比例换算，将坐标为负的按比例放缩到正值
         let svg_width = $("#svg_scatter")[0].scrollWidth;
         let svg_height = $("#svg_scatter")[0].scrollHeight;
-        let min_x = d3.min(data.info, function (d) { return d.x });
-        let min_y = d3.min(data.info, function (d) { return d.y });
-        let max_x = d3.max(data.info, function (d) { return d.x });
-        let max_y = d3.max(data.info, function (d) { return d.y });
+        let min_x = d3.min(data.info, function (d) {
+            return d.x
+        });
+        let min_y = d3.min(data.info, function (d) {
+            return d.y
+        });
+        let max_x = d3.max(data.info, function (d) {
+            return d.x
+        });
+        let max_y = d3.max(data.info, function (d) {
+            return d.y
+        });
         let xScale = d3.scaleLinear().domain([min_x, max_x]).range([0, svg_width - 20]);
         let yScale = d3.scaleLinear().domain([min_y, max_y]).range([svg_height - 20, 0]);
 
 
-        let points = [], max_val = 1;
+        let points = [],
+            max_val = 1;
         for (let i = 0; i < data.info.length; i++) {
             let point = {
-                x:xScale(data.info[i].x),
-                y:yScale(data.info[i].y),
-                value:1,
-                radius:15
+                x: xScale(data.info[i].x),
+                y: yScale(data.info[i].y),
+                value: 1,
+                radius: 15
             }
             points.push(point);
         }

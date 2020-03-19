@@ -35,13 +35,13 @@
         <label style='color:rgb(124, 124, 124);margin:10px;display:inline-block;margin:2% 5% 1% 5%'>Dataset：
         </label>
         <div class="dropdown show" style="display:inline-block;">
-            <a class="btn btn-sm dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
+            <a class="btn btn-sm dropdown-toggle" href="#" role="button" id="button_dataset" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="true" style='margin-top:-5px;'>
-                Patent
+                Paper Data
             </a>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                <a class="dropdown-item" href="#">Chicago</a>
-                <a class="dropdown-item" href="#">Simulation data</a>
+            <div class="dropdown-menu downListData" aria-labelledby="button_dataset" id='datasetDropdown'>
+                <a class="dropdown-item" value='patent'>Patent Data</a>
+                <a class="dropdown-item" value='paper'>Paper Data</a>
             </div>
         </div>
         <div style='display:block'>
@@ -99,7 +99,7 @@
             </div> --}}
 
             <div class='btn_out'>
-                <button id="confirm" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Confirm</button>
+                <button id="confirm_param" class="btn btn-outline-primary my-2 my-sm-0 confirm" type="submit">Confirm</button>
             </div>
 
         </div>
@@ -109,7 +109,7 @@
             <div id='headline'><a id='headline_b'>Attributions Selected</a></div>
 
             <div class="custom-control custom-checkbox" style='margin:3% 5% 0 5%;'>
-                <input type="checkbox" class="custom-control-input" id="1" checked='true'>
+                <input type="checkbox" class="custom-control-input" id="1" checked>
                 <label class="custom-control-label" for="1" id="citedLabel" style='color:gray'>Conference</label>
                 <div class='tuli' style='background-color:#7fc97f'></div>
             </div>
@@ -124,7 +124,6 @@
                 <input type="checkbox" class="custom-control-input" id="3">
                 <label class="custom-control-label" for="3" id="confLabel" style='color:gray'>Paper Type</label>
                 <div class='tuli' style='background-color:#fdc086'></div>
-
             </div>
 
             {{!-- <div class="custom-control custom-checkbox" style='margin:3% 5% 0 5%;'>
@@ -140,7 +139,7 @@
                 <div class='tuli' style='background-color:#00D8FF'></div>
 
             </div> --}}
-            <button id="confirm" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Confirm</button>
+            <button id="confirm_attr" class="btn btn-outline-primary my-2 my-sm-0 confirm" type="submit">Confirm</button>
         </div>
     </div>
 

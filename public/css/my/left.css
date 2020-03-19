@@ -64,7 +64,7 @@ div#attributes {
 
 }
 
-button#confirm {
+button.confirm {
     position:absolute;
     bottom:5%;
     margin-left: 35%;
@@ -100,6 +100,13 @@ div#buttonList{
     font-size: .8rem;
     min-width: 5rem;
 }
+
+.downListData{
+    padding:0;
+    font-size: .9rem;
+    min-width: 5rem;
+}
+
 .downList a{
     padding: .2rem .5rem;
 }
@@ -131,8 +138,7 @@ div#buttonList{
 }
 
 .slider_out {
-    margin-top: 9%;
-
+    margin-top: 18%;
 }
 
 .slider_span {
@@ -145,7 +151,7 @@ div#buttonList{
 
 #rangeLeft1{
     position:absolute;
-    top:13%;
+    top:20%;
     left:37%;
     color: #aaaaaa;
     font-size: 0.7em;
@@ -154,7 +160,7 @@ div#buttonList{
 
 #rangeRight1{
     position:absolute;
-    top:13%;
+    top:20%;
     right:13%;
     color: #aaaaaa;
     font-size: 0.7em;
@@ -164,7 +170,7 @@ div#buttonList{
 
 #rangeLeft2{
     position:absolute;
-    top:34%;
+    top:48%;
     left:37%;
     color: #aaaaaa;
     font-size: 0.7em;
@@ -173,7 +179,7 @@ div#buttonList{
 
 #rangeRight2{
     position:absolute;
-    top:34%;
+    top:48%;
     right:13%;
     color: #aaaaaa;
     font-size: 0.7em;
