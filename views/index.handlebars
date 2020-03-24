@@ -2,7 +2,7 @@
 <link rel="stylesheet" type="text/css" href="/css/jq22-demo.css"> --}}
 
 
-<script src="/js/echarts/echarts.js"></script>
+{{!-- <script src="/js/echarts/echarts.js"></script> --}}
 <script src="/js/d3/d3.v4.min.js"></script>
 <script src="/js/bootstrap/Popper.js"></script>
 <script src="/js/jquery/jquery-3.3.1.min.js"></script>
@@ -14,13 +14,7 @@
 <script src="/js/FileSaver.js"></script>
 <script src="/js/d3/d3-ForceEdgeBundling.js"></script>
 <script src="/js/leaflet/leaflet.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
-    integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
-    crossorigin="" />
 <!-- Make sure you put this AFTER Leaflet's CSS -->
-<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
-    integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
-    crossorigin=""></script>
 <script src="/js/heatmap.js"></script>
 
 
@@ -28,10 +22,8 @@
     <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#" style="border-bottom:0.1px solid rgb(216, 216, 216);background-color:white;box-shadow:none;color:rgb(124, 124, 124);font-size:1.5em;">胜利油田</a>
 </nav> --}}
 <div id='left'>
-    <div id='dataset'>
-        <div id="headLine">
-            <a id='headline_a'>Data Infomation</a>
-        </div>
+
+    {{!-- <div id='dataset'>
         <label style='color:rgb(124, 124, 124);margin:10px;display:inline-block;margin:2% 5% 1% 5%'>Dataset：
         </label>
         <div class="dropdown show" style="display:inline-block;">
@@ -44,29 +36,17 @@
                 <a class="dropdown-item" value='paper'>Paper Data</a>
             </div>
         </div>
-        <div style='display:block'>
-            <label style='color:rgb(124, 124, 124);display:inline-block;margin:0 0 1% 5%; '>Nodes
-            </label>
-            <label style='color:rgb(124, 124, 124);display:inline-block;margin:0 0 1% 20%;'>Edges
-            </label>
-            <label style='color:rgb(124, 124, 124);margin:0 0 1% 16%;'>Attributes
-            </label>
-        </div>
+    </div> --}}
 
-        <div style='disply:block;color:rgb(124, 124, 124)'>
-            <a class='data_info' id='node_quantity' style='margin-left:5%;width:50px;'>0</a>
-            <a class='data_info' id='edge_quantity' style='margin-left:15%;width:70px;'>0</a>
-            <a class='data_info' id='attr_quantity' style='margin-left:15%;width:50px;'>0</a>
-        </div>
 
-    </div>
+
 
     <div id='control_pannel'>
         <div id="headLine">
             <a id='headline_a'>Control Pannel</a>
         </div>
-        <div id='controlInner'>
-            <div id='headline'><a id='headline_b'>Model Parameter</a></div>
+        <div id='control_content'>
+            <div id='headline'><a id='headline_b'>Deepwalk</a></div>
             <span id='rangeLeft1'>10</span>
             <span id='rangeRight1'>30</span>
 
@@ -99,7 +79,8 @@
             </div> --}}
 
             <div class='btn_out'>
-                <button id="confirm_param" class="btn btn-outline-primary my-2 my-sm-0 confirm" type="submit">Confirm</button>
+                <button id="confirm_param" class="btn btn-outline-secondary my-2 my-sm-0 confirm"
+                    type="submit">Confirm</button>
             </div>
 
         </div>
@@ -139,7 +120,8 @@
                 <div class='tuli' style='background-color:#00D8FF'></div>
 
             </div> --}}
-            <button id="confirm_attr" class="btn btn-outline-primary my-2 my-sm-0 confirm" type="submit">Confirm</button>
+            <button id="confirm_attr" class="btn btn-outline-secondary my-2 my-sm-0 confirm"
+                type="submit">Confirm</button>
         </div>
     </div>
 
@@ -147,10 +129,10 @@
         <div id="headLine">
             <a id='headline_a'>Tree View</a>
         </div>
-        <div id='buttonList'>
-            <div class="dropdown dropdownList" id='dropdown'>
-                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="button_w1"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+        <div id='buttonList' class="btn-group" role="group" aria-label="Basic example">
+            <div id='dropdown1' class="btn-group" role="group">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle tree_button" type="button"
+                    id="button_w1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                     style='font-size:0.8em;padding:.0rem .5rem;'>
                     w1: 1
                 </button>
@@ -160,30 +142,30 @@
                     <a class="dropdown-item" href="#" value=3>3</a>
                 </div>
             </div>
-            <div class="dropdown dropdownList" id='dropdown'>
+            <div id='dropdown2' class="btn-group" role="group">
                 <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="button_w2"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                     style='font-size:0.8em;padding:.0rem .5rem;'>
                     w2: 5
                 </button>
                 <div class="dropdown-menu downList" aria-labelledby="dropdownMenuButton" id='w2'>
-                      <a class="dropdown-item" href="#" value=1>1</a>
+                    <a class="dropdown-item" href="#" value=1>1</a>
                     <a class="dropdown-item" href="#" value=2>2</a>
                     <a class="dropdown-item" href="#" value=3>3</a>
                     <a class="dropdown-item" href="#" value=4>4</a>
-                     <a class="dropdown-item" href="#" value=5>5</a>
+                    <a class="dropdown-item" href="#" value=5>5</a>
                     <a class="dropdown-item" href="#" value=6>6</a>
                     <a class="dropdown-item" href="#" value=7>7</a>
                 </div>
             </div>
-            <div class="dropdown dropdownList" id='dropdown'>
+            <div id='dropdown3' class="btn-group" role="group">
                 <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="button_w3"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                     style='font-size:0.8em;padding:.0rem .5rem;'>
                     w3: 0.1
                 </button>
                 <div class="dropdown-menu downList" aria-labelledby="dropdownMenuButton" id='w3'>
-                     <a class="dropdown-item" href="#" value=0.1>0.1</a>
+                    <a class="dropdown-item" href="#" value=0.1>0.1</a>
                     <a class="dropdown-item" href="#" value=0.2>0.2</a>
                     <a class="dropdown-item" href="#" value=0.3>0.3</a>
                 </div>
@@ -207,13 +189,33 @@
             <a id='headline_a'>Aggregation View</a>
         </div>
         <svg id='svg_force'></svg>
-        <div id='innerTopo' class="custom-control custom-checkbox">
-            <input type="checkbox" class="custom-control-input" id="topo">
-            <label class="custom-control-label" for="topo" id="citedLabel" style='color:gray'>Inner Topology</label>
+
+        <div id='data_info' style='disply:block;color:rgb(124, 124, 124)'>
+            <label>Nodes: </label>
+            <a id='node_quantity'>0</a>
+            <label>Edges: </label>
+            <a id='edge_quantity'>0</a>
+            <label>Cluster: </label>
+            <a id='cluster_quantity'>0</a>
         </div>
-        <button id="origin" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Original topology</button>
-        <button id="cluster_layout" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Cluster Layout</button>
-        <button id="edge_bundling" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Edge Bundling</button>
+        <div id='force_button_out'>
+            <div id='innerTopo' class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" id="topo">
+                <label class="custom-control-label" for="topo" id="citedLabel" style='color:gray'>Inner</label>
+            </div>
+            <div id='button_group_force' class="btn-group" role="group" aria-label="Basic example">
+                <button id="inner" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Inner</button>
+                <button id="origin" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Origin</button>
+                <button id="cluster_layout" class="btn btn-outline-secondary my-2 my-sm-0" style='border-left:0'
+                    type="submit">Cluster</button>
+                <button id="edge_bundling" class="btn btn-outline-secondary my-2 my-sm-0" style='border-left:0'
+                    type="submit">Bundling</button>
+            </div>
+        </div>
+
+
+
+
         <div id='moveButtons'>
             <button type="button" class="btn btn-outline-secondary my-2 my-sm-1 Movebutton" aria-label="Left Align"
                 id='zoomIn'>
@@ -239,6 +241,7 @@
                 id='ButtonDown'>
                 <img src="/img/arrowdown.png" width='20' height="20">
             </button>
+
         </div>
     </div>
 

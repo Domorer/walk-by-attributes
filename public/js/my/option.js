@@ -39,7 +39,7 @@ let option = (function () {
         forceChart.drawOriForce(oriNodes, variable.oriLinks, variable.cluster_dict);
 
     });
-
+ 
     //*******************滑块******************
     var slider_times = $("#walk_times").slider({
         orientation: "horizontal",
@@ -348,9 +348,7 @@ let option = (function () {
                     let attr_count = 0;
                     for (let key in variable.attrValue_dict)
                         attr_count += 1
-                    $('#node_quantity').text(node_quantity)
-                    $('#edge_quantity').text(data_link.length)
-                    $('#attr_quantity').text(attr_count)
+                    
                     //获取原始link的字典
                     for (let i = 0; i < data_link.length; i++) {
                         if (variable.oriLink_dict[data_link[i].source] != null) {
@@ -387,6 +385,11 @@ let option = (function () {
 
                     parallel.drawParallel();
 
+
+                    //修改force框内的数据，每次confirm都要重新更新数据，不管是哪里的confirm按钮
+                    $('#node_quantity').text(node_quantity)
+                    $('#edge_quantity').text(data_link.length)
+                    $('#cluster_quantity').text(variable.cluster_arr.length)
                 })
 
             })

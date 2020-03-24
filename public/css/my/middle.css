@@ -3,6 +3,22 @@
     height: 100%;
 }
 
+#data_info {
+    position: absolute;
+    width: 20rem;
+    top: 1.4rem;
+}
+
+#data_info label {
+    color: rgb(124, 124, 124);
+    padding: 0 0 1% .5rem;
+}
+
+#data_info a {
+    display: inline-block;
+    font-size: 1rem;
+    margin-right:.6rem;
+}
 
 #svg_force {
     border-radius: 4px;
@@ -11,27 +27,44 @@
     height: 97%;
 }
 
-#innerTopo{
+#force_button_out {
     position: absolute;
-    top: 3%;
-    left: 2%;
+    top: 1.4rem;
+    right: .5rem;
 }
 
-button#cluster_layout {
+#force_button_out button{
+    padding-left: 5;
+    padding-right: 5;
+    padding-top: 0;
+    padding-bottom: 0;
+    font-size: 0.8rem;
+    width:4.5rem;
+    border:1.1px solid #bbbbbb;
+}
+
+/* #button_group_force {
     position: absolute;
-    top: 3%;
-    right: 1%;
+    top: 1.4rem;
+    right: .5rem;
+} */
+
+#innerTopo {
+    display: inline;
+    vertical-align: middle;
+    margin-right: .2rem;
+}
+
+/* button#cluster_layout {
     padding-left: 5;
     padding-right: 5;
     padding-top: 0;
     padding-bottom: 0;
     font-size: 0.8em;
+  
 }
 
 button#edge_bundling {
-    position: absolute;
-    top: 3%;
-    right: 15%;
     padding-left: 5;
     padding-right: 5;
     padding-top: 0;
@@ -39,23 +72,21 @@ button#edge_bundling {
     font-size: 0.8em;
 }
 
-button#origin{
-    position: absolute;
-    top: 3%;
-    right: 29%;
+button#origin {
     padding-left: 5;
     padding-right: 5;
     padding-top: 0;
     padding-bottom: 0;
     font-size: 0.8em;
+} */
+
+div#moveButtons {
+    position: absolute;
+    top: 7%;
+    left: .5rem;
+    width: 20px;
 }
 
-div#moveButtons{
-    position: absolute;
-    top:7%;
-    right:2%;
-    width:20px;
-}
-div#moveButtons button{
+div#moveButtons button {
     padding: 2
 }
