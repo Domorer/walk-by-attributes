@@ -13,6 +13,11 @@ let parallel = (function () {
         svg_parallel.selectAll('*').remove();
         let svg_width = $("#svg_parallel")[0].scrollWidth;
         let svg_height = $("#svg_parallel")[0].scrollHeight;
+        let attrAxisHeight = 0.6 * svg_height,
+            attrAxisWidth = 0.9 * svg_width,
+            left_space = (svg_width - attrAxisWidth) / 2,
+            right_space = 5,
+            rect_width = 10
         // 2. 添加标签,数组长度代表属性数量
         let labels = [],
             oriName_arr = []
@@ -23,7 +28,14 @@ let parallel = (function () {
         console.log('variable.attrValue_dict:   ', variable.attrValue_dict)
         svg_parallel.append('g').selectAll('text').data(oriName_arr).enter()
             .append('text')
-            .attr('x', (d, i) => 0.15 * svg_width + i * svg_width * 0.75 / (labels.length - 1))
+            .attr('x', (d, i) => {
+                if (i == 0)
+                    return i * attrAxisWidth / (labels.length - 1) + 1
+                else if (i == oriName_arr.length - 1)
+                    return i * attrAxisWidth / (labels.length - 1) + left_space * 2 - 1
+                else
+                    return left_space + i * attrAxisWidth / (labels.length - 1)
+            })
             .attr('y', 0.07 * svg_height)
             .style('font-size', 13)
             .style('font-weight', 100)
@@ -31,18 +43,25 @@ let parallel = (function () {
             .style('stroke-width', 1)
             .style('stroke', 'black')
             .style('fill', 'black')
-            .style('text-anchor', 'middle')
+            .style('text-anchor', (d, i) => {
+                if (i == 0)
+                    return 'start'
+                else if (i == oriName_arr.length - 1)
+                    return 'end'
+                else
+                    return 'middle'
+            })
             .text(d => d)
 
-        //3. 添加时间段轴
+        //3. 添加属性轴
         let attrs_line = []
         for (let i = 0; i < labels.length; i++) {
             attrs_line.push(
                 [
-                    [0.15 * svg_width + i * svg_width * 0.75 / (labels.length - 1),
+                    [left_space + i * attrAxisWidth / (labels.length - 1),
                         0.1 * svg_height
                     ],
-                    [0.15 * svg_width + i * svg_width * 0.75 / (labels.length - 1),
+                    [left_space + i * attrAxisWidth / (labels.length - 1),
                         0.9 * svg_height
                     ]
                 ]
@@ -96,7 +115,7 @@ let parallel = (function () {
             attrValue_arr.push(tmp_attrValueArr)
             rect_arr.push(valueObj_arr)
             //将高度单位化，代表每个点在轴i上所拥有的高度
-            unitHeight = (0.8 / nodesCount) * svg_height
+            unitHeight = attrAxisHeight / nodesCount
         }
         // console.log("drawParallel -> rect_arr", rect_arr)
 
@@ -132,7 +151,7 @@ let parallel = (function () {
                 //加上在该属性值上的排列顺序
                 let tmp_index = variable.valueIds_dict[labels[j]][tmp_attrValue].indexOf(id)
                 preHeight += tmp_index * unitHeight
-                tmp_line.push([0.15 * svg_width + j * svg_width * 0.75 / (labels.length - 1),
+                tmp_line.push([left_space + j * attrAxisWidth / (labels.length - 1),
                     0.1 * svg_height + preHeight
                 ])
             }
@@ -159,11 +178,11 @@ let parallel = (function () {
                     return 'parallelClass_' + variable.cluster_dict[ids_arr[i]].cluster
             })
             .style('stroke', '#b0b0b0')
-            .style('stroke-width', function(){
-                if(variable.dataset == 'patent')
+            .style('stroke-width', function () {
+                if (variable.dataset == 'patent')
                     return 0.2
                 else
-                 return 1
+                    return 1
             })
             .style('fill', 'none')
             .style('opacity', .05)
@@ -184,7 +203,11 @@ let parallel = (function () {
 
             svg_parallel.append('g').selectAll('rect').data(rect_arr[i]).enter()
                 .append('rect')
-                .attr('x', 0.15 * svg_width + i * svg_width * 0.75 / (labels.length - 1) - 5)
+                .attr('x', d => {
+
+                    return left_space + i * attrAxisWidth / (labels.length - 1) - 5
+
+                })
                 .attr('y', (d, vi) => {
                     let preHeight = 0
                     vi -= 1
@@ -195,7 +218,7 @@ let parallel = (function () {
                     }
                     return 0.1 * svg_height + preHeight
                 })
-                .attr('width', 10)
+                .attr('width', rect_width)
                 .attr('height', (d) => {
                     if ((unitHeight * d.count / 10) > 5)
                         return unitHeight * d.count - 5
@@ -218,7 +241,7 @@ let parallel = (function () {
                     }
                 })
                 .attr('id', d => 'rect_' + labels[i] + '_' + d.attrValue) //id : rect_属性_属性值
-                .on('click',d=>{
+                .on('click', d => {
                     console.log(d.attrValue)
                 })
 
@@ -236,8 +259,12 @@ let parallel = (function () {
 
                 svg_parallel.append('g').selectAll('text').data(valueTexts).enter()
                     .append('text')
-                    .attr('x', 0.15 * svg_width + i * svg_width * 0.75 / (labels.length - 1) - 12)
-                    .attr('y', (d, vi) => {
+                    .attr('x', d => {
+                        if (i == 0)
+                            return left_space + i * attrAxisWidth / (labels.length - 1) + rect_width
+                        else
+                            return left_space + i * attrAxisWidth / (labels.length - 1) - rect_width
+                    }).attr('y', (d, vi) => {
                         let preHeight = rect_arr[i][vi]['count'] * unitHeight / 2
                         vi -= 1
                         //计算先前属性所占高度
@@ -248,12 +275,16 @@ let parallel = (function () {
                         return 0.1 * svg_height + preHeight
                     })
                     .style('font-size', 10)
-                    .style('font-weight', 100)
                     .style('color', 'black')
-                    .style('stroke-width', 1)
+                    .style('stroke-width', .5)
                     .style('stroke', 'black')
                     .style('fill', 'black')
-                    .style('text-anchor', 'end')
+                    .style('text-anchor', d => {
+                        if (i == 0)
+                            return 'start'
+                        else
+                            return 'end'
+                    })
                     .text(d => d)
             }
 
@@ -304,7 +335,7 @@ let parallel = (function () {
             for (let v in tmpValueIds_dict[attr]) {
                 d3.select('#rect_' + attr + '_' + v)
                     .attr('x', function () {
-                        let oriX = 0.15 * svg_width + index * svg_width * 0.75 / (attrCount - 1)
+                        let oriX = left_space + index * attrAxisWidth / (attrCount - 1)
                         return oriX - widthScale(tmpValueIds_dict[attr][v]) / 2;
                     })
                     .transition()

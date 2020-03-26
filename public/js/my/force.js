@@ -50,18 +50,20 @@ let forceChart = (function () {
             })
             .attr('stroke', function (d) {
                 d.cluster = cluster_dict[d.id];
-                if (d.cluster != -1 && d.cluster != undefined)
-                    return color(d.cluster)
-                else
-                    return 'black';
+                return 'blue'
+                // if (d.cluster != -1 && d.cluster != undefined)
+                //     return color(d.cluster)
+                // else
+                //     return 'black';
             }).attr('fill', function (d) {
-                if (d.cluster != -1 && d.cluster != undefined)
-                    return color(d.cluster)
-                else
-                    return 'black';
-            }).attr('class', function (d) {
-                return d.id;
-            });
+                return 'blue'
+                // if (d.cluster != -1 && d.cluster != undefined)
+                //     return color(d.cluster)
+                // else
+                //     return 'black';
+            }).attr('id', function (d) {
+                return `oriForce_${d.id}`;
+            }).attr('class', d => `oriForce_${d.cluster}`)
 
         let line = d3.line()
             .x(function (d) {
@@ -174,22 +176,20 @@ let forceChart = (function () {
             .attr('cy', function (d) {
                 return d.y;
             })
-            .attr('stroke', function (d) {
-                // d.cluster = cluster_dict[d.id];
-                // if (d.cluster != -1 && d.cluster != undefined)
-                //     return color(d.cluster)
-                // else
-                let tmp_index = variable.attrValue_dict[variable.attr].indexOf(d[parseInt(variable.attr)])
-                return variable.valueColor_dict[variable.dataset][variable.attr][tmp_index]
-            }).attr('fill', function (d) {
-                // if (d.cluster != -1 && d.cluster != undefined)
-                //     return color(d.cluster)
-                // else
-                let tmp_index = variable.attrValue_dict[variable.attr].indexOf(d[parseInt(variable.attr)])
-                return variable.valueColor_dict[variable.dataset][variable.attr][tmp_index]
-            }).attr('class', function (d) {
-                return d.id;
-            }).call(drag(simulation));
+            .style('stroke', function (d) {
+                // let tmp_index = variable.attrValue_dict[variable.attr].indexOf(d[parseInt(variable.attr)])
+                // return variable.valueColor_dict[variable.dataset][variable.attr][tmp_index]
+                return 'blue'
+            }).style('fill', function (d) {
+                // let tmp_index = variable.attrValue_dict[variable.attr].indexOf(d[parseInt(variable.attr)])
+                // return variable.valueColor_dict[variable.dataset][variable.attr][tmp_index]
+                return 'blue'
+            }).attr('id', function (d) {
+                return `oriForce_${d.id}`;
+            }).attr('class', d => {
+                return `oriForce_${d[parseInt(variable.attr)]}`
+            })
+            .call(drag(simulation));
     }
 
 
@@ -474,7 +474,7 @@ let forceChart = (function () {
                         if (variable.dataset == 'patent')
                             return 0
                         else
-                        return .05
+                            return .05
                     })
                     .style('stroke-width', 1)
                     .style('stroke', '#e3e3e3')
@@ -492,7 +492,7 @@ let forceChart = (function () {
                 /*如果innertopo为选中状态，则点击当前节点就会改变该节点和节点外圈扇形的透明度
                 
                 */
-                if ($('#topo')[0].checked) {
+                if (option.inner_open) {
                     if ($(this)[0].style.opacity == '0') {
                         d3.selectAll('.pie_' + d.id).style('opacity', 1);
                         d3.select(this).style('opacity', 1);

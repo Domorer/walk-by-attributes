@@ -16,7 +16,7 @@
 <script src="/js/leaflet/leaflet.js"></script>
 <!-- Make sure you put this AFTER Leaflet's CSS -->
 <script src="/js/heatmap.js"></script>
-
+<script src="/js/jscolor.js"></script>
 
 {{!-- <nav id="nav" class="navbar navbar-dark sticky-top  flex-md-nowrap p-0" style="border-bottom:3px solid rgb(216, 216, 216);">
     <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#" style="border-bottom:0.1px solid rgb(216, 216, 216);background-color:white;box-shadow:none;color:rgb(124, 124, 124);font-size:1.5em;">胜利油田</a>
@@ -45,24 +45,53 @@
         <div id="headLine">
             <a id='headline_a'>Control Pannel</a>
         </div>
+
+        <div class='color_brewer'>
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <a id='nav_a_1' class="nav-item nav-link nav_a disabled" id="nav-home-tab" data-toggle="tab" href="#nav-1"
+                        role="tab" aria-controls="nav-home" aria-selected="true">Conf</a>
+                    <a id='nav_a_2' class="nav-item nav-link nav_a disabled" id="nav-profile-tab" data-toggle="tab" href="#nav-2"
+                        role="tab" aria-controls="nav-profile" aria-selected="false">Year</a>
+                    <a id='nav_a_3' class="nav-item nav-link nav_a disabled" id="nav-contact-tab" data-toggle="tab" href="#nav-3"
+                        role="tab" aria-controls="nav-contact" aria-selected="false">Type</a>
+                </div>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade" id="nav-1" role="tabpanel" aria-labelledby="nav-home-tab"></div>
+                <div class="tab-pane fade" id="nav-2" role="tabpanel" aria-labelledby="nav-profile-tab"></div>
+                <div class="tab-pane fade" id="nav-3" role="tabpanel" aria-labelledby="nav-contact-tab"></div>
+            </div>
+        </div>
+
+
         <div id='control_content'>
             <div id='headline'><a id='headline_b'>Deepwalk</a></div>
-            <span id='rangeLeft1'>10</span>
-            <span id='rangeRight1'>30</span>
+            <span id='rangeLeft1' class='rangeLabel'>10</span>
+            <span id='rangeRight1' class='rangeLabel'>30</span>
 
             <div class='slider_out'>
                 <span class='slider_span'>WT:
                 </span>
-                <input type="text" id="times_text" class='slider_input' value=10>
+                <input type="text" id="times_text" class='slider_input' style='margin-right:2' value=10>
                 <div id='walk_times' class='slider'></div>
             </div>
-            <span id='rangeLeft2'>15</span>
-            <span id='rangeRight2'>40</span>
+            <span id='rangeLeft2' class='rangeLabel'>10</span>
+            <span id='rangeRight2' class='rangeLabel'>40</span>
             <div class='slider_out'>
                 <span class='slider_span'>WL:
                 </span>
-                <input type="text" id="length_text" class='slider_input' value=20>
+                <input type="text" id="length_text" class='slider_input' style='margin-right:3' value=20>
                 <div id='walk_length' class='slider'></div>
+            </div>
+
+            <span id='rangeLeft3' class='rangeLabel'>0</span>
+            <span id='rangeRight3' class='rangeLabel'>20</span>
+            <div class='slider_out'>
+                <span class='slider_span'>WD:
+                </span>
+                <input type="text" id="windows_text" class='slider_input' value=5>
+                <div id='word_length' class='slider'></div>
             </div>
             {{!-- <div id='radio_out'>
                 <span class='slider_span'>RT:</span>
@@ -199,10 +228,6 @@
             <a id='cluster_quantity'>0</a>
         </div>
         <div id='force_button_out'>
-            <div id='innerTopo' class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input" id="topo">
-                <label class="custom-control-label" for="topo" id="citedLabel" style='color:gray'>Inner</label>
-            </div>
             <div id='button_group_force' class="btn-group" role="group" aria-label="Basic example">
                 <button id="inner" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Inner</button>
                 <button id="origin" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Origin</button>

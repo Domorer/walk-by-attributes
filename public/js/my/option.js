@@ -1,6 +1,7 @@
 let option = (function () {
 
     let comb_len = 0;
+    let inner_open = false; //保存inner按钮的操作情况
     let optIndex = 0; //记录操作的index
     let comb_record = []; //记录操作的具体参数元素格式为[当前属性选择，当前游走方式选择]
 
@@ -36,15 +37,30 @@ let option = (function () {
             tmp_node['id'] = key
             oriNodes.push(tmp_node);
         }
-        forceChart.drawOriForce(oriNodes, variable.oriLinks, variable.cluster_dict);
+        for (key in variable.attrValue_dict) {
+            $(`#nav_a_${key}`).removeClass('disabled')
+        }
+        $(`#nav_a_1`).addClass('active')
+        $(`#nav-1`).addClass(['show', 'active'])
+
+        // forceChart.drawOriForce(oriNodes, variable.oriLinks, variable.cluster_dict);
 
     });
- 
+    $('#inner').on('click', function () {
+        option.inner_open = !option.inner_open;
+        if (option.inner_open)
+            d3.select(this).style('background-color', '#409eff')
+        else
+            d3.select(this).style('background-color', 'transparent')
+    })
+    //颜色选择器
+
+
     //*******************滑块******************
     var slider_times = $("#walk_times").slider({
         orientation: "horizontal",
         range: "min",
-        min: 10,
+        min: 0,
         max: 30,
         value: 10,
         slide: function (event, ui) {
@@ -59,7 +75,7 @@ let option = (function () {
     var slider_length = $("#walk_length").slider({
         orientation: "horizontal",
         range: "min",
-        min: 15,
+        min: 10,
         max: 40,
         value: 20,
         slide: function (event, ui) {
@@ -71,7 +87,16 @@ let option = (function () {
         }
     })
 
-
+    var slider_length = $("#word_length").slider({
+        orientation: "horizontal",
+        range: "min",
+        min: 0,
+        max: 20,
+        value: 5,
+        slide: function (event, ui) {
+            $("#windows_text").val(ui.value);
+        }
+    })
     $('#confirm_param, #confirm_attr').on('click', function () {
         reset()
     })
@@ -222,6 +247,7 @@ let option = (function () {
     $('#toHeatmap').on('click', function () {
         console.log('checked: ', $('#inputHeat')[0].checked);
     });
+
     //每次类变化后页面进行的操作
     function modify_cluster(data, tree_confirm) {
         //地图视图清空
@@ -310,6 +336,7 @@ let option = (function () {
             d3.csv(`data/${variable.dataset}/weighted_link.csv`, function (error, data_link) {
                 d3.json(`data/${variable.dataset}/nodeInfo.json`, function (error, nodeInfo) {
                     variable.nodeInfo = nodeInfo;
+                    console.log("resetByDataset -> nodeInfo", nodeInfo)
                     /* 遍历节点信息字典数据：
                         1. 获取valueCount_dict 各属性值拥有的点的数量
                         2. attrValue_dict  ,,属性字典，各属性所拥有的属性值字典
@@ -344,11 +371,10 @@ let option = (function () {
                     console.log("option -> variable.attrValue_dict", variable.attrValue_dict)
 
                     console.log('data_link: ', data_link)
-                    //修改属性信息展示窗口的数据
                     let attr_count = 0;
                     for (let key in variable.attrValue_dict)
                         attr_count += 1
-                    
+
                     //获取原始link的字典
                     for (let i = 0; i < data_link.length; i++) {
                         if (variable.oriLink_dict[data_link[i].source] != null) {
@@ -386,10 +412,42 @@ let option = (function () {
                     parallel.drawParallel();
 
 
-                    //修改force框内的数据，每次confirm都要重新更新数据，不管是哪里的confirm按钮
+                    /*1.修改force框内的数据，每次confirm都要重新更新数据，不管是哪里的confirm按钮
+                    
+                    */
                     $('#node_quantity').text(node_quantity)
                     $('#edge_quantity').text(data_link.length)
                     $('#cluster_quantity').text(variable.cluster_arr.length)
+
+                    /*2.初始化属性值颜色选择器
+                    根据数据集读取属性个数和属性值数量来初始化属性值的颜色选择器
+                    如果属性值过多则忽略
+                    */
+                    for (let i = 0; i < variable.attr_arr_dict[variable.dataset].length; i++) {
+                        let tmp_attr = variable.attr_arr_dict[variable.dataset][i]
+                        for (let j = 0; j < variable.attrValue_dict[tmp_attr].length; j++) {
+                            //设置修改点颜色函数，选中各种点的
+                            function setCircleColor(picker) {
+                                console.log('??')
+                                // d3.selectAll(`.oriForce_${variable.attrValue_dict[tmp_attr][j]}`)
+                                //     .style('fill', '#' + picker.toString())
+                                //     .style('stroke', '#' + picker.toString())
+                            }
+
+
+                            let tmp_bg_color = variable.valueColor_dict[variable.dataset][i + 1][j],
+                                tmp_input = `<input id='colorPicker_${i+1}_${j}' class='jscolor colorPicker {onFineChange:'setCircleColor(this)'}' 
+                                             disabled='disabled'>`,
+                                tmp_label = `<label class='colorLabel'>${variable.attrValue_dict[tmp_attr][j]} : </label>`
+                            $('#nav-' + (i + 1)).append(tmp_label)
+                            $('#nav-' + (i + 1)).append(tmp_input)
+                            new jscolor(`colorPicker_${i+1}_${j}`)
+                            $(`#colorPicker_${i+1}_${j}`).css({
+                                'background-color': tmp_bg_color
+                            })
+                        }
+                    }
+
                 })
 
             })
@@ -425,6 +483,7 @@ let option = (function () {
 
     return {
         comb_record,
-        optIndex
+        optIndex,
+        inner_open
     }
 })()
