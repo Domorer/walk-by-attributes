@@ -113,6 +113,7 @@ var jsc = {
 		if (el.addEventListener) {
 			el.addEventListener(evnt, func, false);
 		} else if (el.attachEvent) {
+			console.log(2)
 			el.attachEvent('on' + evnt, func);
 		}
 	},
@@ -679,6 +680,7 @@ var jsc = {
 
 
 	dispatchFineChange : function (thisObj) {
+		// console.log(thisObj)
 		if (thisObj.onFineChange) {
 			var callback;
 			if (typeof thisObj.onFineChange === 'string') {
@@ -985,7 +987,7 @@ var jsc = {
 		this.refine = true; // whether to refine the entered color code (e.g. uppercase it and remove whitespace)
 		this.hash = false; // whether to prefix the HEX color code with # symbol
 		this.uppercase = true; // whether to show the color code in upper case
-		this.onFineChange = null; // called instantly every time the color changes (value can be either a function or a string with javascript code)
+		this.onFineChange = options; // called instantly every time the color changes (value can be either a function or a string with javascript code)
 		this.activeClass = 'jscolor-active'; // class to be set to the target element when a picker window is open on it
 		this.overwriteImportant = false; // whether to overwrite colors of styleElement using !important
 		this.minS = 0; // min allowed saturation (0 - 100)
@@ -1030,11 +1032,11 @@ var jsc = {
 		this.container = null; // where to append the color picker (BODY element by default)
 
 
-		for (var opt in options) {
-			if (options.hasOwnProperty(opt)) {
-				this[opt] = options[opt];
-			}
-		}
+		// for (var opt in options) {
+		// 	if (options.hasOwnProperty(opt)) {
+		// 		this[opt] = options[opt];
+		// 	}
+		// }
 
 
 		this.hide = function () {
@@ -1816,9 +1818,9 @@ var jsc = {
 		if (this.value) {
 			// Try to set the color from the .value option and if unsuccessful,
 			// export the current color
-			// this.fromString(this.value) || this.exportColor();
+			this.fromString(this.value) || this.exportColor();
 		} else {
-			// this.importColor();
+			this.importColor();
 		}
 	}
 

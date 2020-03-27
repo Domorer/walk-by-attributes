@@ -43,13 +43,13 @@ let option = (function () {
         $(`#nav_a_1`).addClass('active')
         $(`#nav-1`).addClass(['show', 'active'])
 
-        // forceChart.drawOriForce(oriNodes, variable.oriLinks, variable.cluster_dict);
+        forceChart.drawOriForce(oriNodes, variable.oriLinks, variable.cluster_dict);
 
     });
     $('#inner').on('click', function () {
         option.inner_open = !option.inner_open;
         if (option.inner_open)
-            d3.select(this).style('background-color', '#409eff')
+            d3.select(this).style('background-color', '#e4dfff')
         else
             d3.select(this).style('background-color', 'transparent')
     })
@@ -427,23 +427,20 @@ let option = (function () {
                         let tmp_attr = variable.attr_arr_dict[variable.dataset][i]
                         for (let j = 0; j < variable.attrValue_dict[tmp_attr].length; j++) {
                             //设置修改点颜色函数，选中各种点的
-                            function setCircleColor(picker) {
-                                console.log('??')
-                                // d3.selectAll(`.oriForce_${variable.attrValue_dict[tmp_attr][j]}`)
-                                //     .style('fill', '#' + picker.toString())
-                                //     .style('stroke', '#' + picker.toString())
-                            }
-
-
                             let tmp_bg_color = variable.valueColor_dict[variable.dataset][i + 1][j],
-                                tmp_input = `<input id='colorPicker_${i+1}_${j}' class='jscolor colorPicker {onFineChange:'setCircleColor(this)'}' 
+                                tmpAttrValue = variable.attrValue_dict[tmp_attr][j],
+                                tmp_input = `<input id='colorPicker_${tmp_attr}_${tmpAttrValue}' class='jscolor colorPicker' 
                                              disabled='disabled'>`,
-                                tmp_label = `<label class='colorLabel'>${variable.attrValue_dict[tmp_attr][j]} : </label>`
+                                tmp_label = `<label class='colorLabel'>${tmpAttrValue} : </label>`
                             $('#nav-' + (i + 1)).append(tmp_label)
                             $('#nav-' + (i + 1)).append(tmp_input)
-                            new jscolor(`colorPicker_${i+1}_${j}`)
-                            $(`#colorPicker_${i+1}_${j}`).css({
-                                'background-color': tmp_bg_color
+                            /*此处先执行jscolor是因为该对象有个内置默认操作：如果为给定input标签value值，
+                            则会自动将bgcolor设置为白色，覆盖设置的蓝色背景色
+                            */
+                            // $(`#colorPicker_${i+1}_${j}`).addClass(`{onFineChange:'setCircleColor(this)'}`)
+                            let jsc_tmp = new jscolor(`colorPicker_${tmp_attr}_${tmpAttrValue}`, 'option.setCircleColor(this)')
+                            $(`#colorPicker_${tmp_attr}_${tmpAttrValue}`).css({
+                                'background-color': 'blue'
                             })
                         }
                     }
@@ -454,6 +451,16 @@ let option = (function () {
         }).catch(function (error) {
             console.log('error: ', error);
         })
+    }
+
+    function setCircleColor(picker) {
+
+        let tmpId = picker.valueElement.id.split('_'),
+            tmpAttrValue = tmpId[2]
+        //原始力引导的点根据属性值来进行分类
+        d3.selectAll(`.oriForce_${tmpAttrValue}`)
+            .style('fill', '#' + picker.toString())
+            .style('stroke', '#' + picker.toString())
     }
 
     function getCombData(param, dataset) {
@@ -484,6 +491,7 @@ let option = (function () {
     return {
         comb_record,
         optIndex,
-        inner_open
+        inner_open,
+        setCircleColor
     }
 })()

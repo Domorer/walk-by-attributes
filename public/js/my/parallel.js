@@ -13,7 +13,7 @@ let parallel = (function () {
         svg_parallel.selectAll('*').remove();
         let svg_width = $("#svg_parallel")[0].scrollWidth;
         let svg_height = $("#svg_parallel")[0].scrollHeight;
-        let attrAxisHeight = 0.6 * svg_height,
+        let attrAxisHeight = 0.5 * svg_height,
             attrAxisWidth = 0.9 * svg_width,
             left_space = (svg_width - attrAxisWidth) / 2,
             right_space = 5,
@@ -287,17 +287,21 @@ let parallel = (function () {
                     })
                     .text(d => d)
             }
-
         }
+
+        
     }
 
 
     function changeWidth(cluster) {
+
         let svg_width = $("#svg_parallel")[0].scrollWidth;
         let svg_height = $("#svg_parallel")[0].scrollHeight;
         let ids = variable.cluster_ids_dict[cluster],
             tmpValueIds_dict = {},
             attrCount = 0
+        let attrAxisWidth = 0.9 * svg_width,
+            left_space = (svg_width - attrAxisWidth) / 2
         console.log("changeWidth -> variable.attrValue_dict", variable.attrValue_dict)
 
         //初始化点的数量字典

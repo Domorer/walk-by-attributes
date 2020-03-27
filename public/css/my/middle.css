@@ -10,13 +10,16 @@
 }
 
 #data_info label {
+    font-size:.8rem;
+    font-weight: 600;
     color: rgb(124, 124, 124);
     padding: 0 0 1% .5rem;
 }
 
 #data_info a {
     display: inline-block;
-    font-size: 1rem;
+    font-size: .8rem;
+    font-weight: 600;
     margin-right:.6rem;
 }
 
@@ -30,7 +33,7 @@
 #force_button_out {
     position: absolute;
     top: 1.4rem;
-    right: .5rem;
+    right: 0;
 }
 
 #force_button_out button{
@@ -38,9 +41,13 @@
     padding-right: 5;
     padding-top: 0;
     padding-bottom: 0;
-    font-size: 0.8rem;
+    font-size: .8rem;
+    font-weight: 400;
     width:4.5rem;
-    border:1.1px solid #bbbbbb;
+    border:1.5px solid #ecebeb;
+    border-right:0;
+    border-top:0;
+    border-radius:0;
 }
 
 /* #button_group_force {

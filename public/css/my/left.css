@@ -26,38 +26,38 @@ div#headLine {
     background-color: #409eff;
 }
 
-.color_brewer{
+.color_brewer {
     position: absolute;
-    top:1.5rem;
-    height:4.9rem;
-    left:2%;
-    width:96%;
-    border:1px solid #ecebeb
+    top: 1.5rem;
+    height: 4.9rem;
+    left: 2%;
+    width: 96%;
+    border: 1px solid #ecebeb
 }
 
-.nav_a{
-    padding:.2rem .7rem;
-    color:#97afff
+.nav_a {
+    padding: .2rem .7rem;
+    color: #97afff
 }
 
-#nav-tabContent div{
-    height:3rem;
+#nav-tabContent div {
+    height: 3rem;
     line-height: 3rem;
 }
 
-.colorPicker{
-    width:1rem;
-    height:1rem;
-    border:1px solid #b9b9b9;
-    border-radius:20%;
-    margin-left:.5rem;
+.colorPicker {
+    width: 1rem;
+    height: 1rem;
+    border: 1px solid #b9b9b9;
+    border-radius: 20%;
+    margin-left: .5rem;
 }
 
-.colorLabel{
+.colorLabel {
     color: rgb(170, 170, 170);
     font-size: 0.8rem;
     font-weight: 500;
-    margin-left:.7rem;
+    margin-left: .7rem;
 }
 
 
@@ -121,13 +121,15 @@ button.confirm {
 div#buttonList {
     position: absolute;
     top: 1.5rem;
-    left: 1%;
     width: 99%;
 }
 
 div#buttonList button {
     width: 4.5rem;
-    border: 1px solid #bbbbbb;
+    border: 1.5px solid #ecebeb;
+    border-left:0;
+    border-top:0;
+    border-radius:0;
 }
 
 .downList {
@@ -228,7 +230,7 @@ div#buttonList button {
 #rangeRight3 {
     position: absolute;
     top: 70%;
-    right: 12%;     
+    right: 12%;
 }
 
 
