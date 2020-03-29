@@ -6,7 +6,7 @@ let variable = (function () {
     let all_comb; //所有游走类型的数据集合
     let all_data; //所有参数的集合
     let type_count = 1; //选择了几个属性
-    let attr = '1';
+    let attr = '0';
     let w1 = 0.1,
         w2 = 6,
         w3 = 0.1;
@@ -107,7 +107,7 @@ let variable = (function () {
         wt: 10,
         sl: 20,
         rl: false,
-        comb: '1'
+        comb: '0'
     };
     let last_cluster; // 记录上次选择的cluster，用于还原对应元素的样式
 

@@ -626,7 +626,7 @@ let forceChart = (function () {
             tmp_color_arr,
             tmp_attr_arr,
             tmp_max = -Infinity
-        if (variable.type_count == 1) {
+        if (variable.type_count == 1 && variable.attr != '0') {
             tmp_color_arr = variable.valueColor_dict[variable.dataset][variable.attr]
             //单属性时，variable.attr 就是属性名称，不是多个属性名称的集合
             let value_dict = {};

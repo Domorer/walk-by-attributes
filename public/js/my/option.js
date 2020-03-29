@@ -16,15 +16,6 @@ let option = (function () {
     console.log("option -> variable.param", variable.param)
 
 
-
-    //获取站点坐标数据
-    d3.json('data/Chicago/loc.json', function (error, data) {
-        for (let key in data) {
-            data[key]['lat'] = parseFloat(data[key]['lat'])
-            data[key]['lng'] = parseFloat(data[key]['lng'])
-        }
-        variable.loc_dict = data;
-    })
     //*****************力引导图的簇展示***************
     $('#cluster_layout').on('click', function () {
         // forceChart.Clustering(variable.comb_data['clu_ids'], variable.comb_data['cluster_link'], variable.cluster_dict);
@@ -110,8 +101,8 @@ let option = (function () {
         d3.select('#attributes').selectAll('.custom-checkbox').remove();
         for (let j = 0; j < variable.attr_arr_dict[variable.dataset].length; j++) {
             let checked = null
-            if (j == 0)
-                checked = 'checked'
+            // if (j == 0)
+            //     checked = 'checked'
             let tmp_attrName = variable.oriAttrName_dict[variable.dataset][j + 1]
             let tmpInnerHtml = `<div class='custom-control custom-checkbox' style='margin:3% 5% 0 5%;'>` +
                 `<input type='checkbox' class='custom-control-input' id='${j + 1}' ${checked}>` +
@@ -293,8 +284,10 @@ let option = (function () {
         variable.type_count = 0;
         variable.attr = '';
         tree_view.modifyCount = 1
+        let all_attr = ''
         //循环判断每个checkbox的状态来获取当前的属性选择,如果一个也没选择就代表随机游走
         variable.attr_arr_dict[variable.dataset].forEach(Element => {
+            all_attr += $('#' + Element)[0].id;
             let tmp_checked = $('#' + Element)[0].checked;
             if (tmp_checked) {
                 comb_len += 1;
@@ -307,9 +300,17 @@ let option = (function () {
             }
         })
 
-        console.log('variable.attr: ', variable.attr);
+
         variable.param['rl'] = false;
-        variable.param['comb'] = variable.attr;
+        if (variable.attr == '') {
+            variable.attr = all_attr
+            variable.type_count = all_attr.split('').length
+            variable.param['comb'] = '0';
+        } else {
+            variable.param['comb'] = variable.attr;
+        }
+        console.log('variable.attr: ', variable.attr);
+
         //*************修改参数后修改各界面的view****************
         getCombData(variable.param, variable.dataset).then(function (data) {
             modify_cluster(data[0], false);
@@ -327,19 +328,20 @@ let option = (function () {
                 wt: 10,
                 sl: 20,
                 rl: false,
-                comb: '1'
+                comb: '0'
             };
-            variable.attr = '1'
-            variable.type_count = 1
+            variable.attr = '123'
+            variable.type_count = 3
         } else {
-            variable.type_count = 1
+            
             variable.param = {
                 wt: 10,
                 sl: 20,
                 rl: false,
-                comb: '1'
+                comb: '0'
             };
-            variable.attr = '1'
+            variable.attr = '12345'
+            variable.type_count = 5
         }
         getCombData(variable.param, variable.dataset).then(function (data) {
             d3.csv(`data/${variable.dataset}/weighted_link.csv`, function (error, data_link) {
