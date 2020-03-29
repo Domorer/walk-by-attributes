@@ -235,14 +235,12 @@ let option = (function () {
         variable.svg_force.transition(transition)
             .attr('viewBox', `${variable.viewbox.left} ${variable.viewbox.top} ${variable.viewbox.right} ${variable.viewbox.bottom}`)
     })
-
     $('#toHeatmap').on('click', function () {
         if (option.heat_open) {
             option.heat_open = !option.heat_open
             d3.select('#scatter_canvas').select('canvas').remove();
             d3.select('#toHeatmap').style('background-color', 'transparent')
         } else {
-
             option.heat_open = !option.heat_open
             scatter.drawHeat(variable.comb_data)
             d3.select('#toHeatmap')
@@ -270,9 +268,14 @@ let option = (function () {
             clusterFun.cluster(variable.comb_data, variable.level, variable.cluster_arr)
         //更新散点图
         scatter.drawScatter(data['info']);
+        if (option.heat_open)
+            scatter.drawHeat(variable.comb_data)
+        //力引导图
         forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
+        //树图
         if (tree_confirm == false)
             tree_view.draw_tree(data, variable.level);
+        //平行坐标轴
         parallel.drawParallel();
     }
 
@@ -333,7 +336,7 @@ let option = (function () {
             variable.attr = '123'
             variable.type_count = 3
         } else {
-            
+
             variable.param = {
                 wt: 10,
                 sl: 20,

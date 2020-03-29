@@ -420,8 +420,8 @@ let riverView = (function () {
             .attr('y', (d, i) => rect_sy + i * y_space)
             .attr('height', 12)
             .attr('width', 12)
-            .attr('rx', 5)
-            .attr('ry', 5)
+            .attr('rx', 2.4)
+            .attr('ry', 2.4)
             .attr('fill', (d, i) => river_color[2 - i])
     }
 

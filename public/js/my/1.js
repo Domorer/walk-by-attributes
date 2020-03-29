@@ -1,2 +1,3 @@
-a = -0
-console.log(1 / a)
+a = 10
+a/=2
+console.log(a)

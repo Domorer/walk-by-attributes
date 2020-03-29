@@ -113,7 +113,6 @@ let scatter = (function () {
                     .style('opacity', function () {
                         return 0
                     })
-                    .style('stroke-width', 1)
                     .style('stroke', '#e3e3e3')
                 d3.select('#area_' + variable.last_cluster).attr('fill', '#D5E2FF');
                 d3.select('#clusterOut_' + variable.last_cluster)
@@ -121,14 +120,12 @@ let scatter = (function () {
 
                 d3.selectAll('.parallelClass_' + d.id)
                     .style('opacity', 1)
-                    .style('stroke-width', 2)
                     .style('stroke', '#8a8a8a')
                 d3.select('#area_' + d.id).attr('fill', '#E83A00');
                 d3.select('#clusterOut_' + d.id)
                     .style('stroke-opacity', 1)
                 /*如果innertopo为选中状态，则点击当前节点就会改变该节点和节点外圈扇形的透明度
-                
-                */
+                 */
 
 
                 variable.last_cluster = d.id;
@@ -239,14 +236,18 @@ let scatter = (function () {
                     x: points[i].x,
                     y: points[i].y
                 }, points.length, point_radius),
-                tmp_value = 1 / calEntropy(tmp_point_set, '1');
-
+                tmp_value = 0,
+                selected_attrs = variable.attr.split('')
+            for (let n = 0; n < selected_attrs.length; n++) {
+                tmp_value += 1 / calEntropy(tmp_point_set, selected_attrs[n]);
+            }
+            tmp_value /= selected_attrs.length;
             if (tmp_value > max_val)
                 max_val = tmp_value
             points[i].value = tmp_value
         }
         //将value为负无穷大的赋值为最大值的两倍
-        let best_max = max_val * 100 //因为信息熵的为0时最好，但此时倒数为无穷，所以将其设置为已有值的10倍
+        let best_max = max_val * 1.5 //因为信息熵的为0时最好，但此时倒数为无穷，所以将其设置为已有值的10倍
         for (let i = 0; i < points.length; i++) {
             if (points[i].value == -Infinity)
                 points[i].value = best_max
@@ -263,7 +264,7 @@ let scatter = (function () {
         })
         heatmap.setData(heat_data).setDataMax(best_max);
 
-        d3.select('.heatmap-canvas').style('z-index', -1)
+        // d3.select('.heatmap-canvas').style('z-index', -1)
     }
 
     let calEntropy = function (points, attr) {
