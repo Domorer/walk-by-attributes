@@ -1,7 +1,8 @@
 let option = (function () {
 
     let comb_len = 0;
-    let inner_open = false; //保存inner按钮的操作情况
+    let inner_open = false, //保存inner按钮的操作情况
+        heat_open = false;
     let optIndex = 0; //记录操作的index
     let comb_record = []; //记录操作的具体参数元素格式为[当前属性选择，当前游走方式选择]
 
@@ -245,14 +246,24 @@ let option = (function () {
     })
 
     $('#toHeatmap').on('click', function () {
-        console.log('checked: ', $('#inputHeat')[0].checked);
+        if (option.heat_open) {
+            option.heat_open = !option.heat_open
+            d3.select('#scatter_canvas').select('canvas').remove();
+            d3.select('#toHeatmap').style('background-color', 'transparent')
+        } else {
+
+            option.heat_open = !option.heat_open
+            scatter.drawHeat(variable.comb_data)
+            d3.select('#toHeatmap')
+                .style('background-color', '#ffc4c4')
+                .style('z-index', 1000)
+        }
     });
 
     //每次类变化后页面进行的操作
     function modify_cluster(data, tree_confirm) {
         //地图视图清空
         // d3.select('#map').selectAll('path').remove();
-
         //桑基图的列数加一
         variable.sankey_count += 1;
         console.log('data: ', data);
@@ -269,8 +280,6 @@ let option = (function () {
         //更新散点图
         scatter.drawScatter(data['info']);
         forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
-
-
         if (tree_confirm == false)
             tree_view.draw_tree(data, variable.level);
         parallel.drawParallel();
@@ -492,6 +501,7 @@ let option = (function () {
         comb_record,
         optIndex,
         inner_open,
+        heat_open,
         setCircleColor
     }
 })()

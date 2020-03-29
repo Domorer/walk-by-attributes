@@ -17,6 +17,7 @@
 <!-- Make sure you put this AFTER Leaflet's CSS -->
 <script src="/js/heatmap.js"></script>
 <script src="/js/jscolor.js"></script>
+<script src='/js/kdTree.js'></script>
 
 {{!-- <nav id="nav" class="navbar navbar-dark sticky-top  flex-md-nowrap p-0" style="border-bottom:3px solid rgb(216, 216, 216);">
     <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#" style="border-bottom:0.1px solid rgb(216, 216, 216);background-color:white;box-shadow:none;color:rgb(124, 124, 124);font-size:1.5em;">胜利油田</a>
@@ -109,7 +110,7 @@
 
             <div class='btn_out'>
                 <button id="confirm_param" class="btn btn-outline-secondary my-2 my-sm-0 confirm"
-                    type="submit">Confirm</button>
+                    type="button">Confirm</button>
             </div>
 
         </div>
@@ -150,7 +151,7 @@
 
             </div> --}}
             <button id="confirm_attr" class="btn btn-outline-secondary my-2 my-sm-0 confirm"
-                type="submit">Confirm</button>
+                type="button">Confirm</button>
         </div>
     </div>
 
@@ -199,9 +200,9 @@
                     <a class="dropdown-item" href="#" value=0.3>0.3</a>
                 </div>
             </div>
-            <button id="em" class="btn btn-outline-secondary my-2 my-sm-0 tree_button" type="submit">em</button>
-            <button id="confirm_cluster" class="btn btn-outline-secondary my-2 my-sm-0 tree_button"
-                type="submit" style='border-bottom-right-radius:.25rem'>confirm</button>
+            <button id="em" class="btn btn-outline-secondary my-2 my-sm-0 tree_button" type="button">em</button>
+            <button id="confirm_cluster" class="btn btn-outline-secondary my-2 my-sm-0 tree_button" type="button"
+                style='border-bottom-right-radius:.25rem'>confirm</button>
 
         </div>
 
@@ -229,13 +230,13 @@
         </div>
         <div id='force_button_out'>
             <div id='button_group_force' class="btn-group" role="group" aria-label="Basic example">
-                <button id="inner" class="btn btn-outline-secondary my-2 my-sm-0" type="submit"
+                <button id="inner" class="btn btn-outline-secondary my-2 my-sm-0" type="button"
                     style='border-bottom-left-radius:.25rem;'>Inner</button>
-                <button id="origin" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Origin</button>
+                <button id="origin" class="btn btn-outline-secondary my-2 my-sm-0" type="button">Origin</button>
                 <button id="cluster_layout" class="btn btn-outline-secondary my-2 my-sm-0"
-                    type="submit">Cluster</button>
+                    type="button">Cluster</button>
                 <button id="edge_bundling" class="btn btn-outline-secondary my-2 my-sm-0"
-                    type="submit">Bundling</button>
+                    type="button">Bundling</button>
             </div>
         </div>
 
@@ -278,16 +279,13 @@
         <div id="headLine">
             <a id='headline_a'>Projection View</a>
         </div>
-        {{!-- <div id='toHeatmap' class="custom-control custom-checkbox" style='margin:0 0 0 0;'>
-            <input type="checkbox" class="custom-control-input" id="inputHeat">
-            <label class="custom-control-label" for="inputHeat" id="labelHeat" style='color:gray'>HeatMap</label>
-        </div> --}}
-        {{!-- <button id="point" class="btn btn-outline-primary my-2 my-sm-0" type="submit">Point</button> --}}
+
+        <button id="toHeatmap" class="btn btn-outline-secondary my-2 my-sm-0">HeatMap</button>
         <div id='scatter_canvas'>
             <svg id='svg_scatter'></svg>
         </div>
 
-        {{!-- <button id="toHeatmap" class="btn btn-outline-secondary my-2 my-sm-0" type="submit">HeatMap</button> --}}
+        {{!-- <button id="toHeatmap" class="btn btn-outline-secondary my-2 my-sm-0" type="button">HeatMap</button> --}}
 
 
     </div>

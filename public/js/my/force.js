@@ -469,12 +469,9 @@ let forceChart = (function () {
                 const a = i;
                 parallel.changeWidth(d.id)
 
-                d3.select('#svg_parallel').selectAll('path')
+                d3.select('#svg_parallel').select('#parallel_path_g').selectAll('path')
                     .style('opacity', function () {
-                        if (variable.dataset == 'patent')
-                            return 0
-                        else
-                            return .05
+                        return 0
                     })
                     .style('stroke-width', 1)
                     .style('stroke', '#e3e3e3')
@@ -627,7 +624,8 @@ let forceChart = (function () {
         //判断是单属性还是多属性
         let attrs_value = new Array(),
             tmp_color_arr,
-            tmp_attr_arr
+            tmp_attr_arr,
+            tmp_max = -Infinity
         if (variable.type_count == 1) {
             tmp_color_arr = variable.valueColor_dict[variable.dataset][variable.attr]
             //单属性时，variable.attr 就是属性名称，不是多个属性名称的集合
@@ -646,7 +644,6 @@ let forceChart = (function () {
                 // console.log(key)
                 attrs_value.push(value_dict[key]);
             }
-
         } else {
             //计算每种属性的信息熵
             tmp_color_arr = variable.attr_color
@@ -654,14 +651,15 @@ let forceChart = (function () {
             for (let i = 0; i < variable.type_count; i++) {
                 let tmpEntropy = calEntropy(cluster, tmp_attr_arr[i], variable.cluster_ids_dict)
                 if (tmpEntropy == 0)
-                    attrs_value.push(10000000)
+                    attrs_value.push(100000)
                 else
                     attrs_value.push(1 / tmpEntropy)
             }
+           
         }
 
         let rScale = d3.scaleLinear()
-            .domain(d3.extent(attrs_value))
+            .domain([0, d3.max(attrs_value)])
             .range([radius * 1.2, radius * 2.3])
         let color = d3.scaleOrdinal(d3.schemeCategory20);
 

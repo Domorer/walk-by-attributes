@@ -21,9 +21,9 @@ let variable = (function () {
             '5': 'Subcat'
         },
         'paper': {
-            '1': 'Conference',
+            '1': 'Conf',
             '2': 'Year',
-            '3': 'Paper type'
+            '3': 'Type'
         }
     }
     let attr_arr_dict = {

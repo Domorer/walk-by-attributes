@@ -1,2 +1,2 @@
-a = ['sada','sfdfd','dfasfas']
-console.log(a.findIndex(element => element == 'dfasfas'))
+a = -0
+console.log(1 / a)

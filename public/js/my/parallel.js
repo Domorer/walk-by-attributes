@@ -13,11 +13,12 @@ let parallel = (function () {
         svg_parallel.selectAll('*').remove();
         let svg_width = $("#svg_parallel")[0].scrollWidth;
         let svg_height = $("#svg_parallel")[0].scrollHeight;
-        let attrAxisHeight = 0.5 * svg_height,
-            attrAxisWidth = 0.9 * svg_width,
+        let attrAxisHeight = 0.5 * svg_height, //平行坐标轴的轴高度
+            top_sapce = 0.1 * svg_height, //平行坐标轴上方空白部分
+            attrAxisWidth = 0.95 * svg_width, //平行坐标轴的直线所占宽度
             left_space = (svg_width - attrAxisWidth) / 2,
-            right_space = 5,
-            rect_width = 10
+            rect_width = 10,
+            form_height = svg_height - top_sapce - attrAxisHeight // 表格所占高度
         // 2. 添加标签,数组长度代表属性数量
         let labels = [],
             oriName_arr = []
@@ -26,6 +27,7 @@ let parallel = (function () {
             oriName_arr.push(variable.oriAttrName_dict[variable.dataset][key])
         }
         console.log('variable.attrValue_dict:   ', variable.attrValue_dict)
+        //平行坐标轴上方标签
         svg_parallel.append('g').selectAll('text').data(oriName_arr).enter()
             .append('text')
             .attr('x', (d, i) => {
@@ -53,16 +55,37 @@ let parallel = (function () {
             })
             .text(d => d)
 
-        //3. 添加属性轴
-        let attrs_line = []
-        for (let i = 0; i < labels.length; i++) {
-            attrs_line.push(
+        /*
+            1.下方属性值表格标签
+            2.分割线
+         */
+        svg_parallel.append('g').selectAll('text').data(oriName_arr).enter()
+            .append('text')
+            .attr('x', left_space - 5)
+            .attr('y', (d, i) => {
+                return top_sapce + attrAxisHeight + 0.1 * svg_height + (i) * form_height / oriName_arr.length - 5
+            })
+            .style('font-size', '.8rem')
+            .style('font-weight', 100)
+            .style('stroke-width', 1)
+            .style('stroke', 'gray')
+            .style('fill', 'gray')
+            .style('text-anchor', (d, i) => {
+                return 'start'
+            })
+            .text(d => d + ' : ')
+
+
+        //分割线
+        let dividing_line = []
+        for (let i = 0; i < oriName_arr.length; i++) {
+            dividing_line.push(
                 [
-                    [left_space + i * attrAxisWidth / (labels.length - 1),
-                        0.1 * svg_height
+                    [left_space - 5,
+                        top_sapce + attrAxisHeight + 0.1 * svg_height + (i) * form_height / oriName_arr.length
                     ],
-                    [left_space + i * attrAxisWidth / (labels.length - 1),
-                        0.9 * svg_height
+                    [svg_width - left_space + 5,
+                        top_sapce + attrAxisHeight + 0.1 * svg_height + (i) * form_height / oriName_arr.length
                     ]
                 ]
             )
@@ -72,11 +95,12 @@ let parallel = (function () {
             .x(d => d[0])
             .y(d => d[1])
 
-        svg_parallel.append('g').selectAll('path').data(attrs_line).enter()
+        svg_parallel.append('g').selectAll('path').data(dividing_line).enter()
             .append('path')
             .attr('d', d => line(d))
-            .attr('stroke', 'white')
-            .attr('stroke-width', 2);
+            .attr('stroke', 'gray')
+            .attr('stroke-width', 1)
+            .style('stroke-dasharray', '5, 5')
 
 
 
@@ -152,7 +176,7 @@ let parallel = (function () {
                 let tmp_index = variable.valueIds_dict[labels[j]][tmp_attrValue].indexOf(id)
                 preHeight += tmp_index * unitHeight
                 tmp_line.push([left_space + j * attrAxisWidth / (labels.length - 1),
-                    0.1 * svg_height + preHeight
+                    top_sapce + preHeight
                 ])
             }
             line_arr.push(tmp_line)
@@ -169,7 +193,9 @@ let parallel = (function () {
         let line_cluster = d3.line()
             .x(d => d[0])
             .y(d => d[1])
-        let lines = svg_parallel.append('g').selectAll('path').data(line_arr).enter()
+        let lines = svg_parallel.append('g')
+            .attr('id', 'parallel_path_g')
+            .selectAll('path').data(line_arr).enter()
             .append('path')
             .attr('d', d => line_cluster(d))
             .attr('id', (d, i) => 'parallel_' + ids_arr[i])
@@ -204,9 +230,7 @@ let parallel = (function () {
             svg_parallel.append('g').selectAll('rect').data(rect_arr[i]).enter()
                 .append('rect')
                 .attr('x', d => {
-
                     return left_space + i * attrAxisWidth / (labels.length - 1) - 5
-
                 })
                 .attr('y', (d, vi) => {
                     let preHeight = 0
@@ -216,7 +240,7 @@ let parallel = (function () {
                         preHeight += rect_arr[i][vi]['count'] * unitHeight
                         vi -= 1
                     }
-                    return 0.1 * svg_height + preHeight
+                    return top_sapce + preHeight
                 })
                 .attr('width', rect_width)
                 .attr('height', (d) => {
@@ -247,60 +271,103 @@ let parallel = (function () {
 
 
 
-            //添加具体的属性值标签
-            if (variable.dataset == 'paper') {
-                let valueTexts = clusterFun.deepCopy(variable.attrValue_dict[labels[i]])
-                if (i == 1) {
-                    for (let j = 0; j < valueTexts.length; j++) {
-                        valueTexts[j] = variable.yearPhase_dict[variable.dataset][valueTexts[j]]
-                    }
+            //添加具体的属性值标签， 竖向的、
+            let valueTexts = clusterFun.deepCopy(variable.attrValue_dict[labels[i]])
+            if (i == 1) {
+                for (let j = 0; j < valueTexts.length; j++) {
+                    valueTexts[j] = variable.yearPhase_dict[variable.dataset][valueTexts[j]]
                 }
-
-
-                svg_parallel.append('g').selectAll('text').data(valueTexts).enter()
-                    .append('text')
-                    .attr('x', d => {
-                        if (i == 0)
-                            return left_space + i * attrAxisWidth / (labels.length - 1) + rect_width
-                        else
-                            return left_space + i * attrAxisWidth / (labels.length - 1) - rect_width
-                    }).attr('y', (d, vi) => {
-                        let preHeight = rect_arr[i][vi]['count'] * unitHeight / 2
-                        vi -= 1
-                        //计算先前属性所占高度
-                        while (vi >= 0) {
-                            preHeight += rect_arr[i][vi]['count'] * unitHeight
-                            vi -= 1
-                        }
-                        return 0.1 * svg_height + preHeight
-                    })
-                    .style('font-size', 10)
-                    .style('color', 'black')
-                    .style('stroke-width', .5)
-                    .style('stroke', 'black')
-                    .style('fill', 'black')
-                    .style('text-anchor', d => {
-                        if (i == 0)
-                            return 'start'
-                        else
-                            return 'end'
-                    })
-                    .text(d => d)
             }
-        }
+            if (variable.dataset == 'paper') {
+                // svg_parallel.append('g').selectAll('text').data(valueTexts).enter()
+                //     .append('text')
+                //     .attr('x', d => {
+                //         if (i == 0)
+                //             return left_space + i * attrAxisWidth / (labels.length - 1) + rect_width
+                //         else
+                //             return left_space + i * attrAxisWidth / (labels.length - 1) - rect_width
+                //     }).attr('y', (d, vi) => {
+                //         let preHeight = rect_arr[i][vi]['count'] * unitHeight / 2
+                //         vi -= 1
+                //         //计算先前属性所占高度
+                //         while (vi >= 0) {
+                //             preHeight += rect_arr[i][vi]['count'] * unitHeight
+                //             vi -= 1
+                //         }
+                //         return top_sapce + preHeight
+                //     })
+                //     .style('font-size', 10)
+                //     .style('color', 'black')
+                //     .style('stroke-width', .5)
+                //     .style('stroke', 'black')
+                //     .style('fill', 'black')
+                //     .style('text-anchor', d => {
+                //         if (i == 0)
+                //             return 'start'
+                //         else
+                //             return 'end'
+                //     })
+                //     .text(d => d)
+            }
 
-        
+            /*
+                画属性值标签表中的矩形
+                画标签
+            */
+            svg_parallel.append('g').selectAll('rect').data(valueTexts).enter()
+                .append('rect')
+                .attr('x', (d, vi) => {
+                    return 0.1 * svg_width + vi * 50
+                })
+                .attr('y', (d, vi) => {
+                    return top_sapce + attrAxisHeight + 0.1 * svg_height + (i) * form_height / oriName_arr.length - rect_width - 5
+                })
+                .attr('width', rect_width)
+                .attr('height', rect_width)
+                .style('fill', (d, vi) => {
+                    if (variable.dataset == 'patent' && i == 3) {
+                        let compute = d3.interpolateRgb('#ffffff', '#ffff00'),
+                            valueScale = d3.scaleLinear().domain([0, rect_arr[i].length]).range([0, 1])
+                        return compute(valueScale(vi))
+                    } else if (variable.dataset == 'patent' && i == 4) {
+                        let compute = d3.interpolateRgb('#ffffff', '#0000ff'),
+                            valueScale = d3.scaleLinear().domain([0, rect_arr[i].length]).range([0, 1])
+                        return compute(valueScale(vi))
+                    } else {
+                        return variable.valueColor_dict[variable.dataset][(i + 1).toString()][vi]
+                    }
+                })
+                .attr('id', d => 'rectForm_' + labels[i] + '_' + d.attrValue) //id : rect_属性_属性值
+                .on('click', d => {
+                    console.log(d.attrValue)
+                })
+
+
+            svg_parallel.append('g').selectAll('text').data(valueTexts).enter()
+                .append('text')
+                .attr('x', (d, vi) => {
+                    return 0.1 * svg_width + vi * 50 + rect_width + 5
+                }).attr('y', (d, vi) => {
+                    return top_sapce + attrAxisHeight + 0.1 * svg_height + (i) * form_height / oriName_arr.length - 5
+                })
+                .style('font-size', 10)
+                .style('color', 'black')
+                .style('stroke-width', .5)
+                .style('stroke', 'black')
+                .style('fill', 'black')
+                .text(d => d)
+
+        }
     }
 
 
     function changeWidth(cluster) {
-
         let svg_width = $("#svg_parallel")[0].scrollWidth;
         let svg_height = $("#svg_parallel")[0].scrollHeight;
         let ids = variable.cluster_ids_dict[cluster],
             tmpValueIds_dict = {},
             attrCount = 0
-        let attrAxisWidth = 0.9 * svg_width,
+        let attrAxisWidth = 0.95 * svg_width,
             left_space = (svg_width - attrAxisWidth) / 2
         console.log("changeWidth -> variable.attrValue_dict", variable.attrValue_dict)
 
