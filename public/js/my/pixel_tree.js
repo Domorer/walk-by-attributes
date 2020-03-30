@@ -179,7 +179,7 @@ let tree_view = (function () {
             x: nodeLoc_dict[top_node][0] + 10,
             y: nodeLoc_dict[top_node][1] + tree_view.transformHeight
         }
-        
+
 
         //绘制断层线
         let level_line = [];
@@ -298,7 +298,29 @@ let tree_view = (function () {
             })
             .attr('width', 4)
             .style('fill', (d, i) => {
-                return tmp_color_arr[d.cIndex]
+                //单属性
+                if (variable.type_count == 1) {
+                    //属性值过多
+                    if (variable.dataset == 'patent' && variable.attr == '4') {
+                        let compute = d3.interpolateRgb('#ffffff', '#ffff00'),
+                            valueScale = d3.scaleLinear().domain([0, d.value_arr.length]).range([0, 1])
+                        return compute(valueScale(d.yIndex))
+                    } else if (variable.dataset == 'patent' && variable.attr == '5') {
+                        let compute = d3.interpolateRgb('#ffffff', '#0000ff'),
+                            valueScale = d3.scaleLinear().domain([0, d.value_arr.length]).range([0, 1])
+                        return compute(valueScale(d.yIndex))
+                    } else if (variable.dataset == 'weibo' && variable.attr == '1') {
+                        let compute = d3.interpolateRgb('#ebffeb', '#14ff14'),
+                            valueScale = d3.scaleLinear().domain([0, d.value_arr.length]).range([0, 1])
+                        return compute(valueScale(d.yIndex))
+                    } else {
+                        return variable.valueColor_dict[variable.dataset][(parseInt(variable.attr)).toString()][d.yIndex]
+                    }
+                }else{
+                    //多属性
+                    tmp_color_arr[d.yIndex]
+                }
+
             })
             .attr('transform', `translate(10,${tree_view.transformHeight})`)
             .attr('id', d => 'rect_' + d.id + '_' + d.key)
@@ -314,7 +336,7 @@ let tree_view = (function () {
             .style('stroke-width', 2)
             .style('stroke-opacity', .5)
             .attr('transform', `translate(10,${tree_view.transformHeight})`)
-        
+
 
         //初始化河流图
         tree_view.modifyCount += 1

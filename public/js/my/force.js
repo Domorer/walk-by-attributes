@@ -686,11 +686,27 @@ let forceChart = (function () {
             .append('path')
             .attr('d', d => arc(d))
             .attr('fill', function (d, i) {
-                if (variable.type_count != 1) {
-                    return tmp_color_arr[parseInt(tmp_attr_arr[i]) - 1]
+                if (variable.type_count == 1) {
+                    //属性值过多
+                    if (variable.dataset == 'patent' && variable.attr == '4') {
+                        let compute = d3.interpolateRgb('#ffffff', '#ffff00'),
+                            valueScale = d3.scaleLinear().domain([0, pie_data.length]).range([0, 1])
+                        return compute(valueScale(i))
+                    } else if (variable.dataset == 'patent' && variable.attr == '5') {
+                        let compute = d3.interpolateRgb('#ffffff', '#0000ff'),
+                            valueScale = d3.scaleLinear().domain([0, pie_data.length]).range([0, 1])
+                        return compute(valueScale(i))
+                    } else if (variable.dataset == 'weibo' && variable.attr == '1') {
+                        let compute = d3.interpolateRgb('#ebffeb', '#14ff14'),
+                            valueScale = d3.scaleLinear().domain([0, pie_data.length]).range([0, 1])
+                        return compute(valueScale(i))
+                    } else {
+                        return variable.valueColor_dict[variable.dataset][(parseInt(variable.attr)).toString()][i]
+                    }
+                } else {
+                    //多属性
+                    tmp_color_arr[d.yIndex]
                 }
-
-                return tmp_color_arr[i];
             })
             .attr('stroke', function (d, i) {
                 if (variable.type_count != 1)

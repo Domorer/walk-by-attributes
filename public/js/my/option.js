@@ -12,6 +12,30 @@ let option = (function () {
     $('.leaflet-control-attribution, .leaflet-control').remove();
     comb_record.push(clusterFun.deepCopy(variable.param));
     //*************初始化******************
+
+    d3.select('#attributes').selectAll('.custom-checkbox').remove();
+    d3.select('#nav-tab').selectAll('a').remove();
+    d3.select('#nav-tabContent').selectAll('div').remove();
+    for (let j = 0; j < variable.attr_arr_dict[variable.dataset].length; j++) {
+        let tmp_attrName = variable.oriAttrName_dict[variable.dataset][j + 1]
+
+        //添加颜色选择器属性列表
+        let colorAttrHtml = `<a id='nav_a_${j+1}' class="nav-item nav-link nav_a disabled" id="nav-home-tab" data-toggle="tab"
+        href="#nav-${j+1}" role="tab">${tmp_attrName}</a>`
+        $('#nav-tab').append(colorAttrHtml)
+        //添加颜色选择器属性值
+        let colorAttrValueHtml = `<div class="tab-pane fade" id="nav-${j+1}" role="tabpanel" aria-labelledby="nav-profile-tab"></div>`
+        $('#nav-tabContent').append(colorAttrValueHtml)
+        //添加属性参数checkbox列表
+        let checked = null
+        if (j == 0 && variable.dataset == 'patent')
+            checked = 'checked'
+        let tmpInnerHtml = `<div class='custom-control custom-checkbox' style='margin:1% 5% 0 5%;'>` +
+            `<input type='checkbox' class='custom-control-input' id='${j + 1}' ${checked}>` +
+            `<label class='custom-control-label' for='${j + 1}' id='citedLabe${j}' style='color:gray'>${tmp_attrName}</label>` +
+            `<div class='tuli' style='background-color:${variable.attr_color[j]}'></div></div>`
+        $('#attributes').append(tmpInnerHtml)
+    }
     resetByDataset();
     console.log("option -> variable.param", variable.param)
 
@@ -93,26 +117,26 @@ let option = (function () {
         reset()
     })
     //treeView 按钮设置
-    $('#datasetDropdown').on('click', function (e) {
-        let tmp_text = e.target.innerText,
-            tmp_dataset = e.target.getAttribute('value')
-        $('#button_dataset').text(tmp_text)
-        variable.dataset = tmp_dataset
-        d3.select('#attributes').selectAll('.custom-checkbox').remove();
-        for (let j = 0; j < variable.attr_arr_dict[variable.dataset].length; j++) {
-            let checked = null
-            // if (j == 0)
-            //     checked = 'checked'
-            let tmp_attrName = variable.oriAttrName_dict[variable.dataset][j + 1]
-            let tmpInnerHtml = `<div class='custom-control custom-checkbox' style='margin:3% 5% 0 5%;'>` +
-                `<input type='checkbox' class='custom-control-input' id='${j + 1}' ${checked}>` +
-                `<label class='custom-control-label' for='${j + 1}' id='citedLabe${j}' style='color:gray'>${tmp_attrName}</label>` +
-                `<div class='tuli' style='background-color:${variable.attr_color[j]}'></div></div>`
-            $('#attributes').append(tmpInnerHtml)
-        }
-        resetByDataset()
+    // $('#datasetDropdown').on('click', function (e) {
+    //     let tmp_text = e.target.innerText,
+    //         tmp_dataset = e.target.getAttribute('value')
+    //     $('#button_dataset').text(tmp_text)
+    //     variable.dataset = tmp_dataset
+    //     d3.select('#attributes').selectAll('.custom-checkbox').remove();
+    //     for (let j = 0; j < variable.attr_arr_dict[variable.dataset].length; j++) {
+    //         let checked = null
+    //         // if (j == 0)
+    //         //     checked = 'checked'
+    //         let tmp_attrName = variable.oriAttrName_dict[variable.dataset][j + 1]
+    //         let tmpInnerHtml = `<div class='custom-control custom-checkbox' style='margin:3% 5% 0 5%;'>` +
+    //             `<input type='checkbox' class='custom-control-input' id='${j + 1}' ${checked}>` +
+    //             `<label class='custom-control-label' for='${j + 1}' id='citedLabe${j}' style='color:gray'>${tmp_attrName}</label>` +
+    //             `<div class='tuli' style='background-color:${variable.attr_color[j]}'></div></div>`
+    //         $('#attributes').append(tmpInnerHtml)
+    //     }
+    //     resetByDataset()
 
-    })
+    // })
     $('#w1').on('click', function (e) {
         let tmp_value = e.target.getAttribute('value')
         $('#button_w1').text('w1: ' + tmp_value)
@@ -132,7 +156,57 @@ let option = (function () {
     $('#em').on('click', function (d) {
         console.log("generateRandomFaultage -> tree_view.tree_nodes_dict[tmp_cluster]", tree_view.tree_nodes_dict)
 
-        bestFaultage();
+        tree_view.modifyCount += 1
+        let faultages = [],
+            visCluster_arr = []
+        //获取当前树的所有可视节点id, 从level_dict 从后往前遍历
+        let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
+        for (let i = max_level; i > variable.level; i--) {
+            for (let j = 0; j < variable.comb_data['level_dict'][i].length; j++)
+                visCluster_arr.push(variable.comb_data['level_dict'][i][j])
+        }
+        for (let i = 0; i < 100; i++) {
+            let tmp_visCluster_arr = visCluster_arr.slice(0)
+            faultages.push(tree_view.generateRandomFaultage(tmp_visCluster_arr))
+        }
+        console.log("option -> faultages", faultages)
+        let emFaultage = [],
+            minEnergy = Infinity
+        for (let i = 0; i < faultages.length; i++) {
+            let tmp_dict = riverView.Cal(variable.comb_data, faultages[i]),
+                tmpEnergy = tmp_dict.ah + tmp_dict.sc + tmp_dict.ts
+            if (minEnergy > tmpEnergy) {
+                minEnergy = tmpEnergy
+                emFaultage = faultages[i]
+            }
+        }
+        /*层次树节点的颜色
+            1.恢复之前已经选中的节点的颜色为默认颜色    
+            2.修改最有切层节点的颜色为选中颜色
+        */
+        let colorSelected = '#ff4416',
+            colorOri = '#329CCB'
+        for (let j = 0; j < variable.cluster_arr.length; j++) {
+            d3.select('#tree_' + variable.cluster_arr[j])
+                .attr('fill', colorOri)
+        }
+        //更新当前的cluster_arr
+        variable.cluster_arr = emFaultage
+        for (let j = 0; j < variable.cluster_arr.length; j++) {
+            d3.select('#tree_' + variable.cluster_arr[j])
+                .transition()
+                .duration(1000)
+                .attr('fill', colorSelected)
+        }
+        let top_nodeId = variable.comb_data['level_dict'][max_level][0],
+            topNode = tree_view.tree_nodes_dict[top_nodeId]
+        let tmp_node = {
+            'name': topNode.data.name,
+            'x': topNode.x + 10,
+            'y': topNode.y + tree_view.transformHeight
+        };
+        riverView.modifyRiver(variable.comb_data, emFaultage, false, tmp_node, false)
+        console.log("option -> emFaultage", emFaultage)
     })
 
     //用户自定义的类数组确定按钮
@@ -276,21 +350,23 @@ let option = (function () {
     }
 
     function resetByDataset() {
-        variable.param = {
-            wt: 10,
-            sl: 20,
-            rl: false,
-            comb: '0'
-        };
         if (variable.dataset == 'paper') {
+            variable.param = {
+                wt: 10,
+                sl: 20,
+                rl: false,
+                comb: '0'
+            };
             variable.attr = '123'
             variable.type_count = 3
-        } else if (variable.dataset == 'patent') {
-            variable.attr = '12345'
-            variable.type_count = 5
         } else {
-            variable.attr = '1234'
-            variable.type_count = 4
+            variable.param = {
+                wt: 10,
+                sl: 20,
+                rl: false,
+                comb: '1'
+            };
+            variable.attr = '1'
         }
         getCombData(variable.param, variable.dataset).then(function (data) {
             d3.csv(`data/${variable.dataset}/weighted_link.csv`, function (error, data_link) {
@@ -366,8 +442,9 @@ let option = (function () {
                     forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
                     //树图
                     tree_view.draw_tree(data[0], variable.level);
-                    // bestFaultage();
                     //平行坐标轴
+
+
                     parallel.drawParallel();
 
 
@@ -382,6 +459,7 @@ let option = (function () {
                     根据数据集读取属性个数和属性值数量来初始化属性值的颜色选择器
                     如果属性值过多则忽略
                     */
+            
                     for (let i = 0; i < variable.attr_arr_dict[variable.dataset].length; i++) {
                         let tmp_attr = variable.attr_arr_dict[variable.dataset][i]
                         for (let j = 0; j < variable.attrValue_dict[tmp_attr].length; j++) {
@@ -400,7 +478,7 @@ let option = (function () {
                             let jsc_tmp = new jscolor(`colorPicker_${tmp_attr}_${tmpAttrValue}`, 'option.setCircleColor(this)')
                             $(`#colorPicker_${tmp_attr}_${tmpAttrValue}`).css({
                                 'background-color': variable.origin_color,
-                                'border': 0
+                                'border':0
                             })
                         }
                     }
@@ -445,59 +523,7 @@ let option = (function () {
         });
     }
 
-    let bestFaultage = function () {
-        tree_view.modifyCount += 1
-        let faultages = [],
-            visCluster_arr = []
-        //获取当前树的所有可视节点id, 从level_dict 从后往前遍历
-        let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
-        for (let i = max_level; i > variable.level; i--) {
-            for (let j = 0; j < variable.comb_data['level_dict'][i].length; j++)
-                visCluster_arr.push(variable.comb_data['level_dict'][i][j])
-        }
-        for (let i = 0; i < 100; i++) {
-            let tmp_visCluster_arr = visCluster_arr.slice(0)
-            faultages.push(tree_view.generateRandomFaultage(tmp_visCluster_arr))
-        }
-        console.log("option -> faultages", faultages)
-        let emFaultage = [],
-            minEnergy = Infinity
-        for (let i = 0; i < faultages.length; i++) {
-            let tmp_dict = riverView.Cal(variable.comb_data, faultages[i]),
-                tmpEnergy = tmp_dict.ah + tmp_dict.sc + tmp_dict.ts
-            if (minEnergy > tmpEnergy) {
-                minEnergy = tmpEnergy
-                emFaultage = faultages[i]
-            }
-        }
-        /*层次树节点的颜色
-            1.恢复之前已经选中的节点的颜色为默认颜色    
-            2.修改最有切层节点的颜色为选中颜色
-        */
-        let colorSelected = '#ff4416',
-            colorOri = '#329CCB'
-        for (let j = 0; j < variable.cluster_arr.length; j++) {
-            d3.select('#tree_' + variable.cluster_arr[j])
-                .attr('fill', colorOri)
-        }
-        //更新当前的cluster_arr
-        variable.cluster_arr = emFaultage
-        for (let j = 0; j < variable.cluster_arr.length; j++) {
-            d3.select('#tree_' + variable.cluster_arr[j])
-                .transition()
-                .duration(1000)
-                .attr('fill', colorSelected)
-        }
-        let top_nodeId = variable.comb_data['level_dict'][max_level][0],
-            topNode = tree_view.tree_nodes_dict[top_nodeId]
-        let tmp_node = {
-            'name': topNode.data.name,
-            'x': topNode.x + 10,
-            'y': topNode.y + tree_view.transformHeight
-        };
-        riverView.modifyRiver(variable.comb_data, emFaultage, false, tmp_node, false, false)
-        console.log("option -> emFaultage", emFaultage)
-    }
+
 
 
     return {

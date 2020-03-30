@@ -22,10 +22,13 @@ let parallel = (function () {
         // 2. 添加标签,数组长度代表属性数量
         let labels = [],
             oriName_arr = []
+
         for (let key in variable.attrValue_dict) {
             labels.push(key)
             oriName_arr.push(variable.oriAttrName_dict[variable.dataset][key])
         }
+        console.log("drawParallel -> labels", labels)
+
         console.log('variable.attrValue_dict:   ', variable.attrValue_dict)
         //平行坐标轴上方标签
         svg_parallel.append('g').selectAll('text').data(oriName_arr).enter()
@@ -63,7 +66,7 @@ let parallel = (function () {
             .append('text')
             .attr('x', left_space - 5)
             .attr('y', (d, i) => {
-                return top_sapce + attrAxisHeight + 0.1 * svg_height + (i) * form_height / oriName_arr.length - 5
+                return top_sapce + attrAxisHeight + 0.03 * svg_height + (i) * form_height / oriName_arr.length + rect_width
             })
             .style('font-size', '.8rem')
             .style('font-weight', 100)
@@ -82,10 +85,10 @@ let parallel = (function () {
             dividing_line.push(
                 [
                     [left_space - 5,
-                        top_sapce + attrAxisHeight + 0.1 * svg_height + (i) * form_height / oriName_arr.length
+                        top_sapce + attrAxisHeight + 0.03 * svg_height + (i) * form_height / oriName_arr.length + rect_width + 5
                     ],
                     [svg_width - left_space + 5,
-                        top_sapce + attrAxisHeight + 0.1 * svg_height + (i) * form_height / oriName_arr.length
+                        top_sapce + attrAxisHeight + 0.03 * svg_height + (i) * form_height / oriName_arr.length + rect_width + 5
                     ]
                 ]
             )
@@ -193,6 +196,7 @@ let parallel = (function () {
         let line_cluster = d3.line()
             .x(d => d[0])
             .y(d => d[1])
+            .curve(d3.curveBasis)
         let lines = svg_parallel.append('g')
             .attr('id', 'parallel_path_g')
             .selectAll('path').data(line_arr).enter()
@@ -260,7 +264,12 @@ let parallel = (function () {
                         let compute = d3.interpolateRgb('#ffffff', '#0000ff'),
                             valueScale = d3.scaleLinear().domain([0, rect_arr[i].length]).range([0, 1])
                         return compute(valueScale(vi))
-                    } else {
+                    } else if (variable.dataset == 'weibo' && i == 0){
+                        let compute = d3.interpolateRgb('#ebffeb', '#14ff14'),
+                            valueScale = d3.scaleLinear().domain([0, rect_arr[i].length]).range([0, 1])
+                        return compute(valueScale(vi))
+                    }
+                    else {
                         return variable.valueColor_dict[variable.dataset][(i + 1).toString()][vi]
                     }
                 })
@@ -273,10 +282,17 @@ let parallel = (function () {
 
             //添加具体的属性值标签， 竖向的、
             let valueTexts = clusterFun.deepCopy(variable.attrValue_dict[labels[i]])
-            if (i == 1 && variable.dataset != 'weibo') {
+            if ((variable.dataset == 'paper' && i == 1) || (variable.dataset == 'patent' && i == 0)) {
                 for (let j = 0; j < valueTexts.length; j++) {
                     valueTexts[j] = variable.yearPhase_dict[variable.dataset][valueTexts[j]]
                 }
+            }
+            if (valueTexts.length > 6) {
+                let tmp_len = valueTexts.length
+                for (let i = 0; i < tmp_len - 6; i++) {
+                    valueTexts.pop()
+                }
+                valueTexts.push('......')
             }
             if (variable.dataset == 'paper') {
                 // svg_parallel.append('g').selectAll('text').data(valueTexts).enter()
@@ -320,27 +336,29 @@ let parallel = (function () {
                     return 0.1 * svg_width + vi * 50
                 })
                 .attr('y', (d, vi) => {
-                    return top_sapce + attrAxisHeight + 0.1 * svg_height + (i) * form_height / oriName_arr.length - rect_width - 5
+                    return top_sapce + attrAxisHeight + 0.03 * svg_height + (i) * form_height / oriName_arr.length
                 })
                 .attr('width', rect_width)
                 .attr('height', rect_width)
                 .style('fill', (d, vi) => {
+
                     if (variable.dataset == 'patent' && i == 3) {
                         let compute = d3.interpolateRgb('#ffffff', '#ffff00'),
                             valueScale = d3.scaleLinear().domain([0, rect_arr[i].length]).range([0, 1])
-                        return compute(valueScale(vi))
+                        return compute(valueScale((vi + 1) * rect_arr[i].length / 2 / valueTexts.length))
                     } else if (variable.dataset == 'patent' && i == 4) {
                         let compute = d3.interpolateRgb('#ffffff', '#0000ff'),
                             valueScale = d3.scaleLinear().domain([0, rect_arr[i].length]).range([0, 1])
-                        return compute(valueScale(vi))
+                        return compute(valueScale((vi + 1) * rect_arr[i].length / 2 / valueTexts.length))
                     } else {
                         return variable.valueColor_dict[variable.dataset][(i + 1).toString()][vi]
                     }
                 })
-                .attr('id', d => 'rectForm_' + labels[i] + '_' + d.attrValue) //id : rect_属性_属性值
+                .attr('id', d => 'rectForm_' + labels[i] + '_' + d) //id : rect_属性_属性值
                 .on('click', d => {
                     console.log(d.attrValue)
                 })
+            console.log("drawParallel -> valueTexts", valueTexts)
 
 
             svg_parallel.append('g').selectAll('text').data(valueTexts).enter()
@@ -348,14 +366,19 @@ let parallel = (function () {
                 .attr('x', (d, vi) => {
                     return 0.1 * svg_width + vi * 50 + rect_width + 5
                 }).attr('y', (d, vi) => {
-                    return top_sapce + attrAxisHeight + 0.1 * svg_height + (i) * form_height / oriName_arr.length - 5
+                    return top_sapce + attrAxisHeight + 0.03 * svg_height + (i) * form_height / oriName_arr.length + rect_width
                 })
                 .style('font-size', 10)
                 .style('color', 'black')
                 .style('stroke-width', .5)
                 .style('stroke', 'black')
                 .style('fill', 'black')
-                .text(d => d)
+                .text(d => {
+                    if (d == 'America')
+                        return 'US'
+                    else
+                        return d
+                })
 
         }
     }
