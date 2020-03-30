@@ -1,5 +1,5 @@
 let variable = (function () {
-            let dataset = 'paper';
+            let dataset = 'weibo';
             let comb_data; //当前游走类型的数据
             let link_data; //引用连线数据
             let node_data; //力引导点的数据
@@ -27,9 +27,9 @@ let variable = (function () {
                 },
                 'weibo': {
                     '1': 'city',
-                    '2': 'gender',
+                    '2': 'sex',
                     '3': 'vip',
-                    '4': 'profession'
+                    '4': 'prof'
                 }
             }
             let attr_arr_dict = {
@@ -55,7 +55,7 @@ let variable = (function () {
                 'weibo': {
                     '1': ['#f7fcfd', '#e5f5f9', '#ccece6', '#99d8c9', '#66c2a4', '#41ae76', '#238b45', '#006d2c', '#00441b'],
                     '2': ['#9ebcda', '#8c96c6'],
-                    '3': ['#ffffe5', '#fff7bc', '#fee391', '#fec44f', '#fe9929', '#ec7014', '#cc4c02', '#993404', '#662506'],
+                    '3': ['#fee391', '#ec7014'],
                     '4': ['#ffffd4', '#fee391', '#fec44f', '#fe9929', '#ec7014', '#cc4c02', '#8c2d04'],
                     '5': ['#f2f0f7', '#dadaeb', '#bcbddc', '#9e9ac8', '#807dba', '#6a51a3', '#4a1486']
                 }};

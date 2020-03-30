@@ -370,6 +370,7 @@ let forceChart = (function () {
         forceChart.cluster_nodes = cluster_nodes;
 
         //设置力的作用
+
         let simulation = d3.forceSimulation(cluster_nodes)
             .force("charge", d3.forceManyBody().strength(-3500).distanceMax(200))
             .force("link", d3.forceLink(cluster_links).id(d => d.id))

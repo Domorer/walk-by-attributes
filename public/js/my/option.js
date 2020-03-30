@@ -326,25 +326,21 @@ let option = (function () {
     }
 
     function resetByDataset() {
+        variable.param = {
+            wt: 10,
+            sl: 20,
+            rl: false,
+            comb: '0'
+        };
         if (variable.dataset == 'paper') {
-            variable.param = {
-                wt: 10,
-                sl: 20,
-                rl: false,
-                comb: '0'
-            };
             variable.attr = '123'
             variable.type_count = 3
-        } else {
-
-            variable.param = {
-                wt: 10,
-                sl: 20,
-                rl: false,
-                comb: '0'
-            };
+        } else if (variable.dataset == 'patent') {
             variable.attr = '12345'
             variable.type_count = 5
+        } else {
+            variable.attr = '1234'
+            variable.type_count = 4
         }
         getCombData(variable.param, variable.dataset).then(function (data) {
             d3.csv(`data/${variable.dataset}/weighted_link.csv`, function (error, data_link) {

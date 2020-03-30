@@ -273,7 +273,7 @@ let parallel = (function () {
 
             //添加具体的属性值标签， 竖向的、
             let valueTexts = clusterFun.deepCopy(variable.attrValue_dict[labels[i]])
-            if (i == 1) {
+            if (i == 1 && variable.dataset != 'weibo') {
                 for (let j = 0; j < valueTexts.length; j++) {
                     valueTexts[j] = variable.yearPhase_dict[variable.dataset][valueTexts[j]]
                 }
