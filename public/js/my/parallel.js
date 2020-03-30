@@ -208,7 +208,7 @@ let parallel = (function () {
                 if (variable.dataset == 'patent')
                     return 0.2
                 else
-                    return 1
+                    return .5
             })
             .style('fill', 'none')
             .style('opacity', .05)

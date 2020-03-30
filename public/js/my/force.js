@@ -474,7 +474,6 @@ let forceChart = (function () {
                     .style('opacity', function () {
                         return 0
                     })
-                    .style('stroke-width', 1)
                     .style('stroke', '#e3e3e3')
                 d3.select('#area_' + variable.last_cluster).attr('fill', '#D5E2FF');
                 d3.select('#clusterOut_' + variable.last_cluster)
@@ -482,7 +481,6 @@ let forceChart = (function () {
 
                 d3.selectAll('.parallelClass_' + d.id)
                     .style('opacity', 1)
-                    .style('stroke-width', 2)
                     .style('stroke', '#8a8a8a')
                 d3.select('#area_' + d.id).attr('fill', '#E83A00');
                 d3.select('#clusterOut_' + d.id)
