@@ -132,57 +132,7 @@ let option = (function () {
     $('#em').on('click', function (d) {
         console.log("generateRandomFaultage -> tree_view.tree_nodes_dict[tmp_cluster]", tree_view.tree_nodes_dict)
 
-        tree_view.modifyCount += 1
-        let faultages = [],
-            visCluster_arr = []
-        //获取当前树的所有可视节点id, 从level_dict 从后往前遍历
-        let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
-        for (let i = max_level; i > variable.level; i--) {
-            for (let j = 0; j < variable.comb_data['level_dict'][i].length; j++)
-                visCluster_arr.push(variable.comb_data['level_dict'][i][j])
-        }
-        for (let i = 0; i < 100; i++) {
-            let tmp_visCluster_arr = visCluster_arr.slice(0)
-            faultages.push(tree_view.generateRandomFaultage(tmp_visCluster_arr))
-        }
-        console.log("option -> faultages", faultages)
-        let emFaultage = [],
-            minEnergy = Infinity
-        for (let i = 0; i < faultages.length; i++) {
-            let tmp_dict = riverView.Cal(variable.comb_data, faultages[i]),
-                tmpEnergy = tmp_dict.ah + tmp_dict.sc + tmp_dict.ts
-            if (minEnergy > tmpEnergy) {
-                minEnergy = tmpEnergy
-                emFaultage = faultages[i]
-            }
-        }
-        /*层次树节点的颜色
-            1.恢复之前已经选中的节点的颜色为默认颜色    
-            2.修改最有切层节点的颜色为选中颜色
-        */
-        let colorSelected = '#ff4416',
-            colorOri = '#329CCB'
-        for (let j = 0; j < variable.cluster_arr.length; j++) {
-            d3.select('#tree_' + variable.cluster_arr[j])
-                .attr('fill', colorOri)
-        }
-        //更新当前的cluster_arr
-        variable.cluster_arr = emFaultage
-        for (let j = 0; j < variable.cluster_arr.length; j++) {
-            d3.select('#tree_' + variable.cluster_arr[j])
-                .transition()
-                .duration(1000)
-                .attr('fill', colorSelected)
-        }
-        let top_nodeId = variable.comb_data['level_dict'][max_level][0],
-            topNode = tree_view.tree_nodes_dict[top_nodeId]
-        let tmp_node = {
-            'name': topNode.data.name,
-            'x': topNode.x + 10,
-            'y': topNode.y + tree_view.transformHeight
-        };
-        riverView.modifyRiver(variable.comb_data, emFaultage, false, tmp_node, false)
-        console.log("option -> emFaultage", emFaultage)
+        bestFaultage();
     })
 
     //用户自定义的类数组确定按钮
@@ -416,9 +366,8 @@ let option = (function () {
                     forceChart.Clustering(variable.cluster_ids_dict, variable.clusterLink_weight_dict, variable.cluster_dict);
                     //树图
                     tree_view.draw_tree(data[0], variable.level);
+                    // bestFaultage();
                     //平行坐标轴
-
-
                     parallel.drawParallel();
 
 
@@ -450,7 +399,8 @@ let option = (function () {
                             // $(`#colorPicker_${i+1}_${j}`).addClass(`{onFineChange:'setCircleColor(this)'}`)
                             let jsc_tmp = new jscolor(`colorPicker_${tmp_attr}_${tmpAttrValue}`, 'option.setCircleColor(this)')
                             $(`#colorPicker_${tmp_attr}_${tmpAttrValue}`).css({
-                                'background-color': 'blue'
+                                'background-color': variable.origin_color,
+                                'border': 0
                             })
                         }
                     }
@@ -495,7 +445,59 @@ let option = (function () {
         });
     }
 
-
+    let bestFaultage = function () {
+        tree_view.modifyCount += 1
+        let faultages = [],
+            visCluster_arr = []
+        //获取当前树的所有可视节点id, 从level_dict 从后往前遍历
+        let max_level = d3.max(Object.keys(variable.comb_data['level_dict']), d => parseInt(d))
+        for (let i = max_level; i > variable.level; i--) {
+            for (let j = 0; j < variable.comb_data['level_dict'][i].length; j++)
+                visCluster_arr.push(variable.comb_data['level_dict'][i][j])
+        }
+        for (let i = 0; i < 100; i++) {
+            let tmp_visCluster_arr = visCluster_arr.slice(0)
+            faultages.push(tree_view.generateRandomFaultage(tmp_visCluster_arr))
+        }
+        console.log("option -> faultages", faultages)
+        let emFaultage = [],
+            minEnergy = Infinity
+        for (let i = 0; i < faultages.length; i++) {
+            let tmp_dict = riverView.Cal(variable.comb_data, faultages[i]),
+                tmpEnergy = tmp_dict.ah + tmp_dict.sc + tmp_dict.ts
+            if (minEnergy > tmpEnergy) {
+                minEnergy = tmpEnergy
+                emFaultage = faultages[i]
+            }
+        }
+        /*层次树节点的颜色
+            1.恢复之前已经选中的节点的颜色为默认颜色    
+            2.修改最有切层节点的颜色为选中颜色
+        */
+        let colorSelected = '#ff4416',
+            colorOri = '#329CCB'
+        for (let j = 0; j < variable.cluster_arr.length; j++) {
+            d3.select('#tree_' + variable.cluster_arr[j])
+                .attr('fill', colorOri)
+        }
+        //更新当前的cluster_arr
+        variable.cluster_arr = emFaultage
+        for (let j = 0; j < variable.cluster_arr.length; j++) {
+            d3.select('#tree_' + variable.cluster_arr[j])
+                .transition()
+                .duration(1000)
+                .attr('fill', colorSelected)
+        }
+        let top_nodeId = variable.comb_data['level_dict'][max_level][0],
+            topNode = tree_view.tree_nodes_dict[top_nodeId]
+        let tmp_node = {
+            'name': topNode.data.name,
+            'x': topNode.x + 10,
+            'y': topNode.y + tree_view.transformHeight
+        };
+        riverView.modifyRiver(variable.comb_data, emFaultage, false, tmp_node, false, false)
+        console.log("option -> emFaultage", emFaultage)
+    }
 
 
     return {

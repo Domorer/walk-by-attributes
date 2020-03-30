@@ -180,11 +180,11 @@ let forceChart = (function () {
             .style('stroke', function (d) {
                 // let tmp_index = variable.attrValue_dict[variable.attr].indexOf(d[parseInt(variable.attr)])
                 // return variable.valueColor_dict[variable.dataset][variable.attr][tmp_index]
-                return 'blue'
+                return variable.origin_color
             }).style('fill', function (d) {
                 // let tmp_index = variable.attrValue_dict[variable.attr].indexOf(d[parseInt(variable.attr)])
                 // return variable.valueColor_dict[variable.dataset][variable.attr][tmp_index]
-                return 'blue'
+                return variable.origin_color
             }).attr('id', function (d) {
                 return `oriForce_${d.id}`;
             }).attr('class', d => {

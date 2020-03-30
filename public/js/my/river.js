@@ -103,7 +103,7 @@ let riverView = (function () {
         return value_dict
     }
 
-    function modifyRiver(data, cluster_arr, separate, node, treeClick) {
+    function modifyRiver(data, cluster_arr, separate, node, treeClick, initial) {
         let colorSelected = {
                 fill: '#ff957c',
                 stroke: '#ff4416'
@@ -120,10 +120,12 @@ let riverView = (function () {
          */
 
         riverView.clusterArr_record.push(cluster_arr);
-        if (!separate && treeClick)
+        if (!separate && treeClick && !initial)
             riverView.value_arr.push(Cal(data, cluster_arr, d3.symbolCross, node))
-        else if (separate && treeClick)
+        else if (separate && treeClick && !initial)
             riverView.value_arr.push(Cal(data, cluster_arr, d3.symbolDiamond, node))
+        else if (initial)
+            riverView.value_arr.push(Cal(data, cluster_arr, d3.symbolCircle, node))
         else
             riverView.value_arr.push(Cal(data, cluster_arr, d3.symbolStar, node))
 
@@ -150,7 +152,7 @@ let riverView = (function () {
 
         let valueScale = d3.scaleLinear()
             .domain([0, maxValue])
-            .range([0, 0.10 * svg_height])
+            .range([0, 0.08 * svg_height])
         //占比高度比例尺
         let areaInitial = d3.area()
             .x(d => d.x)
@@ -320,7 +322,6 @@ let riverView = (function () {
     }
 
     function drawRiver(data, cluster_arr) {
-
         let svg_width = $("#svg_tree")[0].scrollWidth;
         let svg_height = $("#svg_tree")[0].scrollHeight;
         let riverHeight = 0.25 * svg_height

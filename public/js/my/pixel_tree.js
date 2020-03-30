@@ -165,21 +165,27 @@ let tree_view = (function () {
                     x: d.x + 10,
                     y: d.y + tree_view.transformHeight
                 };
-                riverView.modifyRiver(data, variable.cluster_arr, separate, tmp_info, true)
+                riverView.modifyRiver(data, variable.cluster_arr, separate, tmp_info, true, false)
             })
-
-        //*******初始化河流图************
-        riverView.drawRiver(data, level_dict[variable.level])
-        //绘制断层线
+        //生成层次聚类树图的id-loc字典
         let nodeLoc_dict = {}
         for (let i = 0; i < nodes.length; i++) {
             nodeLoc_dict[nodes[i].data.name] = [nodes[i].x, nodes[i].y];
         }
+        //*******初始化河流图************
+        riverView.drawRiver(data, level_dict[variable.level])
+        let top_info = {
+            name: top_node,
+            x: nodeLoc_dict[top_node][0] + 10,
+            y: nodeLoc_dict[top_node][1] + tree_view.transformHeight
+        }
+        
+
+        //绘制断层线
         let level_line = [];
         console.log('level_dict: ', level_dict);
         console.log(variable.level);
         for (let i = 0; i < level_dict[variable.level].length; i++) {
-
             level_line.push(nodeLoc_dict[level_dict[variable.level][i]]);
         }
         level_line.sort((a, b) => a[0] - b[0])
@@ -308,6 +314,11 @@ let tree_view = (function () {
             .style('stroke-width', 2)
             .style('stroke-opacity', .5)
             .attr('transform', `translate(10,${tree_view.transformHeight})`)
+        
+
+        //初始化河流图
+        tree_view.modifyCount += 1
+        riverView.modifyRiver(data, variable.cluster_arr, true, top_info, false, true)
     }
 
 
