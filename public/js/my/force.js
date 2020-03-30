@@ -2,8 +2,9 @@ let forceChart = (function () {
     let forceWidth = $('#svg_force')[0].scrollWidth;
     let forceHeight = $('#svg_force')[0].scrollHeight;
     let cluster_nodes, bundling_edge;
-    variable.viewbox.right = forceWidth,
-        variable.viewbox.bottom = forceHeight;
+    variable.viewbox.right = forceWidth;
+    variable.viewbox.bottom = forceHeight;
+    let max_value = -Infinity;
     //设置边绑定按钮
     $('#edge_bundling').on('click', () => {
         forceChart.edgeBundling(forceChart.cluster_nodes, forceChart.bundling_edge, variable.clusterLink_weight_dict)
@@ -642,6 +643,8 @@ let forceChart = (function () {
             }
             for (let key in value_dict) {
                 // console.log(key)
+                if (forceChart.max_value < value_dict[key])
+                    forceChart.max_value = value_dict[key]
                 attrs_value.push(value_dict[key]);
             }
         } else {
@@ -655,7 +658,7 @@ let forceChart = (function () {
                 else
                     attrs_value.push(1 / tmpEntropy)
             }
-           
+
         }
 
         let rScale = d3.scaleLinear()
@@ -888,6 +891,7 @@ let forceChart = (function () {
         bundling_edge,
         edgeBundling,
         drawOriForce,
-        calEntropy
+        calEntropy,
+        max_value
     }
 }())
