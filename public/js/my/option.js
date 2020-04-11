@@ -64,7 +64,7 @@ let option = (function () {
         $(`#nav_a_1`).addClass('active')
         $(`#nav-1`).addClass(['show', 'active'])
 
-        // forceChart.drawOriForce(oriNodes, variable.oriLinks, variable.cluster_dict);
+        forceChart.drawOriForce(oriNodes, variable.oriLinks, variable.cluster_dict);
 
     });
     $('#inner').on('click', function () {
