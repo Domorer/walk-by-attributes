@@ -686,6 +686,7 @@ let forceChart = (function () {
             .append('path')
             .attr('d', d => arc(d))
             .attr('fill', function (d, i) {
+                console.log(variable.type_count)
                 if (variable.type_count == 1) {
                     //属性值过多
                     if (variable.dataset == 'patent' && variable.attr == '4') {
@@ -704,8 +705,8 @@ let forceChart = (function () {
                         return variable.valueColor_dict[variable.dataset][(parseInt(variable.attr)).toString()][i]
                     }
                 } else {
-                    //多属性
-                    tmp_color_arr[d.yIndex]
+                   
+                    return tmp_color_arr[i]
                 }
             })
             .attr('stroke', function (d, i) {

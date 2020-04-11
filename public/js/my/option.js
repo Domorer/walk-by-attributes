@@ -19,12 +19,17 @@ let option = (function () {
     for (let j = 0; j < variable.attr_arr_dict[variable.dataset].length; j++) {
         let tmp_attrName = variable.oriAttrName_dict[variable.dataset][j + 1]
 
-        //添加颜色选择器属性列表
+        //添加颜色选择器属性列表div
         let colorAttrHtml = `<a id='nav_a_${j+1}' class="nav-item nav-link nav_a disabled" id="nav-home-tab" data-toggle="tab"
         href="#nav-${j+1}" role="tab">${tmp_attrName}</a>`
         $('#nav-tab').append(colorAttrHtml)
         //添加颜色选择器属性值
-        let colorAttrValueHtml = `<div class="tab-pane fade" id="nav-${j+1}" role="tabpanel" aria-labelledby="nav-profile-tab"></div>`
+        let show = 'null',
+            colorAttrValueHtml
+        if (j == 0)
+            show = 'show active'
+        colorAttrValueHtml = `<div class="tab-pane fade ${show}" id="nav-${j+1}" role="tabpanel" aria-labelledby="nav-profile-tab"></div>`
+
         $('#nav-tabContent').append(colorAttrValueHtml)
         //添加属性参数checkbox列表
         let checked = null
@@ -59,7 +64,7 @@ let option = (function () {
         $(`#nav_a_1`).addClass('active')
         $(`#nav-1`).addClass(['show', 'active'])
 
-        forceChart.drawOriForce(oriNodes, variable.oriLinks, variable.cluster_dict);
+        // forceChart.drawOriForce(oriNodes, variable.oriLinks, variable.cluster_dict);
 
     });
     $('#inner').on('click', function () {
@@ -459,7 +464,7 @@ let option = (function () {
                     根据数据集读取属性个数和属性值数量来初始化属性值的颜色选择器
                     如果属性值过多则忽略
                     */
-            
+
                     for (let i = 0; i < variable.attr_arr_dict[variable.dataset].length; i++) {
                         let tmp_attr = variable.attr_arr_dict[variable.dataset][i]
                         for (let j = 0; j < variable.attrValue_dict[tmp_attr].length; j++) {
@@ -478,7 +483,7 @@ let option = (function () {
                             let jsc_tmp = new jscolor(`colorPicker_${tmp_attr}_${tmpAttrValue}`, 'option.setCircleColor(this)')
                             $(`#colorPicker_${tmp_attr}_${tmpAttrValue}`).css({
                                 'background-color': variable.origin_color,
-                                'border':0
+                                'border': 0
                             })
                         }
                     }

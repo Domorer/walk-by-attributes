@@ -318,7 +318,7 @@ let tree_view = (function () {
                     }
                 }else{
                     //多属性
-                    tmp_color_arr[d.yIndex]
+                    return tmp_color_arr[d.yIndex]
                 }
 
             })
