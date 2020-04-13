@@ -626,7 +626,8 @@ let forceChart = (function () {
             tmp_color_arr,
             tmp_attr_arr,
             tmp_max = -Infinity
-        if (variable.type_count == 1 && variable.attr != '0') {
+        console.log(variable.attr)
+        if (variable.type_count == 1 && variable.param.comb != '0') {
             tmp_color_arr = variable.valueColor_dict[variable.dataset][variable.attr]
             //单属性时，variable.attr 就是属性名称，不是多个属性名称的集合
             let value_dict = {};
@@ -638,6 +639,27 @@ let forceChart = (function () {
 
             for (let i = 0; i < tmp_ids.length; i++) {
                 let tmp_value = variable.nodeInfo[tmp_ids[i]][variable.attr];
+                value_dict[tmp_value] += 1;
+            }
+            for (let key in value_dict) {
+                // console.log(key)
+                if (forceChart.max_value < value_dict[key])
+                    forceChart.max_value = value_dict[key]
+                attrs_value.push(value_dict[key]);
+            }
+        } else if (variable.param.comb == '0') {
+            console.log(variable.dw_attr)
+            tmp_color_arr = variable.valueColor_dict[variable.dataset][variable.dw_attr]
+            //单属性时，variable.attr 就是属性名称，不是多个属性名称的集合
+            let value_dict = {};
+            for (let i = 0; i < variable.attrValue_dict[variable.dw_attr].length; i++) {
+                value_dict[variable.attrValue_dict[variable.dw_attr][i]] = 0
+            }
+            //遍历当前类内的点，并统计各个属性值都包含几个点
+            let tmp_ids = variable.cluster_ids_dict[cluster];
+
+            for (let i = 0; i < tmp_ids.length; i++) {
+                let tmp_value = variable.nodeInfo[tmp_ids[i]][variable.dw_attr];
                 value_dict[tmp_value] += 1;
             }
             for (let key in value_dict) {
@@ -667,6 +689,7 @@ let forceChart = (function () {
 
 
         let pie_data = d3.pie()(attrs_value)
+        console.log("drawPie -> attrs_value", attrs_value)
         for (let i = 0; i < pie_data.length; i++) {
             pie_data[i].startAngle = i * Math.PI * 2 / pie_data.length;
             pie_data[i].endAngle = (i + .9) * Math.PI * 2 / pie_data.length;
@@ -702,10 +725,10 @@ let forceChart = (function () {
                             valueScale = d3.scaleLinear().domain([0, pie_data.length]).range([0, 1])
                         return compute(valueScale(i))
                     } else {
-                        return variable.valueColor_dict[variable.dataset][(parseInt(variable.attr)).toString()][i]
+                        return variable.valueColor_dict[variable.dataset][(parseInt(variable.dw_attr)).toString()][i]
                     }
                 } else {
-                   
+
                     return tmp_color_arr[i]
                 }
             })

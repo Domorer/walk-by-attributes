@@ -314,7 +314,8 @@ let option = (function () {
         //***********获取当前各参数的选择情况***********
         comb_len = 0; //记录当前选择的属性数量，用于后面key的格式定义
         variable.type_count = 0;
-        variable.attr = '';
+        variable.attr = ''
+        variable.dw_attr = ''
         tree_view.modifyCount = 1
         let all_attr = ''
         //循环判断每个checkbox的状态来获取当前的属性选择,如果一个也没选择就代表随机游走
@@ -330,8 +331,18 @@ let option = (function () {
                     variable.attr = $('#' + Element)[0].id;
                 }
             }
+            let dw_checked = $(`#dw_${Element}`)[0].checked;
+            if(dw_checked){
+                variable.dw_attr += $('#' + Element)[0].id
+            }
         })
 
+        if(variable.type_count != 0){
+            $('#dw_control').css('display','none')
+        }
+        else{
+            $('#dw_control').css('display', 'block')
+        }
 
         variable.param['rl'] = false;
         if (variable.attr == '') {
@@ -362,8 +373,9 @@ let option = (function () {
                 rl: false,
                 comb: '0'
             };
-            variable.attr = '123'
-            variable.type_count = 3
+            variable.attr = '1'
+            variable.type_count = 1
+            variable.dw_attr = '1'
         } else {
             variable.param = {
                 wt: 10,
