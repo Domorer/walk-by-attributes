@@ -39,8 +39,15 @@
 div#dw_control {
     position: absolute;
     top: 3rem;
-    right: .5rem;
+    right: 0;
     margin: 0;
+    padding:5px;
+    
+    border:1px solid #ecebeb;
+    border-bottom-left-radius: .25rem;
+    border-top-left-radius: .25rem;
+
+    border-right: 0;
 }
 
 #force_button_out button {

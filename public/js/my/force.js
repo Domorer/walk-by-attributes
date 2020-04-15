@@ -2,6 +2,7 @@ let forceChart = (function () {
     let forceWidth = $('#svg_force')[0].scrollWidth;
     let forceHeight = $('#svg_force')[0].scrollHeight;
     let cluster_nodes, bundling_edge;
+    let pie_radius = 30;
     variable.viewbox.right = forceWidth;
     variable.viewbox.bottom = forceHeight;
     let max_value = -Infinity;
@@ -418,24 +419,31 @@ let forceChart = (function () {
             .attr('id', function (d) {
                 return d.source + '_' + d.target;
             })
-        //最外层大圆环
 
-        let nodeOut = variable.svg_force.append('g').attr('class', 'node')
-            .selectAll('circle')
-            .data(cluster_nodes)
-            .enter()
-            .append('circle')
-            .attr('r', function (d) {
-                return rScale(d.value) * 2.5;
-            })
-            .style('fill', 'white')
-            .style('fill-opacity', 0)
-            .style('stroke', 'red')
-            .style('stroke-opacity', 0)
-            .style('stroke-width', 2)
-            .attr('class', function (d) {
-                return 'clusterOut_node';
-            }).attr('id', d => 'clusterOut_' + d.id)
+        // //最外层大圆环
+
+        // let nodeOut = variable.svg_force.append('g').attr('class', 'node')
+        //     .selectAll('circle')
+        //     .data(cluster_nodes)
+        //     .enter()
+        //     .append('circle')
+        //     .attr('r', function (d) {
+        //         return rScale(d.value) + forceChart.pie_radius;
+        //     })
+        //     .style('fill', 'white')
+        //     .style('fill-opacity', 0)
+        //     .style('stroke', 'red')
+        //     .style('stroke-opacity', 0)
+        //     .style('stroke-width', 2)
+        //     .attr('class', function (d) {
+        //         return 'clusterOut_node';
+        //     }).attr('id', d => 'clusterOut_' + d.id)
+
+        //*****画最外层圆环和扇形
+        let {
+            pieArr,
+            nodeOut
+        } = drawPie(cluster_nodes, rScale);
 
         //背景白圆
 
@@ -453,7 +461,7 @@ let forceChart = (function () {
             .attr('class', function (d) {
                 return 'clusterBack_node';
             }).attr('id', d => 'clusterBack_' + d.id)
-
+    
         //实心点
         let node = variable.svg_force.append('g').attr('class', 'node').selectAll('circle').data(cluster_nodes).enter()
             .append('circle')
@@ -517,31 +525,31 @@ let forceChart = (function () {
 
         //画园内的pattern
         //加权随机
-        function randomW(wArr) {
-            let sum = 0;
-            for (let i = 0; i < wArr.length; i++)
-                sum += wArr[i]
-            let randomNum = Math.random() * sum;
-            let tmp = 0
-            for (let i = 0; i < wArr.length; i++) {
-                tmp += wArr[i]
-                if (tmp >= randomNum)
-                    return i;
-            }
-        }
-        let pattern_g = [],
-            pieArr = [];
-        let wtPattern = [0, 2, 7, 2, 1]
-        for (let i = 0; i < cluster_nodes.length; i++) {
-            let pie_g = drawPie(cluster_nodes[i].id, rScale(cluster_nodes[i].value));
-            // let tmp_g = drawTopo(randomW(wtPattern), rScale(cluster_nodes[i].value));
-            // pattern_g.push({
-            //     node: tmp_g[0],
-            //     link: tmp_g[1],
-            //     value: cluster_nodes[i].value
-            // });
-            pieArr.push(pie_g);
-        }
+        // function randomW(wArr) {
+        //     let sum = 0;
+        //     for (let i = 0; i < wArr.length; i++)
+        //         sum += wArr[i]
+        //     let randomNum = Math.random() * sum;
+        //     let tmp = 0
+        //     for (let i = 0; i < wArr.length; i++) {
+        //         tmp += wArr[i]
+        //         if (tmp >= randomNum)
+        //             return i;
+        //     }
+        // }
+        // let pattern_g = []
+        // let wtPattern = [0, 2, 7, 2, 1];
+
+        // for (let i = 0; i < cluster_nodes.length; i++) {
+        //     let pie_g = drawPie(cluster_nodes[i].id, rScale(cluster_nodes[i].value));
+        // let tmp_g = drawTopo(randomW(wtPattern), rScale(cluster_nodes[i].value));
+        // pattern_g.push({
+        //     node: tmp_g[0],
+        //     link: tmp_g[1],
+        //     value: cluster_nodes[i].value
+        // });
+        //     pieArr.push(pie_g);
+        // }
         //画圆外的属性方差值
         // for()
 
@@ -619,133 +627,209 @@ let forceChart = (function () {
 
 
 
-    //画圆外的扇形,单个园
-    function drawPie(cluster, radius) {
-        //判断是单属性还是多属性
-        let attrs_value = new Array(),
+    //*******计算所有扇形的数据*********
+    function calPieData(clusters) {
+        let value_arr = new Array(), //保存每个聚类外计算过后的扇形数据
             tmp_color_arr,
-            tmp_attr_arr,
-            tmp_max = -Infinity
-        console.log(variable.attr)
-        if (variable.type_count == 1 && variable.param.comb != '0') {
-            tmp_color_arr = variable.valueColor_dict[variable.dataset][variable.attr]
-            //单属性时，variable.attr 就是属性名称，不是多个属性名称的集合
-            let value_dict = {};
-            for (let i = 0; i < variable.attrValue_dict[variable.attr].length; i++) {
-                value_dict[variable.attrValue_dict[variable.attr][i]] = 0
-            }
-            //遍历当前类内的点，并统计各个属性值都包含几个点
-            let tmp_ids = variable.cluster_ids_dict[cluster];
+            tmp_attr_arr
+        console.log(variable.param, variable.attr)
+        for (let c = 0; c < clusters.length; c++) {
+            //判断是单属性还是多属性
+            let attrs_value = new Array(),
+                tmp_max = -Infinity
 
-            for (let i = 0; i < tmp_ids.length; i++) {
-                let tmp_value = variable.nodeInfo[tmp_ids[i]][variable.attr];
-                value_dict[tmp_value] += 1;
-            }
-            for (let key in value_dict) {
-                // console.log(key)
-                if (forceChart.max_value < value_dict[key])
-                    forceChart.max_value = value_dict[key]
-                attrs_value.push(value_dict[key]);
-            }
-        } else if (variable.param.comb == '0') {
-            console.log(variable.dw_attr)
-            tmp_color_arr = variable.valueColor_dict[variable.dataset][variable.dw_attr]
-            //单属性时，variable.attr 就是属性名称，不是多个属性名称的集合
-            let value_dict = {};
-            for (let i = 0; i < variable.attrValue_dict[variable.dw_attr].length; i++) {
-                value_dict[variable.attrValue_dict[variable.dw_attr][i]] = 0
-            }
-            //遍历当前类内的点，并统计各个属性值都包含几个点
-            let tmp_ids = variable.cluster_ids_dict[cluster];
+            if (variable.type_count == 1 && variable.param.comb != '0') {
+                tmp_color_arr = variable.valueColor_dict[variable.dataset][variable.attr]
+                //单属性时，variable.attr 就是属性名称，不是多个属性名称的集合
+                let value_dict = {};
+                for (let i = 0; i < variable.attrValue_dict[variable.attr].length; i++) {
+                    value_dict[variable.attrValue_dict[variable.attr][i]] = 0
+                }
+                //遍历当前类内的点，并统计各个属性值都包含几个点
+                let tmp_ids = variable.cluster_ids_dict[clusters[c].id];
 
-            for (let i = 0; i < tmp_ids.length; i++) {
-                let tmp_value = variable.nodeInfo[tmp_ids[i]][variable.dw_attr];
-                value_dict[tmp_value] += 1;
-            }
-            for (let key in value_dict) {
-                // console.log(key)
-                if (forceChart.max_value < value_dict[key])
-                    forceChart.max_value = value_dict[key]
-                attrs_value.push(value_dict[key]);
-            }
-        } else {
-            //计算每种属性的信息熵
-            tmp_color_arr = variable.attr_color
-            tmp_attr_arr = variable.attr.split('')
-            for (let i = 0; i < variable.type_count; i++) {
-                let tmpEntropy = calEntropy(cluster, tmp_attr_arr[i], variable.cluster_ids_dict)
-                if (tmpEntropy == 0)
-                    attrs_value.push(100000)
-                else
-                    attrs_value.push(1 / tmpEntropy)
-            }
+                for (let i = 0; i < tmp_ids.length; i++) {
+                    let tmp_value = variable.nodeInfo[tmp_ids[i]][variable.attr];
+                    value_dict[tmp_value] += 1;
+                }
+                for (let key in value_dict) {
+                    // console.log(key)
+                    if (forceChart.max_value < value_dict[key])
+                        forceChart.max_value = value_dict[key]
+                    attrs_value.push(value_dict[key]);
+                }
+            } else if (variable.param.comb == '0') {
+                if (variable.dw_count == 1) {
+                    tmp_color_arr = variable.valueColor_dict[variable.dataset][variable.dw_attr]
+                    //单属性时，variable.attr 就是属性名称，不是多个属性名称的集合
+                    let value_dict = {};
+                    for (let i = 0; i < variable.attrValue_dict[variable.dw_attr].length; i++) {
+                        value_dict[variable.attrValue_dict[variable.dw_attr][i]] = 0
+                    }
+                    //遍历当前类内的点，并统计各个属性值都包含几个点
+                    let tmp_ids = variable.cluster_ids_dict[clusters[c].id];
 
-        }
-
-        let rScale = d3.scaleLinear()
-            .domain([0, d3.max(attrs_value)])
-            .range([radius * 1.2, radius * 2.3])
-        let color = d3.scaleOrdinal(d3.schemeCategory20);
-
-
-        let pie_data = d3.pie()(attrs_value)
-        console.log("drawPie -> attrs_value", attrs_value)
-        for (let i = 0; i < pie_data.length; i++) {
-            pie_data[i].startAngle = i * Math.PI * 2 / pie_data.length;
-            pie_data[i].endAngle = (i + .9) * Math.PI * 2 / pie_data.length;
-            pie_data[i].innerRadius = radius;
-            pie_data[i].outerRadius = rScale(pie_data[i].data);
-            pie_data[i].class = 'pie_' + cluster;
-        }
-        // let r_scale = 
-
-
-        let arc = d3.arc()
-            .innerRadius(radius)
-            .outerRadius(d => rScale(d.data))
-            .cornerRadius(d => (d.outerRadius - d.innerRadius) / 5)
-
-        let pie_g = variable.svg_force.append('g').selectAll('path').data(pie_data).enter()
-            .append('path')
-            .attr('d', d => arc(d))
-            .attr('fill', function (d, i) {
-                console.log(variable.type_count)
-                if (variable.type_count == 1) {
-                    //属性值过多
-                    if (variable.dataset == 'patent' && variable.attr == '4') {
-                        let compute = d3.interpolateRgb('#ffffff', '#ffff00'),
-                            valueScale = d3.scaleLinear().domain([0, pie_data.length]).range([0, 1])
-                        return compute(valueScale(i))
-                    } else if (variable.dataset == 'patent' && variable.attr == '5') {
-                        let compute = d3.interpolateRgb('#ffffff', '#0000ff'),
-                            valueScale = d3.scaleLinear().domain([0, pie_data.length]).range([0, 1])
-                        return compute(valueScale(i))
-                    } else if (variable.dataset == 'weibo' && variable.attr == '1') {
-                        let compute = d3.interpolateRgb('#ebffeb', '#14ff14'),
-                            valueScale = d3.scaleLinear().domain([0, pie_data.length]).range([0, 1])
-                        return compute(valueScale(i))
-                    } else {
-                        return variable.valueColor_dict[variable.dataset][(parseInt(variable.dw_attr)).toString()][i]
+                    for (let i = 0; i < tmp_ids.length; i++) {
+                        let tmp_value = variable.nodeInfo[tmp_ids[i]][variable.dw_attr];
+                        value_dict[tmp_value] += 1;
+                    }
+                    for (let key in value_dict) {
+                        // console.log(key)
+                        if (forceChart.max_value < value_dict[key])
+                            forceChart.max_value = value_dict[key]
+                        attrs_value.push(value_dict[key]);
                     }
                 } else {
-
-                    return tmp_color_arr[i]
+                    //计算每种属性的信息熵
+                    tmp_color_arr = variable.attr_color
+                    tmp_attr_arr = variable.dw_attr.split('')
+                    for (let i = 0; i < variable.dw_count; i++) {
+                        let tmpEntropy = calEntropy(clusters[c].id, tmp_attr_arr[i], variable.cluster_ids_dict)
+                        if (tmpEntropy == 0)
+                            attrs_value.push(Infinity)
+                        else
+                            attrs_value.push(1 / tmpEntropy)
+                    }
                 }
-            })
-            .attr('stroke', function (d, i) {
-                if (variable.type_count != 1)
-                    return tmp_color_arr[parseInt(tmp_attr_arr[i]) - 1]
-                return tmp_color_arr[i];
-            })
-            .attr('stroke-width', 0.1)
-            .attr('class', d => d.class)
-            .on('click', function (d, i) {
-                console.log(i)
-            })
-        return pie_g;
+            } else {
+                //计算每种属性的信息熵
+                tmp_color_arr = variable.attr_color
+                tmp_attr_arr = variable.attr.split('')
+                for (let i = 0; i < variable.type_count; i++) {
+                    let tmpEntropy = calEntropy(clusters[c].id, tmp_attr_arr[i], variable.cluster_ids_dict)
+                    if (tmpEntropy == 0)
+                        attrs_value.push(Infinity)
+                    else
+                        attrs_value.push(1 / tmpEntropy)
+                }
+            }
+            value_arr.push(attrs_value);
+        }
+        return {
+            'value_arr': value_arr,
+            'color_arr': tmp_color_arr,
+            'attr_arr': tmp_attr_arr
+        }
     }
 
+    //**********根据计算所得的扇形数据绘制扇形，并返回对应的svg对象*************
+    function drawPie(clusters, rScale_Param) {
+        let pie_g_arr = [];
+        let {
+            value_arr,
+            color_arr,
+            attr_arr
+        } = calPieData(clusters)
+        console.log("drawPie -> color_arr", color_arr)
+        console.log("drawPie -> attr_arr", attr_arr)
 
+        let max_value = d3.max(value_arr, function (d) {
+            return d3.max(d, function (_d) {
+                if (_d != Infinity)
+                    return _d
+            })
+        })
+        
+        for (let c = 0; c < value_arr.length; c++) {
+            for (let j = 0; j < value_arr[c].length; j++) {
+                if (value_arr[c][j] == Infinity)
+                    value_arr[c][j] = max_value
+            }
+        }
+        console.log("drawPie -> max_value", max_value)
+        console.log("drawPie -> value_arr", value_arr)
+
+        let circleOut = variable.svg_force.append('g').attr('class', 'node')
+            .selectAll('circle')
+            .data(clusters)
+            .enter()
+            .append('circle')
+            .style('fill', 'white')
+            .style('fill-opacity', 0)
+            .style('stroke', 'red')
+            .style('stroke-opacity', 0)
+            .style('stroke-width', 2)
+            .attr('class', function (d) {
+                return 'clusterOut_node';
+            }).attr('id', d => 'clusterOut_' + d.id)
+
+
+        for (let c = 0; c < value_arr.length; c++) {
+            let tmp_radius_inner = rScale_Param(clusters[c].value);
+            let rScale = d3.scaleLinear()
+                .domain([0, max_value])
+                .range([tmp_radius_inner, tmp_radius_inner + forceChart.pie_radius])
+
+            let pie_data = d3.pie()(value_arr[c])
+
+            for (let i = 0; i < pie_data.length; i++) {
+                pie_data[i].startAngle = i * Math.PI * 2 / pie_data.length;
+                pie_data[i].endAngle = (i + .9) * Math.PI * 2 / pie_data.length;
+                pie_data[i].innerRadius = tmp_radius_inner;
+                pie_data[i].outerRadius = rScale(pie_data[i].data);
+                pie_data[i].class = 'pie_' + clusters[c].id;
+            }
+            // let r_scale = 
+
+
+            let arc = d3.arc()
+                .innerRadius(tmp_radius_inner)
+                .outerRadius(d => rScale(d.data))
+                .cornerRadius(d => (d.outerRadius - d.innerRadius) / 5)
+
+            let pie_g = variable.svg_force.append('g').selectAll('path').data(pie_data).enter()
+                .append('path')
+                .attr('d', d => arc(d))
+                .attr('fill', function (d, vi) {
+                    if (variable.type_count == 1) {
+                        //属性值过多
+                        if (variable.dataset == 'patent' && variable.attr == '4') {
+                            let compute = d3.interpolateRgb('#ffffff', '#ffff00'),
+                                valueScale = d3.scaleLinear().domain([0, pie_data.length]).range([0, 1])
+                            return compute(valueScale(vi))
+                        } else if (variable.dataset == 'patent' && variable.attr == '5') {
+                            let compute = d3.interpolateRgb('#ffffff', '#0000ff'),
+                                valueScale = d3.scaleLinear().domain([0, pie_data.length]).range([0, 1])
+                            return compute(valueScale(vi))
+                        } else if (variable.dataset == 'weibo' && variable.attr == '1') {
+                            let compute = d3.interpolateRgb('#ebffeb', '#14ff14'),
+                                valueScale = d3.scaleLinear().domain([0, pie_data.length]).range([0, 1])
+                            return compute(valueScale(vi))
+                        } else {
+                            if (variable.param.comb != '0')
+                                return variable.valueColor_dict[variable.dataset][(parseInt(variable.attr)).toString()][vi]
+                            else if (variable.param.comb == '0' && variable.dw_count == 1)
+                                return variable.valueColor_dict[variable.dataset][(parseInt(variable.dw_attr)).toString()][vi]
+                            else if (variable.param.comb == '0' && variable.dw_count != 1) {
+                                return color_arr[vi]
+                            }
+                        }
+                    } else {
+                        return color_arr[vi]
+                    }
+                })
+                // .attr('stroke', function (d, vi) {
+                //     if (variable.type_count != 1)
+                //         return color_arr[parseInt(attr_arr[vi]) - 1]
+                //     return color_arr[vi];
+                // })
+                .attr('stroke-width', 0.1)
+                .attr('class', d => d.class)
+                .on('click', function (d, vi) {
+                    console.log(vi)
+                })
+
+            pie_g_arr.push(pie_g)
+            d3.select(`#clusterOut_${clusters[c].id}`)
+                .attr('r', function (d, vi) {
+                    return rScale(d3.max(value_arr[c])) + 1
+                }).style('z-index', -100)
+        }
+        return {
+            'pieArr': pie_g_arr,
+            'nodeOut': circleOut
+        }
+    }
 
     //计算一个类的给定属性的信息熵
     function calEntropy(cluster, attr, clu_ids_dict) {
@@ -931,6 +1015,7 @@ let forceChart = (function () {
         edgeBundling,
         drawOriForce,
         calEntropy,
-        max_value
+        max_value,
+        pie_radius
     }
 }())

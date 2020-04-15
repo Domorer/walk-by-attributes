@@ -11,7 +11,8 @@ let variable = (function () {
     let w1 = 0.1,
         w2 = 6,
         w3 = 0.1;
-    let dw_attr = '';
+    let dw_attr = '',
+        dw_count = 1;
     let attrValue_dict = {}
     let valueIds_dict = {}; //每个属性值对应点数组的字典
     let oriAttrName_dict = {
@@ -176,6 +177,7 @@ let variable = (function () {
         valueColor_dict,
         dataset,
         origin_color,
-        dw_attr
+        dw_attr,
+        dw_count
     }
 })()

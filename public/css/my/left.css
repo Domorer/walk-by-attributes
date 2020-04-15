@@ -93,12 +93,7 @@ div#attributes {
 
 }
 
-div#dw_control {
-    position:absolute;
-    top: 0;
-    right:.5rem;
-    margin:0;
-}
+
 
 button.confirm {
     position: absolute;

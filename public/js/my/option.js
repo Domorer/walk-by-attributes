@@ -314,6 +314,7 @@ let option = (function () {
         //***********获取当前各参数的选择情况***********
         comb_len = 0; //记录当前选择的属性数量，用于后面key的格式定义
         variable.type_count = 0;
+        variable.dw_count = 0;
         variable.attr = ''
         variable.dw_attr = ''
         tree_view.modifyCount = 1
@@ -333,6 +334,7 @@ let option = (function () {
             }
             let dw_checked = $(`#dw_${Element}`)[0].checked;
             if(dw_checked){
+                variable.dw_count += 1;
                 variable.dw_attr += $('#' + Element)[0].id
             }
         })
