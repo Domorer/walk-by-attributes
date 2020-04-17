@@ -250,20 +250,11 @@ let scatter = (function () {
         }
         //将value为负无穷大的赋值为最大值的两倍
         let best_max = max_val * 1.5 //因为信息熵的为0时最好，但此时倒数为无穷，所以将其设置为已有值的10倍
-        if (variable.dw_count == 1 || variable.type_count == 1) {
-            if (variable.attr == '1' || variable.dw_attr == '1')
-                best_max = 6.85 * 1.5
-            else if (variable.attr == '2' || variable.dw_attr == '2')
-                best_max = 6.62 * 1.5
-            else if (variable.attr == '3' || variable.dw_attr == '3')
-                best_max = 6.62 * 1.5
-        } else if (variable.type_count == 3 || variable.dw_count == 3)
-            best_max = 4.63 * 1.5
-
+        
 
         for (let i = 0; i < points.length; i++) {
             if (points[i].value == -Infinity)
-                points[i].value = 10.3
+                points[i].value = best_max
         }
         console.log("drawHeat -> points", points)
         console.log("drawHeat -> max_val", max_val)

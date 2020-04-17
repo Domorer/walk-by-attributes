@@ -337,7 +337,7 @@ let option = (function () {
         console.log("reset -> variable.type_count", variable.type_count)
 
         //如果属性选择框有选择了属性，则deepwalk属性选择情况需要重置
-        if (variable.type_count != 0) {
+        if (variable.type_count != 0 && variable.dataset == 'paper') {
             variable.attr_arr_dict[variable.dataset].forEach((Element, i) => {
                 if (i == 0)
                     $(`#dw_${Element}`)[0].checked = true
@@ -345,14 +345,15 @@ let option = (function () {
                     $(`#dw_${Element}`)[0].checked = false
             })
         }
-        variable.attr_arr_dict[variable.dataset].forEach(Element => {
-            let dw_checked = $(`#dw_${Element}`)[0].checked;
-            if (dw_checked) {
-                variable.dw_count += 1;
-                console.log("reset -> variable.dw_count", variable.dw_count)
-                variable.dw_attr += $('#' + Element)[0].id
-            }
-        })
+        if (variable.dataset == 'paper')
+            variable.attr_arr_dict[variable.dataset].forEach(Element => {
+                let dw_checked = $(`#dw_${Element}`)[0].checked;
+                if (dw_checked) {
+                    variable.dw_count += 1;
+                    console.log("reset -> variable.dw_count", variable.dw_count)
+                    variable.dw_attr += $('#' + Element)[0].id
+                }
+            })
 
         if (variable.type_count != 0) {
             $('#dw_control').css('display', 'none')

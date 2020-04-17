@@ -2,7 +2,7 @@ let forceChart = (function () {
     let forceWidth = $('#svg_force')[0].scrollWidth;
     let forceHeight = $('#svg_force')[0].scrollHeight;
     let cluster_nodes, bundling_edge;
-    let pie_radius = 30;
+    let pie_radius = 60;
     variable.viewbox.right = forceWidth;
     variable.viewbox.bottom = forceHeight;
     let max_value = -Infinity;
@@ -729,12 +729,12 @@ let forceChart = (function () {
             })
         })
         let extent = [0, max_value]; //单属性计算点的数量时，不需要重新设置最大值，所以需要在下面判断是否为多属性，如果为多属性，则需要修改阈值
-        console.log("drawPie ->  variable.type_count",  variable.type_count)
+        console.log("drawPie ->  variable.type_count", variable.type_count)
         console.log("drawPie -> variable.dw_count", variable.dw_count)
-        if (variable.dw_count == 3 || variable.type_count == 3) {
-            max_value = 7.85
+        //如果当前为多属性选择时，需要将最大值设置为出无穷大之外最大值的两倍，所以与之也要随之修改
+        if (variable.type_count > 1)
             extent = [0, max_value * 2]
-        }
+
         for (let c = 0; c < value_arr.length; c++) {
             for (let j = 0; j < value_arr[c].length; j++) {
                 if (value_arr[c][j] == Infinity)
@@ -810,7 +810,8 @@ let forceChart = (function () {
                             }
                         }
                     } else {
-                        return color_arr[vi]
+
+                        return color_arr[parseInt(attr_arr[vi]) - 1]
                     }
                 })
                 // .attr('stroke', function (d, vi) {

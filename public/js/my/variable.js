@@ -1,5 +1,5 @@
 let variable = (function () {
-    let dataset = 'paper';
+    let dataset = 'patent';
     let comb_data; //当前游走类型的数据
     let link_data; //引用连线数据
     let node_data; //力引导点的数据
