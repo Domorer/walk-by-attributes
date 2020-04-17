@@ -323,6 +323,7 @@ let option = (function () {
         variable.attr_arr_dict[variable.dataset].forEach(Element => {
             all_attr += $('#' + Element)[0].id;
             let tmp_checked = $('#' + Element)[0].checked;
+            console.log("reset -> tmp_checked", tmp_checked)
             if (tmp_checked) {
                 comb_len += 1;
                 variable.type_count += 1;
@@ -332,24 +333,37 @@ let option = (function () {
                     variable.attr = $('#' + Element)[0].id;
                 }
             }
+        })
+        console.log("reset -> variable.type_count", variable.type_count)
+
+        //如果属性选择框有选择了属性，则deepwalk属性选择情况需要重置
+        if (variable.type_count != 0) {
+            variable.attr_arr_dict[variable.dataset].forEach((Element, i) => {
+                if (i == 0)
+                    $(`#dw_${Element}`)[0].checked = true
+                else
+                    $(`#dw_${Element}`)[0].checked = false
+            })
+        }
+        variable.attr_arr_dict[variable.dataset].forEach(Element => {
             let dw_checked = $(`#dw_${Element}`)[0].checked;
-            if(dw_checked){
+            if (dw_checked) {
                 variable.dw_count += 1;
+                console.log("reset -> variable.dw_count", variable.dw_count)
                 variable.dw_attr += $('#' + Element)[0].id
             }
         })
 
-        if(variable.type_count != 0){
-            $('#dw_control').css('display','none')
-        }
-        else{
+        if (variable.type_count != 0) {
+            $('#dw_control').css('display', 'none')
+        } else {
             $('#dw_control').css('display', 'block')
         }
 
         variable.param['rl'] = false;
         if (variable.attr == '') {
             variable.attr = all_attr
-            variable.type_count = all_attr.split('').length
+            // variable.type_count = all_attr.split('').length
             variable.param['comb'] = '0';
         } else {
             variable.param['comb'] = variable.attr;

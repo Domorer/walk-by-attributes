@@ -213,14 +213,14 @@ let tree_view = (function () {
         let line_arr = [],
             xIndex = 0, //在此处记录连线的起点，即树底层节点的坐标
             tmp_color_arr;
-        if (variable.type_count == 1) {
+        if (variable.type_count == 1 && variable.param.comb != '0') {
             tmp_color_arr = variable.valueColor_dict[variable.dataset][variable.attr]
             for (let i = nodes.length - groundFloorClusterNumbers; i < nodes.length; i++) {
                 let tmp_line = [
                     [nodes[i].x, nodes[i].y]
                 ]
                 line_arr.push(tmp_line)
-                let tmp_value_arr = calAttrValueNodes(nodes[i].data['name'])
+                let tmp_value_arr = calAttrValueNodes(nodes[i].data['name'], variable.attr)
                 for (let j = 0; j < variable.attrValue_dict[variable.attr].length; j++) {
                     let tmp_rect = {
                         'x': nodes[i].x,
@@ -237,6 +237,63 @@ let tree_view = (function () {
                     rects.push(tmp_rect)
                 }
                 xIndex += 1
+            }
+        } else if (variable.param.comb == '0') {
+            if (variable.dw_count == 1) {
+                tmp_color_arr = variable.valueColor_dict[variable.dataset][variable.dw_attr]
+                for (let i = nodes.length - groundFloorClusterNumbers; i < nodes.length; i++) {
+                    let tmp_line = [
+                        [nodes[i].x, nodes[i].y]
+                    ]
+                    line_arr.push(tmp_line)
+                    let tmp_value_arr = calAttrValueNodes(nodes[i].data['name'], variable.dw_attr)
+                    for (let j = 0; j < variable.attrValue_dict[variable.dw_attr].length; j++) {
+                        let tmp_rect = {
+                            'x': nodes[i].x,
+                            'y': nodes[i].y + 0.13 * svg_height,
+                            'id': nodes[i].data['name'],
+                            'key': variable.attrValue_dict[variable.dw_attr][j],
+                            'value_arr': tmp_value_arr,
+                            'yIndex': j, //读取对应属性值
+                            'xIndex': xIndex, //保存横向序号
+                            'cIndex': j
+                        }
+                        if (tmp_value_arr[j] > max_Value)
+                            max_Value = tmp_value_arr[j]
+                        rects.push(tmp_rect)
+                    }
+                    xIndex += 1
+                }
+            } else {
+                tmp_color_arr = variable.attr_color
+                for (let i = nodes.length - groundFloorClusterNumbers; i < nodes.length; i++) {
+                    let tmp_line = [
+                        [nodes[i].x, nodes[i].y]
+                    ]
+                    line_arr.push(tmp_line)
+                    let tmp_attr_arr = variable.dw_attr.split(''),
+                        tmp_value_arr = []
+                    for (let j = 0; j < variable.dw_count; j++) {
+                        let tmp_entropy = forceChart.calEntropy(nodes[i].data['name'], tmp_attr_arr[j], variable.cluster_ids_dict)
+                        tmp_value_arr.push(tmp_entropy)
+                        if (tmp_entropy > max_Value)
+                            max_Value = tmp_value_arr[j]
+                    }
+                    for (let j = 0; j < variable.dw_count; j++) {
+                        let tmp_rect = {
+                            'x': nodes[i].x,
+                            'y': nodes[i].y + 0.13 * svg_height,
+                            'id': nodes[i].data['name'],
+                            'key': tmp_attr_arr[j],
+                            'value_arr': tmp_value_arr,
+                            'yIndex': j, //读取对应属性的index
+                            'xIndex': xIndex, //保存横向序号
+                            'cIndex': parseInt(tmp_attr_arr[j] - 1)
+                        }
+                        rects.push(tmp_rect)
+                    }
+                    xIndex += 1
+                }
             }
         } else {
             tmp_color_arr = variable.attr_color
@@ -316,7 +373,7 @@ let tree_view = (function () {
                     } else {
                         return variable.valueColor_dict[variable.dataset][(parseInt(variable.attr)).toString()][d.yIndex]
                     }
-                }else{
+                } else {
                     //多属性
                     return tmp_color_arr[d.yIndex]
                 }
@@ -397,18 +454,18 @@ let tree_view = (function () {
     }
 
 
-    function calAttrValueNodes(cluster) {
+    function calAttrValueNodes(cluster, attr) {
         let attrs_value = new Array()
         //单属性时，variable.attr 就是属性名称，不是多个属性名称的集合
         let value_dict = {};
-        for (let i = 0; i < variable.attrValue_dict[variable.attr].length; i++) {
-            value_dict[variable.attrValue_dict[variable.attr][i]] = 0
+        for (let i = 0; i < variable.attrValue_dict[attr].length; i++) {
+            value_dict[variable.attrValue_dict[attr][i]] = 0
         }
         //遍历当前类内的点，并统计各个属性值都包含几个点
         let tmp_ids = variable.cluster_ids_dict[cluster];
 
         for (let i = 0; i < tmp_ids.length; i++) {
-            let tmp_value = variable.nodeInfo[tmp_ids[i]][variable.attr];
+            let tmp_value = variable.nodeInfo[tmp_ids[i]][attr];
             value_dict[tmp_value] += 1;
         }
         for (let key in value_dict) {

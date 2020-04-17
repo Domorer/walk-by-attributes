@@ -461,7 +461,7 @@ let forceChart = (function () {
             .attr('class', function (d) {
                 return 'clusterBack_node';
             }).attr('id', d => 'clusterBack_' + d.id)
-    
+
         //实心点
         let node = variable.svg_force.append('g').attr('class', 'node').selectAll('circle').data(cluster_nodes).enter()
             .append('circle')
@@ -722,18 +722,23 @@ let forceChart = (function () {
         } = calPieData(clusters)
         console.log("drawPie -> color_arr", color_arr)
         console.log("drawPie -> attr_arr", attr_arr)
-
         let max_value = d3.max(value_arr, function (d) {
             return d3.max(d, function (_d) {
                 if (_d != Infinity)
                     return _d
             })
         })
-        
+        let extent = [0, max_value]; //单属性计算点的数量时，不需要重新设置最大值，所以需要在下面判断是否为多属性，如果为多属性，则需要修改阈值
+        console.log("drawPie ->  variable.type_count",  variable.type_count)
+        console.log("drawPie -> variable.dw_count", variable.dw_count)
+        if (variable.dw_count == 3 || variable.type_count == 3) {
+            max_value = 7.85
+            extent = [0, max_value * 2]
+        }
         for (let c = 0; c < value_arr.length; c++) {
             for (let j = 0; j < value_arr[c].length; j++) {
                 if (value_arr[c][j] == Infinity)
-                    value_arr[c][j] = max_value
+                    value_arr[c][j] = max_value * 2
             }
         }
         console.log("drawPie -> max_value", max_value)
@@ -757,7 +762,7 @@ let forceChart = (function () {
         for (let c = 0; c < value_arr.length; c++) {
             let tmp_radius_inner = rScale_Param(clusters[c].value);
             let rScale = d3.scaleLinear()
-                .domain([0, max_value])
+                .domain(extent)
                 .range([tmp_radius_inner, tmp_radius_inner + forceChart.pie_radius])
 
             let pie_data = d3.pie()(value_arr[c])

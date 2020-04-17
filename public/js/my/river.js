@@ -75,6 +75,9 @@ let riverView = (function () {
             nodeCounts += cluster_ids_dict[clu].length
         let entropy_sum = 0,
             tmp_attr_arr = variable.attr.split('')
+
+        if (variable.param.comb == '0')
+            tmp_attr_arr = variable.dw_attr.split('')
         for (let clu in cluster_ids_dict) {
             //计算一个类各属性的信息熵之和
             for (let i = 0; i < variable.type_count; i++) {
@@ -86,7 +89,12 @@ let riverView = (function () {
         //参数一
         let structure_closeness = variable.w1 * (1 - innerLinks_count / variable.oriLinks.length)
         //参数二
-        let attr_homogeneity = entropy_sum * variable.w2 / variable.type_count
+        let attr_homogeneit
+        if (variable.param.comb == '0')
+            attr_homogeneity = entropy_sum * variable.w2 / variable.dw_count
+        else
+            attr_homogeneity = entropy_sum * variable.w2 / variable.type_count
+
         //参数三
         let tree_structure = variable.w3 * cluster_arr.length
         //最终值

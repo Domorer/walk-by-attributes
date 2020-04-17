@@ -230,14 +230,16 @@ let scatter = (function () {
         }
         // 生成kd tree
         let kd_tree = new kdTree(points, distance, ['x', 'y'])
+        let selected_attrs = variable.attr.split('');
+        if (variable.param.comb == '0')
+            selected_attrs = variable.dw_attr.split('')
 
         for (let i = 0; i < points.length; i++) {
             let tmp_point_set = kd_tree.nearest({
                     x: points[i].x,
                     y: points[i].y
                 }, points.length, point_radius),
-                tmp_value = 0,
-                selected_attrs = variable.attr.split('')
+                tmp_value = 0
             for (let n = 0; n < selected_attrs.length; n++) {
                 tmp_value += 1 / calEntropy(tmp_point_set, selected_attrs[n]);
             }
@@ -248,13 +250,27 @@ let scatter = (function () {
         }
         //将value为负无穷大的赋值为最大值的两倍
         let best_max = max_val * 1.5 //因为信息熵的为0时最好，但此时倒数为无穷，所以将其设置为已有值的10倍
+        if (variable.dw_count == 1 || variable.type_count == 1) {
+            if (variable.attr == '1' || variable.dw_attr == '1')
+                best_max = 6.85 * 1.5
+            else if (variable.attr == '2' || variable.dw_attr == '2')
+                best_max = 6.62 * 1.5
+            else if (variable.attr == '3' || variable.dw_attr == '3')
+                best_max = 6.62 * 1.5
+        } else if (variable.type_count == 3 || variable.dw_count == 3)
+            best_max = 4.63 * 1.5
+
+
         for (let i = 0; i < points.length; i++) {
             if (points[i].value == -Infinity)
-                points[i].value = best_max
+                points[i].value = 10.3
         }
         console.log("drawHeat -> points", points)
         console.log("drawHeat -> max_val", max_val)
-
+        let heat_max = d3.max(points, d => {
+            return d.value
+        })
+        console.log("drawHeat -> heat_max", heat_max)
         let heat_data = {
             data: points
         }
