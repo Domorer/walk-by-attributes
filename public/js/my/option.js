@@ -26,8 +26,8 @@ let option = (function () {
         //添加颜色选择器属性值
         let show = 'null',
             colorAttrValueHtml
-        if (j == 0)
-            show = 'show active'
+        // if (j == 0)
+        //     show = 'show active'
         colorAttrValueHtml = `<div class="tab-pane fade ${show}" id="nav-${j+1}" role="tabpanel" aria-labelledby="nav-profile-tab"></div>`
 
         $('#nav-tabContent').append(colorAttrValueHtml)
