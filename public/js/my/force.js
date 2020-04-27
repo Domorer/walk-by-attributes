@@ -94,7 +94,9 @@ let forceChart = (function () {
 
     }
 
-    function drawOriForce(nodes, links, cluster_dict) {
+    function drawOriForce(orinodes, orilinks, cluster_dict) {
+        let nodes = clusterFun.deepCopy(orinodes),
+            links = clusterFun.deepCopy(orilinks)
         let color = d3.scaleOrdinal(d3.schemeCategory20);
         let forceWidth = $('#svg_force')[0].scrollWidth;
         let forceHeight = $('#svg_force')[0].scrollHeight;

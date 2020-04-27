@@ -408,7 +408,7 @@ let parallel = (function () {
             minCount = Infinity
 
         for (let i = 0; i < ids.length; i++) {
-            for (let attr in variable.nodeInfo[ids[i]]) {
+            for (let attr in tmpValueIds_dict) {
                 let tmpValue = variable.nodeInfo[ids[i]][attr]
                 tmpValueIds_dict[attr][tmpValue] += 1
                 if (tmpValueIds_dict[attr][tmpValue] > maxCount)
